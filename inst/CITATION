@@ -1,0 +1,9 @@
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype = "Manual",
+         title = "{mva.plots}: a repository of function to visualize results from multivariate models",
+         author = c(person("Lucy", "Grigoroff"), person("Julien", "Wist")),
+         year = year,
+         note = note,
+         url = "https://github.com/phenological/mva.plots")
