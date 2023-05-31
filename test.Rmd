@@ -1,0 +1,433 @@
+```{r}
+functionDir <- "./R/"
+functionList <- list.files(path = functionDir)
+for(i in functionList){
+  source(paste0(functionDir,i))
+}
+```
+#load data to test functions
+```{r}
+ann<-local(get(load("~/OneDrive - Murdoch University/datasets/covid19/bioGune/dataElements/covid19_bioGune_PLA_ANN.daE")))
+aaMeta1<-ann@obsDescr[[1]]
+
+aa<-local(get(load(file.path("~/OneDrive - Murdoch University/datasets/covid19/bioGune/dataElements/covid19_bioGune_PLA_SPC.daE"))))
+aaData<-data.frame(apply(aa@.Data,2,as.numeric)) #lipoproteins
+aaMeta2<-aa@obsDescr[[1]] #metadata from covid19_mauritius_PLA_LIPO.daE file
+
+# match Amino Acids and both Annotations
+aaMeta1<-aaMeta1[which(aaMeta1$sampleID %in% aaMeta2$sampleID),]
+aaData<-aaData[which(aaMeta2$sampleID %in% aaMeta1$sampleID),]
+aaMeta2<-aaMeta2[which(aaMeta2$sampleID %in% aaMeta1$sampleID),]
+
+aaMetaF<-merge(aaMeta1,
+                  aaMeta2,
+                  by.x ="sampleID",by.y = "sampleID")
+rm(aaMeta1, aaMeta2, aa, ann)
+
+BIOspcglyc<-cbind(aaData, aaMetaF)
+rm(aaData, aaMetaF)
+
+which(BIOspcglyc[, 1:8]=="Inf")
+which(is.na(BIOspcglyc[, 1:8]))
+which(is.na(BIOspcglyc$age))
+unique(BIOspcglyc$sex)
+
+unique(BIOspcglyc$group)
+BIOspcglyc$covid_status<-ifelse(BIOspcglyc$group =="COVID-pos","covid", ifelse(BIOspcglyc$group=="preCOVID","control", "control"))
+```
+
+#tests pcagrid
+```{r}
+loadPackages(myPackages = c("ggplot2",
+                            "ggpmisc",
+                            "ggplotly",
+                            "plotly",
+                            "prcomp", 
+                            "tidyverse", 
+                            "ggpubr",
+                            "GGally",
+                            "cowplot",
+                            "gridExtra",
+                            "rlist",
+                            "ggrepel"))
+#1) create pcresults object
+a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
+
+#2) create screeCumulativeThresholdObject
+b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
+
+#3) gridplot tests various combinations
+##working
+a1<-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "covid")
+
+a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
+
+a2 <- pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = 5, COtitle = "covid", SZtitle = "Age")
+pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
+
+pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = 1, COtitle = "covid")
+pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = 5, AL = "age", COtitle = "covid")
+pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
+pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = 5, AL = "age", COtitle = "covid")
+pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = "bmi", COtitle = "covid")
+p1 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = "bmi", COtitle = "covid")
+pcaGrid(screeCumulativeThresholdObject = b, CO = "work_activity", SH = NULL, SZ = 5, AL = 1, COtitle = "covid")
+
+
+```
+#tests plotLoadingsGrid
+```{r}
+p2<- plotLoadingGrid(screeCumulativeThresholdObject = b)
+```
+#multiplot (works with grids)
+```{r}
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+a1<-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "covid")
+
+a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
+
+a2 <- pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = 5, COtitle = "covid", SZtitle = "Age")
+multiplot(plotlist = list(p1, p2))
+```
+
+
+#combined scree and cumulative plot
+```{r}
+
+ttt <- function(pcResultsObject, cutoff = 99){
+
+  a <- pcResultsObject
+  #t <- length(which(a$pcSum$`Cumulative Proportion` < cutoff))
+
+#Make cumulative variance plot
+
+# Plotting Charts and adding a secondary axis
+
+ggp <- ggplot(a$pcSum)  + 
+  geom_bar(aes(x=`rowname`, y=`Proportion of Variance`),stat="identity", fill="grey20",colour="black", alpha = 0.4)+
+  geom_line(aes(x=`rowname`, y=`Cumulative Proportion`),stat="identity",color="orange2",size=2, group = 1)+
+  labs(title= "Screeplot and Cumulative Variance",
+       x = "PC",y = "Cumulative Variance (%)")+
+  scale_y_continuous(sec.axis = sec_axis(~.*0.5, name = "Proportion of Variance (%)"))+
+  theme(
+    axis.title.y = element_text(color = "gray30"),
+    axis.title.y.right = element_text(color = "orange3")
+  )
+ggp
+   
+return(cumulativeVariance)
+}
+ttt(pcResultsObject = a)
+```
+
+#legend back up don't touch
+```{r}
+pcagridlegend<-function(screecumulativethresholdobject, x = "PC1", y = "PC2", CO, SH, AL, SZ, COtitle, SHtitle, SZtitle, ALtitle){
+  
+  output <- plotInput(screecumulativethresholdobject, CO, SH, SZ, AL)
+  # Get required data for plotting
+  
+  gu <- if(class(SH) == "character" & class(SZ) == "numeric" & class(AL) == "numeric") {
+    guides(alpha = "none", size = "none")
+  } else if (class(SH) == "NULL" & class(SZ) == "character" & class(AL) == "numeric") {
+    guides(alpha = "none", shape = "none")
+  } else if (class(SH) == "NULL" & class(SZ) == "numeric" & class(AL) == "character") {
+    guides(shape = "none", size = "none")
+  } else if (class(SH) == "character" & class(SZ) == "character" & class(AL) == "numeric") {
+    guides(alpha = "none" )
+  } else if (class(SH) == "character" & class(SZ) == "numeric" & class(AL) == "character") {
+    guides(size = "none")
+  } else if (class(SH) == "NULL" & class(SZ) == "character" & class(AL) == "character") {
+    guides(shape = "none")
+  } else if (class(SH) == "character" & class(SZ) == "character" & class(AL) == "character") {
+    guides()
+  } else if (class(SH) == "NULL" & class(SZ) == "numeric" & class(AL) == "numeric") {
+    guides(shape = "none", size = "none", alpha = "none")
+  }
+  
+  test <- ggplot(data = output$data$pcdf, aes(x = .data[[x]], y = .data[[y]], color = output$CO, shape = output$SH, alpha = output$AL, size = output$SZ)) +
+    geom_point() +
+    gu +
+    # scale_fill_manual(values=c('red','blue','green','red','blue')) +
+    # scale_colour_manual(values=c('red','blue','green','red','blue')) +
+    scale_color_brewer(palette = "Set2") +
+    labs(color = COtitle, shape = SHtitle, size = SZtitle, alpha = ALtitle ) +
+    theme_minimal()
+  return(test)
+}
+
+test <- pcagridlegend(screecumulativethresholdobject = b, x = "PC1", y = "PC2", CO = "covid_status", SH="sex", AL="age", SZ=0.1, COtitle = "COV", SHtitle= "gender", SZtitle=NULL, ALtitle="Age")
+```
+
+#working my_fn1, don't touch 
+```{r}
+  my_fn1 <- function(data, mapping, method="stat_ellipse"){
+    p <- ggplot(data = data, mapping = mapping) +
+    #  geom_point() +
+    # geom_point(aes(color = .data[[colour]], shape = output$SH, size=output$SZ, alpha=output$AL)) +
+    # stat_ellipse(aes(group=interaction(.data[[colour]], color=.data[[colour]]), color=.data[[colour]]))+
+    theme_minimal()+
+    geom_hline(yintercept=0, linetype="dashed", color = "black")+
+    geom_vline(xintercept=0, linetype="dashed", colour= "black")
+  return(p)
+}
+
+pcagrid <-function(screecumulativethresholdobject, CO, SH, SZ, AL){
+
+  output <- plotinput(screecumulativethresholdobject, CO, SH, SZ, AL)
+  thresh <- output$data$treshold
+  #   my_fn1 <- function(data, mapping, method="stat_ellipse"){
+  #   p <- ggplot(data = output$data$pcdf, mapping=mapping) +
+  #     geom_point(aes(color = .data[[colour]], shape = output$SH, size=output$SZ, alpha=output$AL)) +
+  #     stat_ellipse(aes(group=interaction(.data[[colour]], color=.data[[colour]]), color=.data[[colour]]))+
+  #     theme_minimal()+
+  #     geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  #     geom_vline(xintercept=0, linetype="dashed", colour= "black")
+  #   p
+  # }
+
+  title <- list()
+  for (i in 1:thresh) {
+    title[[i]] <- paste0('PC', i, ' (', round(output$data$explained_variance_ratio[i], 1), '%)')
+  }
+  title<-unlist(title)
+
+  pcagridplot<-GGally::ggpairs(data = output$data$pcdf[,1:thresh],
+                               columnLabels = c(title),
+                               diag="blank",
+                               upper="blank",
+                               #upper=list(continuous = my_fn1),
+                               lower=list(continuous = my_fn1),
+                               #legend = grab_legend(test),
+                               progress = F,
+                               switch = "both") +
+    geom_point(aes(colour = output$CO, shape = output$SH, size=output$SZ, alpha=output$AL)) +
+    stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))+
+    theme_bw() +
+    theme(strip.background = element_rect(fill = "white"),
+          axis.text.x = (element_text(size=rel(0.7), angle=0)),
+          axis.text.y = (element_text(size=rel(0.7), angle=0)),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_rect(fill = NA,colour = "grey35"))
+  pcagridplot
+
+}
+```
+#working pcagrid, don't touch 
+```{r}
+pcagrid <-function(pcresultobject, colour, SH, SZ, AL){
+
+  output <- pcresultobject
+  #t <- 4
+  thresh <- 4
+    #as.numeric(output$data$treshold)
+
+  # Get required data for plotting
+
+  #shape
+  SH <- if(class(SH) == "NULL") {
+    SH = SH
+  }else if(class(SH) == "character"){
+    SH = output$pcdf[,SH]
+  }
+  #SH = output$pcdf$SH
+
+  #size
+  SZ <- if(class(SZ) == "numeric") {
+    SZ = SZ
+  }else if (class(SZ) == "character"){
+    SZ = output$pcdf[,SZ]
+  }
+  #SZ = output$pcdf$SZ
+
+  #alpha
+  AL <- if(class(AL) == "numeric") {
+    AL = AL
+  }else if (class(AL) == "character"){
+    AL = output$pcdf[,AL]
+  }
+  #AL = output$pcdf$AL
+
+
+my_fn1 <- function(data, mapping, method="stat_ellipse"){
+  p <- ggplot(data = df, mapping=mapping) + 
+    geom_point(aes(color = .data[[colour]], shape = SH, size=SZ, alpha=AL)) + 
+    stat_ellipse(aes(group=interaction(.data[[colour]], color=.data[[colour]]), color=.data[[colour]]))+
+  theme_minimal()+
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_vline(xintercept=0, linetype="dashed", colour= "black")
+  p
+} 
+
+  # myfun <- ggplot(data = output$pcdf) +
+  # #myfun <- ggplot(data = output$pcdf, mapping = mapping) +
+  #   geom_point(aes(color = .data[[colour]], shape = SH, size = SZ, alpha = AL)) +
+  #   stat_ellipse(aes(group = interaction(.data[[colour]], color = .data[[colour]]), color = .data[[colour]]))+
+  #   theme_minimal()+
+  #   geom_hline(yintercept = 0, linetype = "dashed", color = "black")+
+  #   geom_vline(xintercept = 0, linetype = "dashed", color = "black")
+
+  title <- list()
+  for (i in 1:thresh) {
+    title[[i]] <- paste0('PC', i, ' (', round(output$explained_variance_ratio[i], 1), '%)')
+  }
+  title<-unlist(title)
+
+  pcagridplot<-GGally::ggpairs(output$pcdf[,1:thresh],
+                         columnLabels = c(title),
+                         diag="blank",
+                         upper="blank",
+                         #upper=list(continuous = my_fn1),
+                         lower=list(continuous = my_fn1),
+                         #legend = grab_legend(test),
+                         progress = F,
+                         switch = "both") +
+                         theme_bw() +
+                         theme(strip.background = element_rect(fill = "white"),
+                                axis.text.x = (element_text(size=rel(0.7), angle=0)),
+                                axis.text.y = (element_text(size=rel(0.7), angle=0)),
+                                panel.grid.major = element_blank(),
+                                panel.grid.minor = element_blank(),
+                                panel.border = element_rect(fill = NA,colour = "grey35"))
+  pcagridplot
+
+}
+
+pcagrid(pcresultobject = a, colour="covid_status", SH=NULL, SZ=1, AL=0.4)
+
+
+# explained_variance_ratio(results = a)
+# b<- pcsummary(results = a)
+# t<- threshold(pcsum = b)
+# screecumulativethreshold(pcsum = b, threshold = t)
+# p<-pcdf(results = a, annotation = BIOspcglyc[,-1:-8])
+# 
+# 
+# inputData <- plotinput(data = aaMeta1, SZ = aaMeta1$sex, SH = aaMeta1$age, AL = 0.4)
+# 
+# append(myList, item, after = index)
+```
+#working plotloadingsgrid
+```{r}
+results<-prcomp(BIOspcglyc[,1:8], center = TRUE, scale. = TRUE)
+data<-cbind(as.data.frame(results[["x"]]), BIOspcglyc[,-1:-8])
+summary(results)->for.scree
+for.scree<-rownames_to_column(as.data.frame(t(for.scree$importance)))%>% mutate(across(where(is.double), ~.x*100))
+
+df <- as.data.frame(results$rotation)
+symmetric_limits <- function (x) 
+{
+    max <- max(abs(x))
+    c(-max, max)
+}
+
+#functions to feed into ggpairs
+my_fn2 <- function(data, mapping, ...){
+  p <- ggplot(data = df, mapping = mapping) + 
+    #geom_point() + 
+    #geom_text(label=rownames(df), hjust=0, vjust=0, position=position_dodge(width=0.9))+
+    scale_x_continuous(limits = symmetric_limits) +
+  scale_y_continuous(limits = symmetric_limits) +
+    #stat_ellipse(aes(group=interaction(df$covid_status, color=df$covid_status), color=df$covid_status))+
+  theme_minimal()+
+    theme(text = element_text(size = 3))+
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_vline(xintercept=0, linetype="dashed", colour= "black")
+  p
+}  
+
+##ggpairs plot with ellipses using ggpairs and predefined functions
+t<-4
+  
+p1 <- GGally::ggpairs(df[,1:t],
+columnLabels = c("PC1", "PC2", "PC3", "PC4"),
+              diag="blank",
+              upper="blank",
+              #upper=list(continuous =my_fn1),
+              lower=list(continuous =my_fn2),
+#legend = TRUE, progress = F, switch="both") + 
+#legend = grab_legend(test), 
+progress = F, switch="both") + geom_point(color= "red", size = 0.5)+
+  geom_text(aes(label = rownames(df)), size = 2, colour = "red", hjust=0, vjust=0)+
+ theme_bw() + 
+                  theme(strip.background = element_rect(fill = "white"),axis.text.x=(element_text(size=rel(0.7), angle=0)),
+                  axis.text.y=(element_text(size=rel(0.7), angle=0)), panel.grid.major = element_blank(),
+                  panel.grid.minor = element_blank(), panel.border = element_rect(fill = NA,colour = "grey35"))
+
+p1
+
+#try get rid of blanksquares
+ gpairs_lower <- function(g){
+  g$plots <- g$plots[-(1:g$nrow)]
+  g$yAxisLabels <- g$yAxisLabels[-1]
+  g$nrow <- g$nrow -1
+
+  g$plots <- g$plots[-(seq(g$ncol, length(g$plots), by = g$ncol))]
+  g$xAxisLabels <- g$xAxisLabels[-g$ncol]
+  g$ncol <- g$ncol - 1
+
+  g
+}
+
+(gpairs_lower(p1))
+ 
+```
+#kmeans cluster
+```{r}
+library(FactoMineR)
+library(factoextra)
+library(stats)
+
+#1) create pcresults object
+a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
+
+#2) determine number of clusters
+fviz_nbclust(a$pcdf[,1:2], FUNcluster = kmeans, method="wss", verbose = FALSE, print.summary = TRUE)
+
+#3) calculate clusters
+set.seed(123)
+trial <- kmeans(x = a$pcdf[,1:2], centers = 4, nstart = 1)
+
+#4) visualize clusters
+fviz_cluster(object = trial, data = a$pcdf[,1:2])
+```
+```{r}
+trial <- kmeans(x = a$pcdf[,1:8], centers = 4, nstart = 25)
+fviz_cluster(object = trial, data = a$pcdf[,1:8])
+```
