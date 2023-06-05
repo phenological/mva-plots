@@ -79,46 +79,62 @@ pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0
                                panel.grid.minor = element_blank(),
                                panel.border = element_rect(fill = NA,colour = "grey35"))
 
-  pcaGridPlot2 <- ellipseOptions(thresh = thresh, output = output, pcData = output$data$pcdf, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2)
+  #pcaGridPlot2 <- ellipseOptions(thresh = thresh, output = output, pcData = output$data$pcdf, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2)
 
-  # #ellipse options
-  #   X <- as.matrix(output$data$pcdf[,1:thresh])
+  #ellipse options
+    X <- as.matrix(output$data$pcdf[,1:thresh])
+
+    # Sample size
+    n <- nrow(X)
+
+    hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
+
+    outliers <- list()
+
+    for(i in 1:thresh)
+    {
+      outliers <- append(outliers, list(i = NULL))
+      for(j in 1:thresh)
+      {
+        if(j>i)
+        {
+          temp <- pcaGridPlot[j, i]
+          if(hotelStat == TRUE){
+            #for the plot
+            temp <- temp + gg_circle(rx = sqrt(var(output$data$pcdf[i]) * hotFisN),
+                                     ry = sqrt(var(output$data$pcdf[j]) * hotFisN),
+                                     xc = 0, yc = 0)
+  #for outliers
+  rx <- sqrt(var(output$data$pcdf[i]) * hotFisN)
+  ry <- sqrt(var(output$data$pcdf[j]) * hotFisN)
+
+  list(insideOut = (output$data$pcdf[i]^2)/(rx^2) + (output$data$pcdf[j]^2)/(ry^2))
+  idx <-which(insideOut > 1)
   #
-  #   # Sample size
-  #   n <- nrow(X)
-  #
-  #   hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
-  #
-  #   for(i in 1:thresh)
-  #   {
-  #     for(j in 1:thresh)
-  #     {
-  #       if(j>i)
-  #       {
-  #         temp <- pcaGridPlot[j, i]
-  #         if(hotelStat == TRUE){
-  #           #for the plot
-  #           temp <- temp + gg_circle(rx = sqrt(var(output$data$pcdf[i]) * hotFisN),
-  #                                    ry = sqrt(var(output$data$pcdf[j]) * hotFisN),
-  #                                    xc = 0, yc = 0)
-  #         }
-  #
-  #         if(ellipseStat == TRUE){
-  #           temp <- temp + stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))
-  #         }
-  #
-  #         if(ellipseStat2 == FALSE){
-  #           temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
-  #         }
-  #
-  #         if(ellipseStat2 == TRUE){
-  #           temp <- temp + stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
-  #
-  #         }
-  #
-  #         pcaGridPlot[j, i] <- temp}}}
+  # outliers[i,j] <- output$data$pcdf[idx,-i:-j]
+  # outl <- output$data$pcdf[idx,-i:-j]
+
+  # placeHolder <- paste0("PC", i, "v", j), want placeholder where j is below
+  outliers$i <- append(outliers$i, list(j = idx))
+
+          }
+
+          if(ellipseStat == TRUE){
+            temp <- temp + stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))
+          }
+
+          if(ellipseStat2 == FALSE){
+            temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+          }
+
+          if(ellipseStat2 == TRUE){
+            temp <- temp + stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+
+          }
+
+          pcaGridPlot[j, i] <- temp}}}
 #remove empty grid spaces (lower and diagonal)
 
-  final_plot <- gPairsLower(pcaGridPlot2)
-  return(final_plot)
+  #final_plot <- gPairsLower(pcaGridPlot2)
+  return(outliers)
 }

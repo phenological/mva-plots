@@ -1,5 +1,6 @@
 ellipseOptions <- function(thresh = thresh, output = output, pcData = output$data$pcdf, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2){
 #ellipse options
+
 X <- as.matrix(pcData[,1:thresh])
 
 # Sample size
@@ -7,6 +8,7 @@ n <- nrow(X)
 
 hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
 
+outliers <- list()
 for(i in 1:thresh)
 {
   for(j in 1:thresh)
@@ -19,6 +21,18 @@ for(i in 1:thresh)
         temp <- temp + gg_circle(rx = sqrt(var(output$data$pcdf[i]) * hotFisN),
                                  ry = sqrt(var(output$data$pcdf[j]) * hotFisN),
                                  xc = 0, yc = 0)
+        #for outliers
+        rx <- sqrt(var(output$data$pcdf[i]) * hotFisN)
+        ry <- sqrt(var(output$data$pcdf[j]) * hotFisN)
+
+        list(insideOut = (output$data$pcdf[i]^2)/(rx^2) + (output$data$pcdf[j]^2)/(ry^2))
+        idx <-which(insideOut > 1)
+        #
+        # outliers[i,j] <- output$data$pcdf[idx,-i:-j]
+
+        placeHolder <- paste0("PC", i, "v", j)
+        outliers <- append(placeHolder, output$data$pcdf[idx, -i:-j])
+
       }
 
       if(ellipseStat == TRUE){
@@ -40,8 +54,11 @@ for(i in 1:thresh)
 
       pcaGridPlot[j, i] <- temp}}}
 
-return(pcaGridPlot)
+return(outliers)
+#return(pcaGridPlot)
 }
+
+
 # #list of outliers for hotelling's
 # for(i in 1:thresh)
 # {
@@ -60,7 +77,7 @@ return(pcaGridPlot)
 #
 #       outliers[i,j] <- output$data$pcdf[idx,-i:-j]
 #       }
-#       if(ellipseStat2 == TRUE){
+#       if(ellipseStat2 == "TRUE"){
 #       temp <- blankPlot[j, i]
 #       build <- ggplot_build(temp)$data
 #       points <- build[[1]]
