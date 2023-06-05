@@ -51,7 +51,8 @@ loadPackages(myPackages = c("ggplot2",
                             "rlist",
                             "ggrepel",
                             "ellipse",
-                            "HotellingEllipse"))
+                            "HotellingEllipse",
+                            "sp"))
 #1) create pcresults object
 a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
 
@@ -713,15 +714,49 @@ gg_circle <- function(rx, ry, xc, yc, color = "black", fill = NA, ...) {
  hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
  
 
-   ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
-  geom_point(aes(colour= a$pcdf$covid_status)) +
-     gg_circle(
-      rx = sqrt(var(a$pcdf$PC4) * hotFisN),
-      ry = sqrt(var(a$pcdf$PC5) * hotFisN),
-      xc = 0, yc = 0
-    )
-    
+p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
+  geom_point() +
+  #stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+  #geom_point(aes(colour= a$pcdf$covid_status)) +
+   gg_circle(
+    rx = sqrt(var(a$pcdf$PC4) * hotFisN),
+    ry = sqrt(var(a$pcdf$PC5) * hotFisN),
+    xc = 0, yc = 0
+  )
 
+#outliers
+rx = sqrt(var(a$pcdf$PC4) * hotFisN)
+ry = sqrt(var(a$pcdf$PC5) * hotFisN)
+
+list(insideOut = (a$pcdf$PC4^2)/(rx^2) + (a$pcdf$PC5^2)/(ry^2))
+idx <-which(insideOut > 1)
+BIOspcglyc[idx,]
+
+                       
+# Load packages
+# library(ggplot2)
+# library(sp)
+# 
+# # Build the plot first
+# p <- ggplot(faithful, aes(waiting, eruptions)) +
+#   geom_point() +
+#   stat_ellipse()
+
+# Extract components
+build2 <- ggplot_build(p)$data
+points2 <- build2[[1]]
+ell2 <- build2[[2]]
+
+# Find which points are inside the ellipse, and add this to the data
+dat <- data.frame(
+  points[1:2], 
+  in.ell2 = as.logical(point.in.polygon(points2$x, points2$y, ell2$x, ell2$y))
+)
+
+# Plot the result
+ggplot(dat, aes(x, y)) +
+  geom_point(aes(col = in.ell)) +
+  stat_ellipse()
   
 ```
 #ggcircle
@@ -734,7 +769,7 @@ pcaHotelGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, A
   # thresh <- output$data$threshold
   test <- pcaGridLegend(screeCumulativeThresholdObject, x = "PC1", y = "PC2", CO, SH, AL, SZ, COtitle, SHtitle, SZtitle, ALtitle)
 
-  myFn3 <- function(data, mapping, method="geom_ellipse"){
+  myFn3 <- function(data, mapping, method="stat_ellipse"){
     p <- ggplot(data = data, mapping = mapping) +
       theme_minimal() +
       geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
@@ -814,9 +849,9 @@ gg_circle <- function(rx, ry, xc, yc, color = "black", fill = NA, ...) {
 
  hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
  
- ellipseStat <- TRUE
+ ellipseStat <- FALSE
  hotelStat <- TRUE
- ellipseStat2 <- TRUE
+ ellipseStat2 <- FALSE
  
 for(i in 1:thresh)
 {
@@ -836,28 +871,23 @@ for(i in 1:thresh)
       }
       
       if(ellipseStat2 == TRUE){
-        temp <- temp + stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+        temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
       }
       
       pcaHotelPlot[j, i] <- temp}}}
 
-library(sp)
 
-# Extract components
+ # Extract components
 build <- ggplot_build(pcaHotelPlot)$data
 points <- build[[1]]
 ell <- build[[2]]
 
-# Find which points are inside the ellipse, and add this to the data
+ # Find which points are inside the ellipse, and add this to the data
 dat <- data.frame(
-  points[1:2], 
+  points[1:2],
   in.ell = as.logical(point.in.polygon(points$x, points$y, ell$x, ell$y))
 )
 
-# # Plot the result
-# ggplot(dat, aes(x, y)) +
-#   geom_point(aes(col = in.ell)) +
-#   stat_ellipse()
 #remove empty grid spaces (lower and diagonal)
 
   final_plot <- gPairsLower(pcaHotelPlot)

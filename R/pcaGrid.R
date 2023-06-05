@@ -22,7 +22,7 @@
 
 #PCA grid with ggpairs
 
-pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0.5, COtitle, SHtitle = "NULL", SZtitle = "NULL", ALtitle = "NULL", gridTitle = "PCA Grid"){
+pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0.5, COtitle, SHtitle = "NULL", SZtitle = "NULL", ALtitle = "NULL", gridTitle = "PCA Grid", hotelStat = FALSE, ellipseStat = FALSE, ellipseStat2 = "NULL"){
 
   output <- plotInput(screeCumulativeThresholdObject, CO, SH, SZ, AL)
   thresh <- output$data$threshold
@@ -59,7 +59,7 @@ pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0
 #create the PCA grid
   gridTitle = gridTitle
 
-  pcagridplot<-GGally::ggpairs(data = output$data$pcdf[,1:thresh],
+  pcaGridPlot<-GGally::ggpairs(data = output$data$pcdf[,1:thresh],
                                columnLabels = c(title),
                                title = gridTitle,
                                diag="blank",
@@ -70,7 +70,7 @@ pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0
                                progress = F,
                                switch = "both") +
                                gp +
-                               stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))+
+                               #stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))+
                                theme_bw() +
                                theme(strip.background = element_rect(fill = "white"),
                                axis.text.x = (element_text(size=rel(0.7), angle=0)),
@@ -79,8 +79,46 @@ pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0
                                panel.grid.minor = element_blank(),
                                panel.border = element_rect(fill = NA,colour = "grey35"))
 
+  pcaGridPlot2 <- ellipseOptions(thresh = thresh, output = output, pcData = output$data$pcdf, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2)
+
+  # #ellipse options
+  #   X <- as.matrix(output$data$pcdf[,1:thresh])
+  #
+  #   # Sample size
+  #   n <- nrow(X)
+  #
+  #   hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
+  #
+  #   for(i in 1:thresh)
+  #   {
+  #     for(j in 1:thresh)
+  #     {
+  #       if(j>i)
+  #       {
+  #         temp <- pcaGridPlot[j, i]
+  #         if(hotelStat == TRUE){
+  #           #for the plot
+  #           temp <- temp + gg_circle(rx = sqrt(var(output$data$pcdf[i]) * hotFisN),
+  #                                    ry = sqrt(var(output$data$pcdf[j]) * hotFisN),
+  #                                    xc = 0, yc = 0)
+  #         }
+  #
+  #         if(ellipseStat == TRUE){
+  #           temp <- temp + stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))
+  #         }
+  #
+  #         if(ellipseStat2 == FALSE){
+  #           temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+  #         }
+  #
+  #         if(ellipseStat2 == TRUE){
+  #           temp <- temp + stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+  #
+  #         }
+  #
+  #         pcaGridPlot[j, i] <- temp}}}
 #remove empty grid spaces (lower and diagonal)
 
-  final_plot <- gPairsLower(pcagridplot)
+  final_plot <- gPairsLower(pcaGridPlot2)
   return(final_plot)
 }
