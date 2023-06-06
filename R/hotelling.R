@@ -1,60 +1,78 @@
-ellipseOptions <- function(thresh = thresh, output = output, pcData = output$data$pcdf, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2){
+ellipseOptions <- function(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2){
 #ellipse options
 
-X <- as.matrix(pcData[,1:thresh])
+  #ellipse options
+  X <- as.matrix(pcData$pcdf[,1:thresh])
 
-# Sample size
-n <- nrow(X)
+  # Sample size
+  n <- nrow(X)
 
-hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
+  hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
 
-outliers <- list()
-for(i in 1:thresh)
-{
-  for(j in 1:thresh)
+  outlierHotel <- list()
+  outlierStat <- list()
+
+  for(i in 1:thresh)
   {
-    if(j>i)
+    # outliers <- append(outliers, list(i = NULL))
+    for(j in 1:thresh)
     {
-      temp <- pcaGridPlot[j, i]
-      if(hotelStat == TRUE){
-        #for the plot
-        temp <- temp + gg_circle(rx = sqrt(var(output$data$pcdf[i]) * hotFisN),
-                                 ry = sqrt(var(output$data$pcdf[j]) * hotFisN),
-                                 xc = 0, yc = 0)
-        #for outliers
-        rx <- sqrt(var(output$data$pcdf[i]) * hotFisN)
-        ry <- sqrt(var(output$data$pcdf[j]) * hotFisN)
+      if(j>i)
+      {
+        placeHolder <- paste0("PC", i, "vPC", j)
 
-        list(insideOut = (output$data$pcdf[i]^2)/(rx^2) + (output$data$pcdf[j]^2)/(ry^2))
-        idx <-which(insideOut > 1)
-        #
-        # outliers[i,j] <- output$data$pcdf[idx,-i:-j]
+        temp <- pcaGridPlot[j, i]
+        if(hotelStat == TRUE){
+          #for the plot
+          temp <- temp + gg_circle(rx = sqrt(var(pcData$pcdf[i]) * hotFisN),
+                                   ry = sqrt(var(pcData$pcdf[j]) * hotFisN),
+                                   xc = 0, yc = 0)
+          #for outliers
+          rx <- sqrt(var(pcData$pcdf[i]) * hotFisN)
+          ry <- sqrt(var(pcData$pcdf[j]) * hotFisN)
 
-        placeHolder <- paste0("PC", i, "v", j)
-        outliers <- append(placeHolder, output$data$pcdf[idx, -i:-j])
+          list(insideOut = (pcData$pcdf[i]^2)/(rx^2) + (pcData$pcdf[j]^2)/(ry^2))
+          idx <-which(insideOut > 1)
 
+          outlierIDX <- pcData$pcdf[idx,-1:-ncol(pcData$scores)]
+
+          new_list <- setNames(list(outlierIDX), placeHolder)
+          outlierHotel <- append(outlierHotel, new_list)
+
+        }
+
+        if(ellipseStat == TRUE){
+          temp <- temp + stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))
+        }
+
+        if(ellipseStat2 == "NORM"){
+          temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+        }
+
+        if(ellipseStat2 == "T"){
+          temp <- temp + stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+          build <- ggplot_build(temp)$data
+          points <- build[[3]]
+          ell <- build[[4]]
+
+          if(hotelStat == TRUE)
+          {
+            ell <- build[[5]]
+          }
+
+          # Find which points are inside the ellipse, and add this to the data
+          dat <- list(in.ell = as.logical(point.in.polygon(points$x, points$y, ell$x, ell$y)))
+          idx <-which(dat$in.ell == FALSE)
+          outlierIDX <- pcData$pcdf[idx, -1:-8]
+          new_list <- setNames(list(outlierIDX), placeHolder)
+          outlierStat <- append(outlierStat, new_list)
+        }
+
+        pcaGridPlot[j, i] <- temp
       }
-
-      if(ellipseStat == TRUE){
-        temp <- temp + stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))
-      }
-
-      if(ellipseStat2=="NULL"){
-
-      }
-
-      if(ellipseStat2 == "norm"){
-        temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
-      }
-
-      if(ellipseStat2 == "t"){
-        temp <- temp + stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
-
-      }
-
-      pcaGridPlot[j, i] <- temp}}}
-
-return(outliers)
+    }
+  }
+return(outlierStat)
 #return(pcaGridPlot)
 }
 
