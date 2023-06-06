@@ -1,7 +1,7 @@
 ellipseOptions <- function(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2){
+
 #ellipse options
 
-  #ellipse options
   X <- as.matrix(pcData$pcdf[,1:thresh])
 
   # Sample size
