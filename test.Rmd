@@ -61,7 +61,7 @@ b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
 
 #3) gridplot tests various combinations
 ##working
-a1<-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "covid", hotelStat = FALSE, ellipseStat2 = "T")
+a1<-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "covid", hotelStat = TRUE, ellipseStat2 = "NORM")
 
 a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
 

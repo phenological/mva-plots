@@ -79,7 +79,7 @@ pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0
                                panel.grid.minor = element_blank(),
                                panel.border = element_rect(fill = NA,colour = "grey35"))
 
-  pcaGridPlot2 <- ellipseOptions(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2)
+  output2 <- ellipseOptions(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2)
 
   # #ellipse options
   #   X <- as.matrix(output$data$pcdf[,1:thresh])
@@ -138,7 +138,13 @@ pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0
   #     }
   #   }
 #remove empty grid spaces (lower and diagonal)
+  pcaGridPlot <- gPairsLower(output2$tempPGP)
 
-  #final_plot <- gPairsLower(pcaGridPlot2)
-  return(pcaGridPlot2)
+#append the completed plot to the output
+  output2$plots <- append(output2$plots, list(pcaGridPlot = pcaGridPlot))
+
+#remove tempPGP (the pcaGridPlot without blank squares removed)
+  output2 <- list.remove(output2, 'tempPGP')
+
+  return(output2)
 }

@@ -10,29 +10,36 @@ ellipseOptions <- function(thresh = thresh, output = output, pcData = output$dat
   hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
 
   outlierHotel <- list()
-  outlierStat <- list()
+  outlierStatT <- list()
+  outlierStatNorm <- list()
 
+#create ellipses and outlier tables for output
   for(i in 1:thresh)
   {
-    # outliers <- append(outliers, list(i = NULL))
     for(j in 1:thresh)
     {
       if(j>i)
       {
+        #set up names for outlier list, eg PC1vPC2
         placeHolder <- paste0("PC", i, "vPC", j)
 
+        #set up changing the individual plots in the grid
         temp <- pcaGridPlot[j, i]
+
+        #Hotelling's T2
+
         if(hotelStat == TRUE){
-          #for the plot
+
+          ##for the plot
           temp <- temp + gg_circle(rx = sqrt(var(pcData$pcdf[i]) * hotFisN),
                                    ry = sqrt(var(pcData$pcdf[j]) * hotFisN),
                                    xc = 0, yc = 0)
-          #for outliers
+          ##for outliers
           rx <- sqrt(var(pcData$pcdf[i]) * hotFisN)
           ry <- sqrt(var(pcData$pcdf[j]) * hotFisN)
 
-          list(insideOut = (pcData$pcdf[i]^2)/(rx^2) + (pcData$pcdf[j]^2)/(ry^2))
-          idx <-which(insideOut > 1)
+          insideOut <- list((pcData$pcdf[i]^2)/(rx^2) + (pcData$pcdf[j]^2)/(ry^2))
+          idx <- which(insideOut[[1]] > 1)
 
           outlierIDX <- pcData$pcdf[idx,-1:-ncol(pcData$scores)]
 
@@ -41,41 +48,90 @@ ellipseOptions <- function(thresh = thresh, output = output, pcData = output$dat
 
         }
 
-        if(ellipseStat == TRUE){
-          temp <- temp + stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))
-        }
-
-        if(ellipseStat2 == "NORM"){
-          temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
-        }
+        #stat_ellipse with type t method
 
         if(ellipseStat2 == "T"){
+
+          ##for the plot
           temp <- temp + stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+
+          ##for the outliers
           build <- ggplot_build(temp)$data
           points <- build[[3]]
           ell <- build[[4]]
 
+          ##ensure correct element from build is selected
           if(hotelStat == TRUE)
           {
             ell <- build[[5]]
           }
 
-          # Find which points are inside the ellipse, and add this to the data
+          ## Find which points are inside the ellipse
           dat <- list(in.ell = as.logical(point.in.polygon(points$x, points$y, ell$x, ell$y)))
           idx <-which(dat$in.ell == FALSE)
-          outlierIDX <- pcData$pcdf[idx, -1:-8]
+          outlierIDX <- pcData$pcdf[idx, -1:-ncol(pcData$scores)]
           new_list <- setNames(list(outlierIDX), placeHolder)
-          outlierStat <- append(outlierStat, new_list)
-        }
+          outlierStatT <- append(outlierStatT, new_list)
+          }
+
+        #stat_elipse with norm method
+          if(ellipseStat2 == "NORM"){
+            ##for plot
+            temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+
+            ##for the outliers
+            build <- ggplot_build(temp)$data
+            points <- build[[3]]
+            ell <- build[[4]]
+
+            ##ensure correct element from build is selected
+            if(hotelStat == TRUE)
+            {
+              ell <- build[[5]]
+            }
+
+            ## Find which points are inside the ellipse
+            dat <- list(in.ell = as.logical(point.in.polygon(points$x, points$y, ell$x, ell$y)))
+            idx <-which(dat$in.ell == FALSE)
+            outlierIDX <- pcData$pcdf[idx, -1:-ncol(pcData$scores)]
+            new_list <- setNames(list(outlierIDX), placeHolder)
+            outlierStatNorm <- append(outlierStatNorm, new_list)
+            }
+
+          #stat_ellipse for separation
+
+          if(ellipseStat == TRUE){
+            temp <- temp + stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))
+          }
+
 
         pcaGridPlot[j, i] <- temp
       }
     }
   }
-return(outlierStat)
-#return(pcaGridPlot)
+
+  output$data <- append(output$data, list(outlierHotel = outlierHotel,
+                                          outlierStatT = outlierStatT,
+                                          outlierStatNorm = outlierStatNorm))
+  tempPGP <- pcaGridPlot
+  output <- append(output, list(tempPGP = tempPGP))
+
+  return(output)
 }
 
+# a <- append(a, list(threshold = t))
+# output$data <- append(output$data, list(outlierHotel = outlierHotel,
+#                                         outlierStat = outlierStat))
+# output$plots <- append(output$plots, list(pcaGridPlot = pcaGridPlot))
+#
+# return(output)
+#
+# return(list(data = a,
+#             plots = list(screeCumulativeThreshold = screeCumulativeThresholdPlot,
+#                          combinedScreeCumulative = combinedScreeCumulative,
+#                          screeplot = screeplot,
+#                          cumulativeVariance = cumulativeVariance,
+#                          thresholdTable = thresholdTable)))
 
 # #list of outliers for hotelling's
 # for(i in 1:thresh)
