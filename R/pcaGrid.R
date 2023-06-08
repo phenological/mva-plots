@@ -79,64 +79,9 @@ pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0
                                panel.grid.minor = element_blank(),
                                panel.border = element_rect(fill = NA,colour = "grey35"))
 
+#ellipses added
   output2 <- ellipseOptions(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2)
 
-  # #ellipse options
-  #   X <- as.matrix(output$data$pcdf[,1:thresh])
-  #
-  #   # Sample size
-  #   n <- nrow(X)
-  #
-  #   hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
-  #
-  #   outliers <- list()
-  #
-  #   for(i in 1:thresh)
-  #   {
-  #     # outliers <- append(outliers, list(i = NULL))
-  #     for(j in 1:thresh)
-  #     {
-  #       if(j>i)
-  #       {
-  #         placeHolder <- paste0("PC", i, "vPC", j)
-  #
-  #         temp <- pcaGridPlot[j, i]
-  #         if(hotelStat == TRUE){
-  #           #for the plot
-  #           temp <- temp + gg_circle(rx = sqrt(var(output$data$pcdf[i]) * hotFisN),
-  #                                    ry = sqrt(var(output$data$pcdf[j]) * hotFisN),
-  #                                    xc = 0, yc = 0)
-  # #for outliers
-  # rx <- sqrt(var(output$data$pcdf[i]) * hotFisN)
-  # ry <- sqrt(var(output$data$pcdf[j]) * hotFisN)
-  #
-  # list(insideOut = (output$data$pcdf[i]^2)/(rx^2) + (output$data$pcdf[j]^2)/(ry^2))
-  # idx <-which(insideOut > 1)
-  #
-  # outlierIDX <- output$data$pcdf[idx,-1:-ncol(output$data$scores)]
-  #
-  # new_list <- setNames(list(outlierIDX), placeHolder)
-  # outliers <- append(outliers, new_list)
-  #
-  #         }
-  #
-  #         if(ellipseStat == TRUE){
-  #           temp <- temp + stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))
-  #         }
-  #
-  #         if(ellipseStat2 == FALSE){
-  #           temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
-  #         }
-  #
-  #         if(ellipseStat2 == TRUE){
-  #           temp <- temp + stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
-  #
-  #         }
-  #
-  #         pcaGridPlot[j, i] <- temp
-  #       }
-  #     }
-  #   }
 #remove empty grid spaces (lower and diagonal)
   pcaGridPlot <- gPairsLower(output2$tempPGP)
 

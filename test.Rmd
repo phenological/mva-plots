@@ -61,7 +61,7 @@ b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
 
 #3) gridplot tests various combinations
 ##working
-a1<-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "covid", hotelStat = TRUE, ellipseStat2 = "NORM")
+a1<-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "covid", hotelStat = TRUE)
 
 a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
 
@@ -724,13 +724,20 @@ p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
     xc = 0, yc = 0
   )
 
+ggplotly(p)
+
 #outliers
 rx = sqrt(var(a$pcdf$PC4) * hotFisN)
 ry = sqrt(var(a$pcdf$PC5) * hotFisN)
 
-list(insideOut = (a$pcdf$PC4^2)/(rx^2) + (a$pcdf$PC5^2)/(ry^2))
-idx <-which(insideOut > 1)
-BIOspcglyc[idx,]
+insideOut <-list( (a$pcdf$PC4^2)/(rx^2) + (a$pcdf$PC5^2)/(ry^2))
+idx <-which(insideOut[[1]] > 1)
+#idx gives  6  13  19  29 104 105 111 117 119 127
+outlierTest <- a$pcdf[idx,]
+
+p + geom_text(data=outlierTest,
+            aes(x = outlierTest$PC4,y=outlierTest$PC5, label = outlierTest$sampleID))
+
 
                        
 # Load packages
@@ -973,4 +980,38 @@ pcaHotelGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, A
   return(final_plot)
 }
 (pcaHotelGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "Covid"))
+```
+#single working example of a PCA with outlier labels 
+```{r}
+ X <- as.matrix(a$pcdf)
+  
+  # Sample size
+  n <- nrow(X)
+
+ hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
+ 
+
+p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
+  geom_point() +
+  #stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+  #geom_point(aes(colour= a$pcdf$covid_status)) +
+   gg_circle(
+    rx = sqrt(var(a$pcdf$PC4) * hotFisN),
+    ry = sqrt(var(a$pcdf$PC5) * hotFisN),
+    xc = 0, yc = 0
+  )
+
+ggplotly(p)
+
+#outliers
+rx = sqrt(var(a$pcdf$PC4) * hotFisN)
+ry = sqrt(var(a$pcdf$PC5) * hotFisN)
+
+insideOut <-list( (a$pcdf$PC4^2)/(rx^2) + (a$pcdf$PC5^2)/(ry^2))
+idx <-which(insideOut[[1]] > 1)
+#idx gives  6  13  19  29 104 105 111 117 119 127
+outlierTest <- a$pcdf[idx,]
+
+p + geom_text(data=outlierTest,
+            aes(x = outlierTest$PC4,y=outlierTest$PC5, label = outlierTest$sampleID))
 ```

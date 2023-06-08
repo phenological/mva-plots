@@ -46,6 +46,9 @@ ellipseOptions <- function(thresh = thresh, output = output, pcData = output$dat
           new_list <- setNames(list(outlierIDX), placeHolder)
           outlierHotel <- append(outlierHotel, new_list)
 
+
+
+          temp <- temp + geom_text(data=pcData$pcdf[idx,], aes( label = sampleID))
         }
 
         #stat_ellipse with type t method
