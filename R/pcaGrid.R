@@ -22,7 +22,7 @@
 
 #PCA grid with ggpairs
 
-pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0.5, COtitle, SHtitle = "NULL", SZtitle = "NULL", ALtitle = "NULL", gridTitle = "PCA Grid", hotelStat = FALSE, ellipseStat = FALSE, ellipseStat2 = "NULL"){
+pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0.5, COtitle, SHtitle = "NULL", SZtitle = "NULL", ALtitle = "NULL", gridTitle = "PCA Grid", hotelStat = FALSE, ellipseStat = FALSE, ellipseStat2 = "NULL", outlierLabels = FALSE, outlierID = FALSE){
 
   output <- plotInput(screeCumulativeThresholdObject, CO, SH, SZ, AL)
   thresh <- output$data$threshold
@@ -80,7 +80,7 @@ pcaGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, AL = 0
                                panel.border = element_rect(fill = NA,colour = "grey35"))
 
 #ellipses added
-  output2 <- ellipseOptions(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2)
+  output2 <- ellipseOptions(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2, outlierLabels = outlierLabels, outlierID = outlierID)
 
 #remove empty grid spaces (lower and diagonal)
   pcaGridPlot <- gPairsLower(output2$tempPGP)

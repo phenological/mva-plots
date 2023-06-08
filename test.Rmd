@@ -61,8 +61,8 @@ b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
 
 #3) gridplot tests various combinations
 ##working
-a1<-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "covid", hotelStat = TRUE)
-
+a1<-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "covid",  ellipseStat2  = "T")
+a1[["plots"]][["pcaGridPlot"]]
 a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
 
 a2 <- pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = 5, COtitle = "covid", SZtitle = "Age")
@@ -1007,11 +1007,19 @@ ggplotly(p)
 rx = sqrt(var(a$pcdf$PC4) * hotFisN)
 ry = sqrt(var(a$pcdf$PC5) * hotFisN)
 
-insideOut <-list( (a$pcdf$PC4^2)/(rx^2) + (a$pcdf$PC5^2)/(ry^2))
-idx <-which(insideOut[[1]] > 1)
+
+insideOut <-list((a$pcdf$PC4^2)/(rx^2) + (a$pcdf$PC5^2)/(ry^2))
+
+a$pcdf$outlier <- ((a$pcdf$PC4^2)/(rx^2) + (a$pcdf$PC5^2)/(ry^2))
+a$pcdf$outlier
+
+idx <-(which(insideOut[[1]] > 1))
 #idx gives  6  13  19  29 104 105 111 117 119 127
 outlierTest <- a$pcdf[idx,]
 
 p + geom_text(data=outlierTest,
             aes(x = outlierTest$PC4,y=outlierTest$PC5, label = outlierTest$sampleID))
+
+p + geom_text(aes(label=ifelse(outlier>1,as.character(sampleID),'')),hjust=0,vjust=0)
+
 ```

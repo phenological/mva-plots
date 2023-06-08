@@ -1,5 +1,13 @@
-ellipseOptions <- function(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2){
+ellipseOptions <- function(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2, outlierLabels = outlierLabels, outlierID = outlierID){
 
+# outlierID <- if(class(outlierID) == "logical"){
+#     pcData$pcdf$outlierID = rep_len(NA, nrow(pcData$pcdf))
+#   }else if (class(outlierID) == "character") {
+#     outlierID = pcData$pcdf[,outlierID]
+#   }
+if(outlierLabels == "hotel" | outlierLabels== "T" | outlierLabels== "NORM"){
+pcData$pcdf$outlierID <- pcData$pcdf[,outlierID]
+}
 #ellipse options
 
   X <- as.matrix(pcData$pcdf[,1:thresh])
@@ -46,9 +54,10 @@ ellipseOptions <- function(thresh = thresh, output = output, pcData = output$dat
           new_list <- setNames(list(outlierIDX), placeHolder)
           outlierHotel <- append(outlierHotel, new_list)
 
-
-
-          temp <- temp + geom_text(data=pcData$pcdf[idx,], aes( label = sampleID))
+          ##label outliers
+          if(hotelStat == TRUE & outlierLabels == "hotel"){
+          temp <- temp + geom_text(data=pcData$pcdf[idx,], aes(label = outlierID), size=2, hjust = 0, vjust = 0)
+          }
         }
 
         #stat_ellipse with type t method
@@ -75,7 +84,13 @@ ellipseOptions <- function(thresh = thresh, output = output, pcData = output$dat
           outlierIDX <- pcData$pcdf[idx, -1:-ncol(pcData$scores)]
           new_list <- setNames(list(outlierIDX), placeHolder)
           outlierStatT <- append(outlierStatT, new_list)
+
+          ##label outliers
+          if(ellipseStat2 == "T" & outlierLabels == "T"){
+            temp <- temp + geom_text(data=pcData$pcdf[idx,], aes(label = outlierID), size=2, hjust = 0, vjust = 0)
           }
+
+        }
 
         #stat_elipse with norm method
           if(ellipseStat2 == "NORM"){
@@ -99,12 +114,16 @@ ellipseOptions <- function(thresh = thresh, output = output, pcData = output$dat
             outlierIDX <- pcData$pcdf[idx, -1:-ncol(pcData$scores)]
             new_list <- setNames(list(outlierIDX), placeHolder)
             outlierStatNorm <- append(outlierStatNorm, new_list)
-            }
 
+            ##label outliers
+            if(ellipseStat2 == "NORM" & outlierLabels == "NORM"){
+              temp <- temp + geom_text(data=pcData$pcdf[idx,], aes(label = outlierID), size = 2, hjust = 0, vjust = 0)
+            }
+            }
           #stat_ellipse for separation
 
           if(ellipseStat == TRUE){
-            temp <- temp + stat_ellipse(aes(group=interaction(output$CO, color=output$CO), color=output$CO))
+            temp <- temp + stat_ellipse(aes(group = interaction(output$CO, color = output$CO), color = output$CO))
           }
 
 
