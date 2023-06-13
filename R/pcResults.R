@@ -23,8 +23,10 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE) {
 
   results <- prcomp(data, center = center, scale. = scale.)
 
-  pcSum <- rownames_to_column(as.data.frame(t(summary(results)[["importance"]]))) %>%
-            mutate(across(where(is.double), ~.x*100))
+  pcSum <- (as.data.frame(t(summary(results)[["importance"]]))) %>%
+             mutate(across(where(is.double), ~.x*100))
+
+  pcSum[,"Principal Component"]<-rownames(pcSum)
 
   scores <- results[["x"]]
 

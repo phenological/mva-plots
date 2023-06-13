@@ -1,12 +1,12 @@
 #' Function 2 for ggpairs.
 #'
-#' Shell function for loadings with text points for the plotlLoadingsGrid function. Any aesthetic parameters are included in the plotlLoadingsGrid function.
+#' Shell function for loadings with text points for the plotLoadingsGrid function. Any aesthetic parameters are included in the plotlLoadingsGrid function.
 #'
 
 myFn2 <- function(data, mapping){
   p <- ggplot(data = data, mapping = mapping) +
-    scale_x_continuous(limits = symmetric_limits) +
-    scale_y_continuous(limits = symmetric_limits) +
+    scale_x_continuous(limits = symmetricLimits) +
+    scale_y_continuous(limits = symmetricLimits) +
     theme_minimal()+
     theme(text = element_text(size = 3))+
     geom_hline(yintercept = 0, linetype = "dashed", color = "black")+
@@ -14,7 +14,7 @@ myFn2 <- function(data, mapping){
   p
 }
 
-#backup function for symmetric_limits without the use of the ggpmisc package.
+#backup function for symmetric_limits without the use of the ggpmisc package. possible add as seperate function within the same .R file, but don't have as a nested function.
 # symmetric_limits <- function (x)
 # {
 #   max <- max(abs(x))

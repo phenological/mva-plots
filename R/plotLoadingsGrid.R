@@ -48,5 +48,8 @@ plotLoadingGrid <- GGally::ggpairs(df[,1:thresh],
 #remove empty grid spaces (lower and diagonal)
 
 final_plot <- gPairsLower(plotLoadingGrid)
-return(final_plot)
+
+output$plots <- append(output$plots, list(plotLoadingGrid = plotLoadingGrid))
+
+return(output)
 }

@@ -22,7 +22,7 @@ screeCumulativeThreshold <- function(pcResultsObject, cutoff = 99){
 
 #Make cumulative variance plot
 
-cumulativeVariance <- ggplot(data = a$pcSum, aes(x = `rowname`, y = `Cumulative Proportion`)) +
+cumulativeVariance <- ggplot(data = a$pcSum, aes(x = `Principal Component`, y = `Cumulative Proportion`)) +
     geom_point(colour = "blue") +
     geom_line(group = 1, colour = "blue") +
     ggtitle("Cumulative Variance") +
@@ -31,7 +31,7 @@ cumulativeVariance <- ggplot(data = a$pcSum, aes(x = `rowname`, y = `Cumulative 
 
 #Make Screeplot
 
-screeplot <- ggplot(data = a$pcSum, aes(x = `rowname`, y = (`Proportion of Variance`))) +
+screeplot <- ggplot(data = a$pcSum, aes(x = `Principal Component`, y = (`Proportion of Variance`))) +
               geom_point(colour = "red") +
               geom_line(group = 1, colour = "red") +
               ggtitle("Scree Plot") +
@@ -39,8 +39,8 @@ screeplot <- ggplot(data = a$pcSum, aes(x = `rowname`, y = (`Proportion of Varia
               ylab("Proportion of Variance (%)")
 
 combinedScreeCumulative <- ggplot(a$pcSum)  +
-  geom_bar(aes(x = `rowname`, y = `Proportion of Variance`), stat = "identity", fill = "grey20", color = "black", alpha = 0.4) +
-  geom_line(aes(x = `rowname`, y = `Cumulative Proportion`), stat = "identity", color = "orange2", linewidth = 2, group = 1) +
+  geom_bar(aes(x = `Principal Component`, y = `Proportion of Variance`), stat = "identity", fill = "grey20", color = "black", alpha = 0.4) +
+  geom_line(aes(x = `Principal Component`, y = `Cumulative Proportion`), stat = "identity", color = "orange2", linewidth = 2, group = 1) +
   labs(title = "Screeplot and Cumulative Variance",
        x = "PC", y = "Cumulative Variance (%)") +
   scale_y_continuous(sec.axis = sec_axis(~.*0.5, name = "Proportion of Variance (%)")) +
@@ -49,9 +49,9 @@ combinedScreeCumulative <- ggplot(a$pcSum)  +
 
 # #Make the threshold table
 
-thresholdTable <- a$pcSum[t,]%>%
-                  ggtexttable(theme = ttheme("mOrange"))
-
+# thresholdTable <- a$pcSum[t,]%>%
+#                   ggtexttable(theme = ttheme("mOrange"))
+thresholdTable <- as.table(as.matrix(a$pcSum[t,]))
 #Put all the information in one figure
 
 screeCumulativeThresholdPlot <- ggdraw() +

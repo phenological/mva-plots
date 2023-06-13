@@ -1,10 +1,5 @@
-ellipseOptions <- function(thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2, outlierLabels = outlierLabels, outlierID = outlierID){
-
-# outlierID <- if(class(outlierID) == "logical"){
-#     pcData$pcdf$outlierID = rep_len(NA, nrow(pcData$pcdf))
-#   }else if (class(outlierID) == "character") {
-#     outlierID = pcData$pcdf[,outlierID]
-#   }
+ellipseOptions <- function(confidenceInterval = confidenceInterval, thresh = thresh, output = output, pcData = output$data, pcaGridPlot = pcaGridPlot, hotelStat = hotelStat, ellipseStat = ellipseStat, ellipseStat2 = ellipseStat2, outlierLabels = outlierLabels, outlierID = outlierID){
+#add in option for CI % level
 if(outlierLabels == "hotel" | outlierLabels== "T" | outlierLabels== "NORM"){
 pcData$pcdf$outlierID <- pcData$pcdf[,outlierID]
 }
@@ -132,9 +127,10 @@ pcData$pcdf$outlierID <- pcData$pcdf[,outlierID]
     }
   }
 
-  output$data <- append(output$data, list(outlierHotel = outlierHotel,
-                                          outlierStatT = outlierStatT,
-                                          outlierStatNorm = outlierStatNorm))
+  output$data <- append(output$data, list(outliers = list(hotelling = outlierHotel,
+                                                          statT = outlierStatT,
+                                                          statNorm = outlierStatNorm)))
+
   tempPGP <- pcaGridPlot
   output <- append(output, list(tempPGP = tempPGP))
 

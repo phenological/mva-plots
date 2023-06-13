@@ -12,7 +12,7 @@ plotInput<- function(screeCumulativeThresholdObject, CO, SH, SZ, AL){
 
   output <- screeCumulativeThresholdObject
 
-  #colour
+  #colour, use is(CO)[1]=="numeric" instead?
   CO <- if(class(CO) == "numeric") {
           output$data$pcdf$CO = rep_len(CO, nrow(output$data$pcdf))
           CO = output$data$pcdf$CO

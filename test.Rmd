@@ -5,6 +5,12 @@ for(i in functionList){
   source(paste0(functionDir,i))
 }
 ```
+
+```{r}
+#ggplot2, prcomp, GGally, roxygen2, stats, BioGenerics, dplyr??, sp??, ggpubr??
+usethis::use_package("BioGenerics")
+
+```
 #load data to test functions
 ```{r}
 ann<-local(get(load("~/OneDrive - Murdoch University/datasets/covid19/bioGune/dataElements/covid19_bioGune_PLA_ANN.daE")))
@@ -38,7 +44,10 @@ BIOspcglyc$covid_status<-ifelse(BIOspcglyc$group =="COVID-pos","covid", ifelse(B
 
 #tests pcagrid
 ```{r}
+#usethis, usepackage, use vignette, list.re
+
 loadPackages(myPackages = c("ggplot2",
+                            "stats",
                             "ggpmisc",
                             "ggplotly",
                             "plotly",
@@ -48,7 +57,7 @@ loadPackages(myPackages = c("ggplot2",
                             "GGally",
                             "cowplot",
                             "gridExtra",
-                            "rlist",
+                            #"rlist",
                             "ggrepel",
                             "ellipse",
                             "HotellingEllipse",
@@ -61,7 +70,7 @@ b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
 
 #3) gridplot tests various combinations
 ##working
-a1<-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "covid",  ellipseStat2  = "T")
+a1<-pcaGrid(screeCumulativeThresholdObject = b, gridTitle = "new", CO="covid_status")
 a1[["plots"]][["pcaGridPlot"]]
 a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
 
@@ -991,8 +1000,10 @@ pcaHotelGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, A
  hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
  
 
-p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
-  geom_point() +
+
+ p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5,  colour=10)) +
+  geom_point(shape = "square") +
+  #scale_color_brewer(palette = "Set2")+
   #stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
   #geom_point(aes(colour= a$pcdf$covid_status)) +
    gg_circle(
@@ -1022,4 +1033,5 @@ p + geom_text(data=outlierTest,
 
 p + geom_text(aes(label=ifelse(outlier>1,as.character(sampleID),'')),hjust=0,vjust=0)
 
+p
 ```
