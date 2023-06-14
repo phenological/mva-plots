@@ -86,6 +86,8 @@ p1 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL,
 pcaGrid(screeCumulativeThresholdObject = b, CO = "work_activity", SH = NULL, SZ = 5, AL = 1, COtitle = "covid")
 
 
+optns=list(colourCoding= "covid_status")
+plotscores(model=b, optns= list(colourCoding)
 ```
 #tests plotLoadingsGrid
 ```{r}
@@ -1034,4 +1036,18 @@ p + geom_text(data=outlierTest,
 p + geom_text(aes(label=ifelse(outlier>1,as.character(sampleID),'')),hjust=0,vjust=0)
 
 p
+
+colourCode<-BIOspcglyc[,"covid_status"]
+shapeCode <- BIOspcglyc[,"sex"]
+
+colourCode<-rep_len("green", nrow(a$pcdf))
+colourCode <-"green"
+
+p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
+  geom_point(aes(shape = shapeCode), colour=colourCode)
+
+p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
+  geom_point(aes(colour=colourCode,shape = shapeCode))
+
+
 ```

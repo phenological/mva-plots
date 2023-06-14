@@ -41,7 +41,6 @@
 
 # if("CO" %in% names(optns)){
 #   if(is("CO")[1]=="character"){
-#     CO<-"black"
 #     #CO <- screeCumulativeThresholdObject$data$pcdf[,optns$CO]
 #   }else if(is((optns$CO)[1])=="numeric"){
 #     CO <- optns$CO[1]
