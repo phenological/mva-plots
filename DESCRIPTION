@@ -18,4 +18,5 @@ Imports:
     ggplot2,
     prcomp,
     roxygen2,
+    sp,
     stats

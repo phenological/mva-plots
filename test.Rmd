@@ -7,8 +7,8 @@ for(i in functionList){
 ```
 
 ```{r}
-#ggplot2, prcomp, GGally, roxygen2, stats, BioGenerics, dplyr??, sp??, ggpubr??
-usethis::use_package("BioGenerics")
+#ggplot2, prcomp, GGally, roxygen2, stats, BioGenerics, dplyr??, sp??(included), ggpubr??
+usethis::use_package("sp")
 
 ```
 #load data to test functions
@@ -70,7 +70,7 @@ b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
 
 #3) gridplot tests various combinations
 ##working
-a1<-pcaGrid(screeCumulativeThresholdObject = b, gridTitle = "new", CO="covid_status")
+a1<-pcaGrid(screeCumulativeThresholdObject = b, gridTitle = "Trial Grid title", CO="covid_status", COtitle = "Covid", SH="sex",hotelStat = TRUE)
 a1[["plots"]][["pcaGridPlot"]]
 a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
 
@@ -86,12 +86,18 @@ p1 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL,
 pcaGrid(screeCumulativeThresholdObject = b, CO = "work_activity", SH = NULL, SZ = 5, AL = 1, COtitle = "covid")
 
 
-optns=list(colourCoding= "covid_status")
-plotscores(model=b, optns= list(colourCoding)
+opt=list(colourCoding= "covid_status")
+
+
+fff<- plotscores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], sizeCoding=3, alphaCoding=BIOspcglyc[,"age"], shapeCoding=BIOspcglyc[,"sex"], ellipse="normal", confidenceInterval=0.90, outlierLabels="patientID"))
+fff[["plots"]][["pcaGrid"]]
+
+ffff<- plotLoadings(model= a)
+
 ```
 #tests plotLoadingsGrid
 ```{r}
-p2<- plotLoadingGrid(screeCumulativeThresholdObject = b)
+p2<- plotLoadingGrid(screeCumulativeThresholdObject = b, gridTitle = "Loadings")
 ```
 #multiplot (works with grids)
 ```{r}
@@ -1002,12 +1008,13 @@ pcaHotelGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, A
  hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
  
 
-
- p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5,  colour=10)) +
-  geom_point(shape = "square") +
+idx<- which(BIOspcglyc[,"covid_status"]=="covid")
+ p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
+  geom_point(aes(shape=a$pcdf$sex))+
   #scale_color_brewer(palette = "Set2")+
-  #stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
-  #geom_point(aes(colour= a$pcdf$covid_status)) +
+  stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
+   #geom_text(aes(label = a$pcdf$patientID), size=2, hjust = 0, vjust = 0)
+
    gg_circle(
     rx = sqrt(var(a$pcdf$PC4) * hotFisN),
     ry = sqrt(var(a$pcdf$PC5) * hotFisN),
@@ -1035,7 +1042,7 @@ p + geom_text(data=outlierTest,
 
 p + geom_text(aes(label=ifelse(outlier>1,as.character(sampleID),'')),hjust=0,vjust=0)
 
-p
+p + geom_text(data=a$pcdf[idx,],aes(PC4, PC5,label="patientID"))
 
 colourCode<-BIOspcglyc[,"covid_status"]
 shapeCode <- BIOspcglyc[,"sex"]
@@ -1048,6 +1055,7 @@ p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
 
 p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
   geom_point(aes(colour=colourCode,shape = shapeCode))
+  
 
 
 ```

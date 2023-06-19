@@ -13,20 +13,22 @@
 #' @param loadings Variable loadings (i.e., a matrix whose columns contain the eigenvectors).
 #' @param sdev The standard deviations of the principal components (i.e., the square roots of the eigenvalues of the covariance/correlation matrix, though the calculation is actually done with the singular values of the data matrix).
 #' @param center The centering used.
-#' @param scale The scaling used
-#' @examples
+#' @param scale The scaling used.
+#' @param threshold The number of principal components needed to explain the amount of cumulative variance specified (or the default of 99%).
 
 
 #calculate Principal Components using prcomp
 
-pcResults <- function(data, annotation, center = TRUE, scale. = TRUE) {
+pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, optns=list()) {
 
-  results <- prcomp(data, center = center, scale. = scale.)
+  results <- prcomp(data,
+                    center = center,
+                    scale. = scale.)
 
   pcSum <- (as.data.frame(t(summary(results)[["importance"]]))) %>%
              mutate(across(where(is.double), ~.x*100))
 
-  pcSum[,"Principal Component"]<-rownames(pcSum)
+  pcSum[,"Principal Component"] <- rownames(pcSum)
 
   scores <- results[["x"]]
 
@@ -40,11 +42,69 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE) {
 
   pcdf<- cbind(as.data.frame(scores), annotation)
 
-  return(list(scores = scores,
-              loadings = loadings,
-              sdev = sdev,
-              center = center,
-              scale = scale,
-              pcSum = pcSum,
-              pcdf = pcdf))
+ if("cutoff" %in% optns){
+   cutoff = optns$cutoff
+ }else{cutoff = 99}
+
+  t <- length(which(pcSum$`Cumulative Proportion` < cutoff))
+
+  #Make cumulative variance plot
+
+  cumulativeVariance <- ggplot(data = pcSum,
+                               aes(x = `Principal Component`,
+                                   y = `Cumulative Proportion`)) +
+                        geom_point(colour = "blue") +
+                        geom_line(group = 1,
+                                  colour = "blue") +
+                        ggtitle("Cumulative Variance") +
+                        xlab("PC") +
+                        ylab("Cumulative Variance Explained (%)")
+
+  #Make Screeplot
+
+  screeplot <- ggplot(data = pcSum,
+                      aes(x = `Principal Component`,
+                          y = (`Proportion of Variance`))) +
+                geom_point(colour = "red") +
+                geom_line(group = 1,
+                          colour = "red") +
+                ggtitle("Scree Plot") +
+                xlab("PC") +
+                ylab("Proportion of Variance (%)")
+
+  #combined scree and cumulative variance plot
+  combinedScreeCumulative <- ggplot(pcSum)  +
+                              geom_bar(aes(x = `Principal Component`,
+                                           y = `Proportion of Variance`),
+                                           stat = "identity", fill = "grey20",
+                                           color = "black",
+                                           alpha = 0.4) +
+                              geom_line(aes(x = `Principal Component`,
+                                            y = `Cumulative Proportion`),
+                                            stat = "identity",
+                                            color = "orange2",
+                                            linewidth = 2, group = 1) +
+                              labs(title = "Screeplot and Cumulative Variance",
+                                  x = "PC",
+                                  y = "Cumulative Variance (%)") +
+                              scale_y_continuous(sec.axis = sec_axis(~.*0.5, name = "Proportion of Variance (%)")) +
+                              theme(axis.title.y = element_text(color = "gray30"),
+                                    axis.title.y.right = element_text(color = "orange3"))
+
+
+  data<-list(scores = scores,
+             loadings = loadings,
+             sdev = sdev,
+             center = center,
+             scale = scale,
+             pcSum = pcSum,
+             pcdf = pcdf,
+             threshold = t)
+
+  plots = list(combinedScreeCumulative = combinedScreeCumulative,
+               screeplot = screeplot,
+               cumulativeVariance = cumulativeVariance)
+
+  return(list(data = data,
+              plots = plots))
 }
