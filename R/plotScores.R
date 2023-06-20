@@ -18,7 +18,7 @@
 #' @examples
 #' data(iris)
 #' a <- pcResults(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
-#' b <- plotscores(model = a, optns=list(colourCoding = iris[,"Species"], colourTitle = "Flower Species"))
+#' b <- plotscores(model = a, optns=list(colourCoding = iris[,"Species"], colourTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alphaCoding = 0.7))
 
 plotscores<-function(model, optns=list()){
 
@@ -42,7 +42,7 @@ if("thresh" %in% names(optns)){
    }
  }else {optns$colourCoding="black"}
 
-  #shape (working)
+#shape (working)
   if("shapeCoding" %in% names(optns)){
     if((length(optns$shapeCoding))>1){
       model$data$pcdf$shapeCoding <- optns$shapeCoding
@@ -56,7 +56,7 @@ if("thresh" %in% names(optns)){
    }
  }else{optns$sizeCoding=3}
 
-  #alpha (working)
+#alpha (working)
    if("alphaCoding" %in% names(optns)){
      if((length(optns$alphaCoding))>1){
        model$data$pcdf$alphaCoding <- optns$alphaCoding

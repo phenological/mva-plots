@@ -1,14 +1,37 @@
 
-eruptionPlot <- function(data, title){
+eruptionPlot <- function(model, optns = list()){
+
+  if("plotTitle" %in% names(optns)){
+    pltTitle = optns$plotTitle
+  }else{
+    plotTitle <- "Eruption plot"
+  }
+
+  #logFC	PValue	FDR cliffsDelta PrincipalComponentLoadings
+
+  model$data$loadings
+  id <- rownames(model$data$loadings)
+
+
+  #Perform FDR adjustment on P-values (false discovery rate method or Banjamini and Hochberg method). make -log10 value for volcano plot
+
+  p_adj<- -log10(p.adjust(p.val, method = "fdr"))
+
+
                         df <- data
 
                         eruptionPlot<- ggplot(data = df, aes(x = df$LogFC, y = df$p_adj)) +
                                       geom_point() +
                                       theme_minimal() +
-                                      geom_hline(yintercept = -log10(0.05), col = "red") +
-                                      geom_vline(xintercept = c(-0.6, 0.6), col = "red") +
-                                      geom_label_repel(aes(label = liponame), size = 2) +
-                                      labs(title = "title", x = "log2FoldChange", y = "-log10 adj.p-val")
+                                      geom_hline(yintercept = -log10(0.05),
+                                                 col = "red") +
+                                      geom_vline(xintercept = c(-0.6, 0.6),
+                                                 col = "red") +
+                                      geom_label_repel(aes(label = rownames(df)),
+                                                       size = 2) +
+                                      labs(title = title,
+                                           x = "log2FoldChange",
+                                           y = "-log10 adj.p-val")
 
                         return(eruptionPlot)
                         }

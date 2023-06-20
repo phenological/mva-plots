@@ -16,7 +16,6 @@ Imports:
     BioGenerics,
     GGally,
     ggplot2,
-    prcomp,
     roxygen2,
     sp,
     stats
