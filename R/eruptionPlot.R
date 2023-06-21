@@ -12,6 +12,38 @@ eruptionPlot <- function(model, optns = list()){
   model$data$loadings
   id <- rownames(model$data$loadings)
 
+  #cliffs delta
+stats::wilcox.test(SPC_All ~ covid_status_factor, data=BIOspcglyc)
+
+  function (ref, comp)
+  {
+    if (!is.numeric(ref) | !is.numeric(comp))
+      stop("Input not numeric")
+    ind_ref <- is.na(ref) | is.infinite(ref)
+    ind_comp <- is.na(comp) | is.infinite(comp)
+    if (any(ind_ref)) {
+      ref <- ref[!ind_ref]
+      message("Removing NA or infinite values from reference group.")
+    }
+    if (any(ind_comp)) {
+      comp <- comp[!ind_comp]
+      message("Removing NA or infinite values from comparator group.")
+    }
+    if (length(ref) < 5 | length(comp) < 5)
+      stop("Low number of values (< 5)")
+    top_counts <- vapply(ref, function(x, y = comp) {
+      names(x) <- NULL
+      names(y) <- NULL
+      c(length(which(x > y)), length(which(x < y)))
+    }, FUN.VALUE = c(2, length(ref)))
+    out <- ((sum(top_counts[1, ]) - sum(top_counts[2, ]))/(length(ref) *
+                                                             length(comp))) * (-1)
+    return(out)
+  }
+
+
+  mag.levels = c(0.147,0.33,0.474) ## effect sizes from (Hess and Kromrey, 2004)
+  magnitude = c("negligible","small","medium","large")
 
   #Perform FDR adjustment on P-values (false discovery rate method or Banjamini and Hochberg method). make -log10 value for volcano plot
 

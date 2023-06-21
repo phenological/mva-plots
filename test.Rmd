@@ -63,37 +63,38 @@ loadPackages(myPackages = c("ggplot2",
                             "HotellingEllipse",
                             "sp"))
 #1) create pcresults object
-a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
+a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8], rank = 3)
 
-#2) create screeCumulativeThresholdObject
-b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
+# #2) create screeCumulativeThresholdObject
+# b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
+# 
+# #3) gridplot tests various combinations
+# ##working
+# a1<-pcaGrid(screeCumulativeThresholdObject = b, gridTitle = "Trial Grid title", CO="covid_status", COtitle = "Covid", SH="sex",hotelStat = TRUE)
+# a1[["plots"]][["pcaGridPlot"]]
+# a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
+# 
+# a2 <- pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = 5, COtitle = "covid", SZtitle = "Age")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
+# 
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = 1, COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = 5, AL = "age", COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = 5, AL = "age", COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = "bmi", COtitle = "covid")
+# p1 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = "bmi", COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "work_activity", SH = NULL, SZ = 5, AL = 1, COtitle = "covid")
+# 
+# 
+# opt=list(colourCoding= "covid_status")
 
-#3) gridplot tests various combinations
-##working
-a1<-pcaGrid(screeCumulativeThresholdObject = b, gridTitle = "Trial Grid title", CO="covid_status", COtitle = "Covid", SH="sex",hotelStat = TRUE)
-a1[["plots"]][["pcaGridPlot"]]
-a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
-
-a2 <- pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = 5, COtitle = "covid", SZtitle = "Age")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
-
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = 1, COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = 5, AL = "age", COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = 5, AL = "age", COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = "bmi", COtitle = "covid")
-p1 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = "bmi", COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "work_activity", SH = NULL, SZ = 5, AL = 1, COtitle = "covid")
-
-
-opt=list(colourCoding= "covid_status")
-
-
-fff<- plotscores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], sizeCoding=3, alphaCoding=BIOspcglyc[,"age"], shapeCoding=BIOspcglyc[,"sex"], ellipse="normal", confidenceInterval=0.90, outlierLabels="patientID"))
+#2) 
+fff<- plotscores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], sizeCoding=3, alphaCoding=BIOspcglyc[,"age"], shapeCoding=BIOspcglyc[,"sex"], ellipse="normal", confidenceInterval=0.90, thresh=3))
 fff[["plots"]][["pcaGrid"]]
 
+#2)
 ffff<- plotLoadings(model= a)
-
+ffff[["plots"]][["plotLoadingGrid"]]
 ```
 #tests plotLoadingsGrid
 ```{r}
@@ -1058,4 +1059,137 @@ p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
   
 
 
+```
+#cliffs delta
+```{r}
+
+BIOspcglyc$covid_status_factor<- as.numeric(factor(BIOspcglyc[,"covid_status"]))
+
+idx <- which(BIOspcglyc$covid_status_factor==1)
+
+control<- BIOspcglyc[idx,] %>%
+  select("SPC1")
+trial <- BIOspcglyc[-idx,] %>%
+  select("SPC1")
+#two tailed wilcoxon (allows for effect in two directions)
+wt<-stats::wilcox.test(
+  SPC_All ~ covid_status_factor, data=BIOspcglyc
+)
+
+wt[["statistic"]]
+#3364
+
+table(BIOspcglyc$covid_status)
+#control   covid 
+#   100      38 
+
+((wt[["statistic"]])/(n*m)-0.5)*2
+(3364/(100*38)-0.5)*2
+
+
+
+
+uni <- t(apply(X, 2, function(x, idx = which(Y == comp),
+    y = Y) {
+    (cd(x[idx], x[-idx]))
+  }))
+
+cd<-function (ref, comp) 
+ {top_counts <- vapply(ref, function(x, y = comp) {
+     names(x) <- NULL
+     names(y) <- NULL
+     c(length(which(x > y)), length(which(x < y)))
+   }, FUN.VALUE = c(2, length(ref)))
+   out <- ((sum(top_counts[1, ]) - sum(top_counts[2, ]))/(length(ref) * 
+     length(comp))) * (-1)
+   return(out)
+ }
+
+idx<- which(BIOspcglyc[,"covid_status"]=="control")
+yy<- BIOspcglyc[-idx,]
+xx<- BIOspcglyc[idx,]
+
+cd(xx$SPC_All, yy$SPC_All)
+#[1] -0.7705263
+
+reseff<-effsize::cliff.delta(y, x, return.dm = TRUE)
+#-0.7705263
+
+# x= yy$SPC_All
+# y= xx$SPC_All
+
+idx<- which(BIOspcglyc[,"covid_status"]=="control")
+yy<- BIOspcglyc[-idx,]
+xx<- BIOspcglyc[idx,]
+ref = xx[,1]
+comp= yy[,1]
+top_counts <- vapply(ref, function(x, y = comp) {
+     names(x) <- NULL
+     names(y) <- NULL
+     c(length(which(x > y)), length(which(x < y)))
+   }, FUN.VALUE = c(2, length(ref)))
+
+#      names(x) <- NULL
+#      names(y) <- NULL
+#      c(length(which(x > y)), length(which(x < y)))
+#    #86 14
+# idx <- which(x > y)
+# idy <- which(x < y)
+# 
+# xxx<-x[idx]
+# sum(xxx)
+# 
+# yyy<-x[idy]
+# sum(yyy)
+# 
+# (sum(x[idx])-sum(x[idy]))/(86*14)
+
+   out <- ((sum(top_counts[1, ]) - sum(top_counts[2, ]))/(length(ref) * 
+     length(comp))) * (-1)
+
+   
+tc<-list(mod@X[which(Y==1),1],mod@X[which(Y==0),1])
+control = tc[[2]]
+treatment = tc[[1]]
+control<-sort(control)
+treatment<-sort(treatment)
+n1 = length(treatment)
+n2 = length(control)
+rescale.factor = (n1*n2-1)/(n1*n2)
+
+dominance = sign(outer(treatment, control, FUN="-")) 
+row.names(dominance) = treatment
+colnames(dominance) = control
+
+d = mean(dominance)
+
+d. = ifelse(abs(d)==1,d*rescale.factor,d)
+
+#manually calculate cliffs delta
+#split into control and treatment
+idx<- which(BIOspcglyc[,"covid_status"]=="control")
+control <- BIOspcglyc[idx,]
+treatment <- BIOspcglyc[-idx,]
+
+#sort from smallest to largest for one sample col
+control<-sort(control$SPC_All)
+treatment<-sort(treatment$SPC_All)
+
+#find length of control and treatment
+n1 = length(treatment)
+n2 = length(control)
+
+#make a matrix using control and treatment: set as one column for treatment(eg 100x1 matrix) and one row for control (eg 1x38 matrix) using outer, and do minus using FUN. reassign any negative as -1, any positive as +1 any 0 is left as 0
+dominance = sign(outer(treatment, control, FUN="-")) 
+
+
+
+dominance
+d = mean(dominance)
+
+#use the values 
+row.names(dominance) = treatment
+colnames(dominance) = control
+rescale.factor = (n1*n2-1)/(n1*n2)
+d. = ifelse(abs(d)==1,d*rescale.factor,d)
 ```
