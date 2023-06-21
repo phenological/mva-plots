@@ -19,9 +19,10 @@
 
 #calculate Principal Components using prcomp
 
-pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, optns=list()) {
+pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 10, optns=list()) {
 
   results <- prcomp(data,
+                    rank = rank,
                     center = center,
                     scale. = scale.)
 
