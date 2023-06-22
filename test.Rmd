@@ -7,7 +7,7 @@ for(i in functionList){
 ```
 
 ```{r}
-#ggplot2, prcomp, GGally, roxygen2, stats, BioGenerics, dplyr??, sp??(included), ggpubr??
+#ggplot2, GGally, roxygen2, stats, BioGenerics, dplyr??, sp??(included), ggpubr??
 usethis::use_package("sp")
 
 ```
@@ -48,16 +48,17 @@ BIOspcglyc$covid_status<-ifelse(BIOspcglyc$group =="COVID-pos","covid", ifelse(B
 
 loadPackages(myPackages = c("ggplot2",
                             "stats",
+                            "roxygen2",
                             #"ggpmisc",
                             #"ggplotly",
                             #"plotly",
                             "tidyverse", 
                             #"ggpubr",
                             "GGally",
-                            "cowplot",
+                            #"cowplot",
                             #"gridExtra",
                             #"rlist",
-                            "ggrepel",
+                            #"ggrepel",
                             #"ellipse",
                             #"HotellingEllipse",
                             "sp"))
@@ -92,8 +93,8 @@ fff<- plotscores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], e
 fff[["plots"]][["pcaGrid"]]
 
 #2)
-ffff<- plotLoadings(model= a)
-ffff[["plots"]][["plotLoadingGrid"]]
+fff<- plotLoadings(model= a)
+fff[["plots"]][["plotLoadingGrid"]]
 ```
 #tests plotLoadingsGrid
 ```{r}

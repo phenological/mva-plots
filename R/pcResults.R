@@ -43,7 +43,9 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 10,
 
   scale <- results[["scale"]]
 
-  pcdf<- cbind(as.data.frame(scores), annotation)
+  pcdf <- cbind(as.data.frame(scores), annotation)
+
+  rawData <- data
 
  if("cutoff" %in% optns){
    cutoff = optns$cutoff
@@ -95,7 +97,8 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 10,
                                     axis.title.y.right = element_text(color = "orange3"))
 
 
-  data<-list(scores = scores,
+  data<-list(rawData = rawData,
+             scores = scores,
              loadings = loadings,
              sdev = sdev,
              center = center,

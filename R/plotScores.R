@@ -263,8 +263,6 @@ plotscores<-function(model, optns=list()){
 
   pcaGridPlot <- gPairsLower(plotGT$plots$pcaGridPlot)
 
-  #outlierHotellings<-plotGT$outlierHotellings
-
   model$data <- append(model$data, list(outliers = list(hotellings = plotGT$outlierHotellings,
                                                         statT = plotGT$outlierT,
                                                         statNorm = plotGT$outlierNormal)))

@@ -2,6 +2,11 @@
 #'
 #' Shell function for loadings with text points for the plotLoadingsGrid function. Any aesthetic parameters are included in the plotlLoadingsGrid function.
 #'
+symmetricLimits <- function (x)
+{
+  max <- max(abs(x))
+  c(-max, max)
+}
 
 myFn2 <- function(data, mapping){
   p <- ggplot(data = data, mapping = mapping) +
@@ -15,8 +20,4 @@ myFn2 <- function(data, mapping){
 }
 
 #backup function for symmetric_limits without the use of the ggpmisc package. possible add as seperate function within the same .R file, but don't have as a nested function.
-# symmetric_limits <- function (x)
-# {
-#   max <- max(abs(x))
-#   c(-max, max)
-# }
+
