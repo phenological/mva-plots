@@ -136,9 +136,10 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
   }
 }
 
-  # model$data <- append(model$data, list(outliers = list(hotelling = outlierHotellings,
-  #                                                         statT = outlierT,
-  #                                                         statNorm = outlierNormal)))
+  #outlierHotellings <- c(1,2,3)
+  model <- append(model, list(outlierHotellings = outlierHotellings,
+                                      outlierT = outlierT,
+                              outlierNormal = outlierNormal))
 
   model$plots <- append(model$plot, list(pcaGridPlot = pcaGridPlot))
 
