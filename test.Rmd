@@ -48,22 +48,21 @@ BIOspcglyc$covid_status<-ifelse(BIOspcglyc$group =="COVID-pos","covid", ifelse(B
 
 loadPackages(myPackages = c("ggplot2",
                             "stats",
-                            "ggpmisc",
-                            "ggplotly",
-                            "plotly",
-                            "prcomp", 
+                            #"ggpmisc",
+                            #"ggplotly",
+                            #"plotly",
                             "tidyverse", 
-                            "ggpubr",
+                            #"ggpubr",
                             "GGally",
                             "cowplot",
-                            "gridExtra",
+                            #"gridExtra",
                             #"rlist",
                             "ggrepel",
-                            "ellipse",
-                            "HotellingEllipse",
+                            #"ellipse",
+                            #"HotellingEllipse",
                             "sp"))
 #1) create pcresults object
-a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8], rank = 3)
+a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
 
 # #2) create screeCumulativeThresholdObject
 # b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
@@ -89,7 +88,7 @@ a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8], rank = 3)
 # opt=list(colourCoding= "covid_status")
 
 #2) 
-fff<- plotscores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], sizeCoding=3, alphaCoding=BIOspcglyc[,"age"], shapeCoding=BIOspcglyc[,"sex"], ellipse="normal", confidenceInterval=0.90, thresh=3))
+fff<- plotscores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], ellipse="T", outlierLabels=BIOspcglyc[,"sex"]))
 fff[["plots"]][["pcaGrid"]]
 
 #2)
@@ -918,7 +917,7 @@ dat <- data.frame(
   final_plot <- gPairsLower(pcaHotelPlot)
   return(final_plot)
 }
-(pcaHotelGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "Covid"))
+(pcaHotelGrid(screeCumulativeThresholdObject = a, CO = "covid_status", COtitle = "Covid"))
 ```
 #stat_ellipse not hotelling's
 ```{r}
@@ -997,7 +996,8 @@ pcaHotelGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, A
   final_plot <- gPairsLower(pcaHotelPlot)
   return(final_plot)
 }
-(pcaHotelGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "Covid"))
+(pcaHotelGrid(screeCumulativeThresholdObject = a
+              , CO = "covid_status", COtitle = "Covid"))
 ```
 #single working example of a PCA with outlier labels 
 ```{r}
@@ -1008,10 +1008,10 @@ pcaHotelGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, A
 
  hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
  
-
+a$data$pcdf$CO<- rep_len("red", nrow(a$data$pcdf))
 idx<- which(BIOspcglyc[,"covid_status"]=="covid")
- p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
-  geom_point(aes(shape=a$pcdf$sex))+
+ p <- ggplot(data=a$data$pcdf, aes(x=a$data$pcdf$PC1, y=a$data$pcdf$PC2)) +
+  geom_point(aes(shape=a$data$pcdf$sex, color=a$data$pcdf$CO))
   #scale_color_brewer(palette = "Set2")+
   stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
    #geom_text(aes(label = a$pcdf$patientID), size=2, hjust = 0, vjust = 0)
@@ -1058,7 +1058,16 @@ p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
   geom_point(aes(colour=colourCode,shape = shapeCode))
   
 
+a$data$pcdf$CO<- rep_len("green", nrow(a$data$pcdf))
 
+ p <- ggplot(data=a$data$pcdf, aes(x=a$data$pcdf$PC1, y=a$data$pcdf$PC2)) +
+  geom_point(aes(shape=a$data$pcdf$sex, colour = (rep_len("green", nrow(a$data$pcdf)))))
+p
+
+
+p <- ggplot(data=a$data$pcdf, aes(x=a$data$pcdf$PC1, y=a$data$pcdf$PC2), color="green") +
+  geom_point(aes(shape=a$data$pcdf$sex))
+p
 ```
 #cliffs delta
 ```{r}
@@ -1168,8 +1177,9 @@ d. = ifelse(abs(d)==1,d*rescale.factor,d)
 #manually calculate cliffs delta
 #split into control and treatment
 idx<- which(BIOspcglyc[,"covid_status"]=="control")
-control <- BIOspcglyc[idx,]
-treatment <- BIOspcglyc[-idx,]
+BIOspcglycR<- BIOspcglyc
+control <- BIOspcglycR[idx,]
+treatment <- BIOspcglycR[-idx,]
 
 #sort from smallest to largest for one sample col
 control<-sort(control$SPC_All)
@@ -1182,14 +1192,18 @@ n2 = length(control)
 #make a matrix using control and treatment: set as one column for treatment(eg 100x1 matrix) and one row for control (eg 1x38 matrix) using outer, and do minus using FUN. reassign any negative as -1, any positive as +1 any 0 is left as 0
 dominance = sign(outer(treatment, control, FUN="-")) 
 
-
-
-dominance
+#calculate the mean of each entry in dominance. d is cliffs delta
 d = mean(dominance)
+
 
 #use the values 
 row.names(dominance) = treatment
 colnames(dominance) = control
 rescale.factor = (n1*n2-1)/(n1*n2)
 d. = ifelse(abs(d)==1,d*rescale.factor,d)
+
+#pvalue calculation 
+x<-BIOspcglyc$SPC_All
+y<-BIOspcglyc$covid_status_factor
+kruskal.test(x, y)$p.value
 ```

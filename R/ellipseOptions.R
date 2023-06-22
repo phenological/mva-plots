@@ -136,7 +136,6 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
   }
 }
 
-  #outlierHotellings <- c(1,2,3)
   model <- append(model, list(outlierHotellings = outlierHotellings,
                                       outlierT = outlierT,
                               outlierNormal = outlierNormal))
