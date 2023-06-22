@@ -21,7 +21,7 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
 
   hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(ci, 2, n - 2)
 
-  outlierHotellings <- list()
+  #oH <- list()
   outlierT <- list()
   outlierNormal <- list()
 
@@ -56,7 +56,8 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
           outlierIDX <- model$data$pcdf[idx,-1:-ncol(model$data$scores)]
 
           new_list <- setNames(list(outlierIDX), placeHolder)
-          outlierHotellings <- append(outlierHotellings, new_list)
+          oH <-new_list
+          #oH <- append(oH, new_list)
 
           ##label outliers
           if(optns$ellipse == "hotellings" & "outlierLabels" %in% names(optns)){
@@ -136,13 +137,20 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
   }
 }
 
-  model <- append(model, list(outlierHotellings = outlierHotellings,
-                                      outlierT = outlierT,
-                              outlierNormal = outlierNormal))
-
-  model$plots <- append(model$plot, list(pcaGridPlot = pcaGridPlot))
-
-  return(model)
+  output <- list(pcaGridPlot = pcaGridPlot
+                 # ,
+                 # outlierHotellings = oH,
+                 # outlierT = outlierT,
+                 # outlierNormal = outlierNormal
+  )
+  # model <- append(model, list(outlierHotellings = oH,
+  #                                     outlierT = outlierT,
+  #                             outlierNormal = outlierNormal))
+  #
+  # model$plots <- append(model$plot, list(pcaGridPlot = pcaGridPlot))
+  #
+  # return(model)
+  return(output)
 }
 
 ###############################################################################################################################

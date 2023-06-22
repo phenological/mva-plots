@@ -20,7 +20,7 @@
 #' a <- pcResults(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
 #' b <- plotscores(model = a, optns=list(colourCoding = iris[,"Species"], colourTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alphaCoding = 0.7))
 
-plotscores<-function(model, optns=list()){
+plotScores<-function(model, optns=list()){
 
   #Grid title (working)
   if("gridTitle" %in% names(optns)){
@@ -228,6 +228,16 @@ plotscores<-function(model, optns=list()){
          alpha = alphaTitle ) +
     theme_minimal()
 
+#ensure that lack of legend doesn't stop ggpairs from working
+  if ((length(optns$colourCoding)) == 1 &
+      (length(optns$shapeCoding)) == 1 &
+      (length(optns$sizeCoding)) == 1 &
+      (length(optns$alphaCoding)) == 1) {
+    testLegend <- NULL
+  } else{
+    testLegend <- grab_legend(test)
+  }
+
   #axis labels
   title <- list()
   for (i in 1:thresh) {
@@ -243,7 +253,8 @@ plotscores<-function(model, optns=list()){
                                upper="blank",
                                #upper=list(continuous = my_fn1),
                                lower=list(continuous = myFn1),
-                               legend = grab_legend(test),
+                               legend = testLegend,
+                               #legend = grab_legend(test),
                                progress = F,
                                switch = "both") +
     gp +
@@ -259,14 +270,22 @@ plotscores<-function(model, optns=list()){
                                       colour = "grey35"))
 
 
-  plotGT<-ellipseOptions (model = model, pcaGridPlot = pcaGridPlot, thresh = thresh, optns = optns)
+  plotGT <- ellipseOptions (model = model,
+                            pcaGridPlot = pcaGridPlot,
+                            thresh = thresh,
+                            optns = optns
+                          )
 
-  pcaGridPlot <- gPairsLower(plotGT$plots$pcaGridPlot)
+  #pcaGridPlot <- gPairsLower(plotGT$plots$pcaGridPlot)
+  pcaGridPlot <- gPairsLower(plotGT$pcaGridPlot)
 
-  model$data <- append(model$data, list(outliers = list(hotellings = plotGT$outlierHotellings,
-                                                        statT = plotGT$outlierT,
-                                                        statNorm = plotGT$outlierNormal)))
   model$plots <- append(model$plots, list(pcaGrid = pcaGridPlot))
+
+  # model$data <- append(model$data, list(outliers = list(hotellings = plotGT$outlierHotellings,
+  #                                                       statT = plotGT$outlierT,
+  #                                                       statNorm = plotGT$outlierNormal)))
+
+
 
   return(model)
 

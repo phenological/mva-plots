@@ -7,8 +7,8 @@ for(i in functionList){
 ```
 
 ```{r}
-#ggplot2, GGally, roxygen2, stats, BioGenerics, dplyr??, sp??(included), ggpubr??
-usethis::use_package("sp")
+#testthat, ggplot2, GGally, roxygen2, stats, dplyr??, sp??(included), ggpubr??
+usethis::use_package("testthat")
 
 ```
 #load data to test functions
@@ -49,6 +49,7 @@ BIOspcglyc$covid_status<-ifelse(BIOspcglyc$group =="COVID-pos","covid", ifelse(B
 loadPackages(myPackages = c("ggplot2",
                             "stats",
                             "roxygen2",
+                            "testthat",
                             #"ggpmisc",
                             #"ggplotly",
                             #"plotly",
@@ -89,13 +90,20 @@ a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
 # opt=list(colourCoding= "covid_status")
 
 #2) 
-fff<- plotscores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], ellipse="T", outlierLabels=BIOspcglyc[,"sex"]))
+fff<- plotScores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], ellipse="T", outlierLabels=BIOspcglyc[,"sex"]))
 fff[["plots"]][["pcaGrid"]]
 
 #2)
 fff<- plotLoadings(model= a)
 fff[["plots"]][["plotLoadingGrid"]]
 ```
+```{r}
+data("iris")
+a<-pcResults(data=iris[,1:4], annotation = iris[,5])
+b<-plotScores(model=a, optns=list())
+b[["plots"]][["pcaGrid"]]
+```
+
 #tests plotLoadingsGrid
 ```{r}
 p2<- plotLoadingGrid(screeCumulativeThresholdObject = b, gridTitle = "Loadings")
