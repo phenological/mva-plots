@@ -258,6 +258,10 @@ plotscores<-function(model, optns=list()){
           panel.border = element_rect(fill = NA,
                                       colour = "grey35"))
 
+
+  plotGT<-ellipseOptions (model = model, pcaGridPlot = pcaGridPlot, thresh = thresh, optns = optns)
+
+  pcaGridPlot <- gPairsLower(plotGT$plots$pcaGridPlot)
   # #confidence interval
   # if("confidenceInterval" %in% names(optns)){
   #   ci <- optns$confidenceInterval
@@ -407,7 +411,7 @@ plotscores<-function(model, optns=list()){
   #   }
   # }
 
-  pcaGridPlot <- gPairsLower(pcaGridPlot)
+
 
   # model$data <- append(model$data, list(outliers = list(outlierHotellings = outlierHotellings,
   #                                                       statT = outlierT,
