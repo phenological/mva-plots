@@ -14,6 +14,8 @@
 #' @param shapeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{shapeCoding} is a variable. No shape legend will appear if \code{shapeCoding} is set to a simple aesthetic such as "square". Default "Shape".
 #' @param sizeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{sizeCoding} is a variable. No size legend will appear if \code{sizeCoding} is set to a simple aesthetic such as 2. Default "Size".
 #' @param alphaTitle A parameter for the \code{optns} list. A character of the desired alpha legend title when \code{alphaCoding} is a variable. No size legend will appear if \code{alphaCoding} is set to a simple aesthetic such as 0.3. Default "Alpha".
+#' @param ellipse A parameter for the \code{optns} list. A character or either "colour", "hotellings", "T", or "normal" depending on desired method of calculation.
+#' @param outlierLabels A parameter for the \code{optns} list. A column from the data frame to label outliers with (only compatible with ellipse set to hotellings, T or normal). You can set it to, for example, outlierLabels=row.names(iris) to more easily identify the outlier position in your dataframe.
 #' @return The model list appended with the grid of loadings under plots.
 #' @examples
 #' data(iris)
@@ -254,7 +256,6 @@ plotScores<-function(model, optns=list()){
                                #upper=list(continuous = my_fn1),
                                lower=list(continuous = myFn1),
                                legend = testLegend,
-                               #legend = grab_legend(test),
                                progress = F,
                                switch = "both") +
     gp +
@@ -276,16 +277,11 @@ plotScores<-function(model, optns=list()){
                             optns = optns
                           )
 
-  #pcaGridPlot <- gPairsLower(plotGT$plots$pcaGridPlot)
   pcaGridPlot <- gPairsLower(plotGT$pcaGridPlot)
 
   model$plots <- append(model$plots, list(pcaGrid = pcaGridPlot))
 
-  # model$data <- append(model$data, list(outliers = list(hotellings = plotGT$outlierHotellings,
-  #                                                       statT = plotGT$outlierT,
-  #                                                       statNorm = plotGT$outlierNormal)))
-
-
+  model$data <- append(model$data, list(outliers = plotGT$outliers))
 
   return(model)
 

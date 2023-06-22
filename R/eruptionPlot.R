@@ -2,18 +2,74 @@
 eruptionPlot <- function(model, optns = list()){
 
   if("plotTitle" %in% names(optns)){
-    pltTitle = optns$plotTitle
+    plotTitle = optns$plotTitle
   }else{
     plotTitle <- "Eruption plot"
   }
 
-  #logFC	PValue	FDR cliffsDelta PrincipalComponentLoadings
+  if("factor" %in% names(optns)){
+    model$data$rawData$factor <- optns$factor
+  }
+  #else{warning?? }
 
-  model$data$loadings
-  id <- rownames(model$data$loadings)
+# want: logFC	PValue FDR cliffsDelta PrincipalComponentLoadings
 
-  #cliffs delta
-stats::wilcox.test(SPC_All ~ covid_status_factor, data=BIOspcglyc)
+##cliffs delta using stats via calculating U statistic (W wilcoxon statistic)
+U <- list()
+for(i in 1:(ncol(model$data$rawData)-1)){
+  u <- stats::wilcox.test(i ~ factor, data = model$data$rawData)
+  U[[i]] <- u[["statistic"]]
+}
+  n <- table(model$data$rawData)[1]
+  m <- table(model$data$rawData)[2]
+
+cd<-list()
+  for(i in 1:(ncol(model$data$rawData)-1)){
+    cd[[i]] <- (U[i]/(n*m)-0.5)*2
+  }
+
+##cliffs delta manually
+###split into control and treatment
+idx <- which(model$data$rawData$factor==1)
+control <- model$data$rawData[idx,]
+treatment <- model$data$rawData[-idx,]
+
+###sort from smallest to largest for one sample col
+base::apply(X = control, MARGIN = )
+control<-sort(control$SPC_All)
+treatment<-sort(treatment$SPC_All)
+
+###find length of control and treatment
+n1 = length(treatment)
+n2 = length(control)
+
+###make a matrix using control and treatment: set as one column for treatment(eg 100x1 matrix) and one row for control (eg 1x38 matrix) using outer, and do minus using FUN. reassign any negative as -1, any positive as +1 any 0 is left as 0
+dominance = sign(outer(treatment, control, FUN="-"))
+
+###calculate the mean of each entry in dominance. d is cliffs delta
+d = mean(dominance)
+
+
+#use the values
+row.names(dominance) = treatment
+colnames(dominance) = control
+rescale.factor = (n1*n2-1)/(n1*n2)
+d. = ifelse(abs(d)==1,d*rescale.factor,d)
+
+
+
+
+
+
+#logFC	PValue	FDR cliffsDelta PrincipalComponentLoadings
+model$data$loadings
+id <- rownames(model$data$loadings)
+
+
+
+
+
+
 
   function (ref, comp)
   {

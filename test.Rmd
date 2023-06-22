@@ -90,7 +90,7 @@ a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
 # opt=list(colourCoding= "covid_status")
 
 #2) 
-fff<- plotScores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], ellipse="T", outlierLabels=BIOspcglyc[,"sex"]))
+fff<- plotScores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], ellipse="hotellings", outlierLabels=BIOspcglyc[,"patientID"]))
 fff[["plots"]][["pcaGrid"]]
 
 #2)
@@ -100,7 +100,7 @@ fff[["plots"]][["plotLoadingGrid"]]
 ```{r}
 data("iris")
 a<-pcResults(data=iris[,1:4], annotation = iris[,5])
-b<-plotScores(model=a, optns=list())
+b<-plotScores(model=a, optns=list(colourCoding=iris[,5], colourTitle="species", ellipse="T", outlierLabels=rownames(iris)))
 b[["plots"]][["pcaGrid"]]
 ```
 
