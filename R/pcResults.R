@@ -49,6 +49,8 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 10,
 
   rawData <- data
 
+  dataSC<- as.data.frame(scale(rawData, scale=TRUE, center=T))
+
  if("cutoff" %in% optns){
    cutoff = optns$cutoff
  }else{cutoff = 99}
@@ -100,6 +102,7 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 10,
 
 
   data<-list(rawData = rawData,
+             dataSC = dataSC,
              scores = scores,
              loadings = loadings,
              sdev = sdev,

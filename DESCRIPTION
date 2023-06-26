@@ -13,6 +13,7 @@ Config/testthat/edition: 3
 Imports:
     GGally,
     ggplot2,
+    ggrepel,
     roxygen2,
     sp,
     stats,

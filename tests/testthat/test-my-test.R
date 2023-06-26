@@ -6,24 +6,32 @@ test_that("pcresults",{
 })
 
 
-test_that("Plot returns ggplot object",{
+#pcResults
+
+
+#plotScores
+test_that("pcaGrid is a gg object",{
   data("iris")
   a <- pcResults(data=iris[,1:4], annotation =iris[,5])
   p <- plotScores(model = a, optns = list())
-  expect_type(p$plots$pcaGrid,"list")
+  expect_s3_class(object= p[["plots"]][["pcaGrid"]], class = "gg")
 })
 
-test_that("Plot returns ggplot object",{
+test_that("plots is a list",{
   data("iris")
   a <- pcResults(data=iris[,1:4], annotation =iris[,5])
   p <- plotScores(model = a, optns = list())
   expect_type(p$plots,"list")
 })
 
-test_that("Plot returns ggplot object",{
-  p <- plot_fun(df)
-  expect_is(p,"ggplot")
+#plotLoadings
+test_that("plotLoadingGrid is a gg object",{
+  data("iris")
+  a <- pcResults(data=iris[,1:4], annotation =iris[,5])
+  p <- plotLoadings(model = a, optns = list())
+  expect_s3_class(object= p[["plots"]][["plotLoadingGrid"]], class = "gg")
 })
+
 
 test_that("Plot uses correct data", {
   p <- plot_fun(df)

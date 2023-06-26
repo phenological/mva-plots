@@ -21,6 +21,7 @@
 #' data(iris)
 #' a <- pcResults(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
 #' b <- plotscores(model = a, optns=list(colourCoding = iris[,"Species"], colourTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alphaCoding = 0.7))
+#' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 plotScores<-function(model, optns=list()){
 
@@ -260,7 +261,8 @@ plotScores<-function(model, optns=list()){
                                switch = "both") +
     gp +
     theme_bw() +
-    theme(strip.background = element_rect(fill = "white"),
+    theme(legend.position = "right",
+      strip.background = element_rect(fill = "white"),
           axis.text.x = (element_text(size = rel(0.7),
                                       angle = 0)),
           axis.text.y = (element_text(size = rel(0.7),
