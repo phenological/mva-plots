@@ -111,6 +111,7 @@ c[["plots"]][["plotLoadingGrid"]]
 #access single plot via [j,i]
 c[["plots"]][["plotLoadingGrid"]][1,1]
 ```
+
 ```{r}
 factor<-BIOspcglyc[,"covid_status"]
 
@@ -207,14 +208,14 @@ ggplot(data=ed, aes(x = cd,
         legend.position = "right",
         legend.direction = "vertical")
 
-d<-eruptionPlot(model=a, factor=BIOspcglyc[,"covid_status"], optns=list())
+d<-eruptionPlot(model=a, factor=BIOspcglyc[,"covid_status"], optns=list(PC=2))
 d[["plots"]][["eruptionPlot"]]
 
 
 data(mtcars)
  
 a <- pcResults(data = mtcars[,1:7], annotation=mtcars[,8:11], center = TRUE, scale. = TRUE)
-b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(colourCoding = "correlation", plotTitle = "mtcars eruption"))
+b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(plotTitle = "mtcars eruption", method = "bonferroni"))
 
 b[["plots"]][["eruptionPlot"]]
 ```

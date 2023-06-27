@@ -1,4 +1,4 @@
-#' Eeruption Plot.
+#' Eruption Plot.
 #'
 #' Eruption plot.
 #'
@@ -15,10 +15,18 @@
 #' data(mtcars)
 #'
 #' a <- pcResults(data = mtcars[,1:7], annotation = mtcars[,8:11], center = TRUE, scale. = TRUE)
-#' b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(colourCoding = "correlation", plotTitle = "mtcars eruption"))
+#' b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(colourCoding = "correlation", plotTitle = "mtcars eruption", method = "bonferroni"))
 #' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 eruptionPlot <- function(model, factor, optns = list()){
+
+  id <- as.data.frame(colnames(model$data$rawData))
+
+  #ensure "factor" isn't included in id
+  if(any(id=="factor")){
+    idx <- which(id == "factor")
+    id <- as.data.frame(id[-idx,])
+  }
 
   if("plotTitle" %in% names(optns)){
     plotTitle = optns$plotTitle
@@ -44,100 +52,62 @@ eruptionPlot <- function(model, factor, optns = list()){
 
     df <- model$data$rawData
 
-    n <- table(df$factor)[1]
-    m <- table(df$factor)[2]
+#cliffs delta
+    cd <- cliffsDelta(model = model, factor = factor)
+
 #correlations between scaled + centered original data and scores
+  corr <- t(as.data.frame(cor(model$data$scores[,PC], model$data$dataSC)))
 
-  corr<-t(as.data.frame(cor(model$data$scores[,PC], model$data$dataSC)))
-
-  # want: logFC	PValue FDR cliffsDelta PrincipalComponentLoadings
-
-##cliffs delta using stats via calculating U statistic (W wilcoxon statistic)
-
-# U <- list()
-# for(i in 1:(ncol(df)-1)){
-#   formula <- as.formula(paste(colnames(df)[i]," ~ factor", sep=""))
-#   model <- wilcox.test(formula, data = df)
-#   U[[i]] <- model[["statistic"]]
-# }
-#
-#
-#    U <- (unlist(U))
-#
-#    cd <- (U/(n*m)-0.5)*2
-#
-# return(cd)
-# }
-
-
-# ##cliffs delta manually
-    rescale.factor = (n*m-1)/(n*m)
-    idx<- which(df[,"factor"]==1)
-    control <- df[idx,]
-    treatment <- df[-idx,]
-
-    #control
-    c<-list()
-    for(i in 1:(ncol(control)-1)){
-      c[[i]] <- sort(control[,i])
-    }
-
-    #treatment
-    t<-list()
-    for(i in 1:(ncol(treatment)-1)){
-      t[[i]] <- sort(treatment[,i])
-    }
-
-    #dominance matrix
-    d<-list()
-    for(i in 1:(ncol(df)-1)){
-      d[[i]] <-sign(outer(t[[i]], c[[i]], FUN="-"))
-    }
-
-    #cliffs delta
-    cd<-list()
-    for(i in 1:(ncol(df)-1)){
-      cd[[i]]<-mean(d[[i]])
-    }
-
-    for(i in 1:(ncol(df)-1)){
-      ifelse(test = abs(cd[[i]])==1, yes = cd[[i]]*rescale.factor, no=cd)
-    }
-unlist(cd)
-cd<-t(as.data.frame(cd))
+#Fold change
+  fc <- foldChange(model = model, factor = factor)
 
 #adjusted p-value
 pval<-list()
 for(i in 1:(ncol(df)-1)){
-  pval[[i]]<-kruskal.test(df[,i],df[,"factor"])$p.value
+  pval[[i]]<-kruskal.test(df[,i], df[,"factor"])$p.value
 }
 
 unlist(pval)
 pvalAdjusted <- p.adjust(pval, method = method)
 pvalRescaled <- abs(log10(pvalAdjusted))
-pvalRescaled<-as.data.frame(pvalRescaled)
+pvalRescaled <- as.data.frame(pvalRescaled)
 
 #loadings and id
-
 pcLoadings<-as.data.frame(model$data$loadings[,PC])
-
-id<-as.data.frame(row.names(pcLoadings))
+#id<-as.data.frame(row.names(pcLoadings))
 
 #eruption data frame
-ed<-cbind(cd, pvalRescaled, pcLoadings, id, corr)
+ed<-cbind(cd, fc, pvalRescaled, pcLoadings, id, corr)
 
-colnames(ed)<-c("cd", "pvalRescaled", "PC1loadings", "id", "correlation")
+colnames(ed)<-c("cd", "log2FC", "pvalRescaled", "PCloadings", "id", "correlation")
 
-if("colourCoding" %in% names(optns)){
-  if(optns$colourCoding=="correlation"){
-    plot<-ggplot(data=ed, aes(x = cd,
-                              y = PC1loadings,
-                              colour = correlation ))
+#univariate plot
+# ggplot(data = results, aes(x = log2FC, y = pvalRescaled)) +
+#   geom_point(size = 3,
+#              shape = 16,
+#              alpha = 0.3) +
+#   theme_minimal() +
+#   geom_hline(yintercept = -log10(0.05), col = "black") +
+#   geom_vline(xintercept = c(-0.6, 0.6), col = "black") +
+#   geom_label_repel(aes(label = id),
+#                    colour = "black",
+#                    min.segment.length = 0.001) +
+#   labs(title = plotTitle,
+#        x = "log2FoldChange",
+#        y = "-log10 adj.p-val")
+
+#plot colourcoding
+if("colourCoding" %in% names(optns)) {
+  if (optns$colourCoding == "correlation") {
+    plot <- ggplot(data = ed, aes(x = cd,
+                                  y = PCloadings,
+                                  colour = correlation))
 
   }
-} else{plot<-ggplot(data=ed, aes(x = cd,
-                                 y = PC1loadings,
-                                 colour = pvalRescaled))
+} else{
+  plot <- ggplot(data = ed, aes(x = cd,
+                                y = PCloadings,
+                                colour = pvalRescaled))
 }
 
 #plot
@@ -145,8 +115,8 @@ eruptionPlot <- plot +
   geom_label_repel(aes(label = id),
                    colour = "black",
                    min.segment.length = 0.001) +
-  geom_point(size = 3,
-             shape = 1) +
+  # geom_point(size = 3,
+  #            shape = 1) +
   geom_point(size = 3,
              shape = 16,
              alpha = 0.3) +
@@ -155,7 +125,7 @@ eruptionPlot <- plot +
   scale_colour_gradientn(colours = rainbow(7)) +
   ggtitle(plotTitle) +
   labs(x = "Cliff's Delta",
-       y = "PC1 Loadings") +
+       y = paste0("PC", PC, "loadings")) +
   theme(panel.grid.minor = element_blank(),
         plot.tag = element_text(face = "bold",
                                 size = 25),
@@ -170,51 +140,8 @@ return(model)
 }
 
 
-
-
-
-# ###split into control and treatment
-# idx <- which(model$data$rawData$factor==1)
-# control <- model$data$rawData[idx,]
-# treatment <- model$data$rawData[-idx,]
-#
-# ###sort from smallest to largest for one sample col
-# base::apply(X = control, MARGIN = )
-# control<-sort(control$SPC_All)
-# treatment<-sort(treatment$SPC_All)
-#
-# ###find length of control and treatment
-# n1 = length(treatment)
-# n2 = length(control)
-#
-# ###make a matrix using control and treatment: set as one column for treatment(eg 100x1 matrix) and one row for control (eg 1x38 matrix) using outer, and do minus using FUN. reassign any negative as -1, any positive as +1 any 0 is left as 0
-# dominance = sign(outer(treatment, control, FUN="-"))
-#
-# ###calculate the mean of each entry in dominance. d is cliffs delta
-# d = mean(dominance)
-#
-#
-# #use the values
-# row.names(dominance) = treatment
-# colnames(dominance) = control
-# rescale.factor = (n1*n2-1)/(n1*n2)
-# d. = ifelse(abs(d)==1,d*rescale.factor,d)
-
-
-
-
-
-
 # #logFC	PValue	FDR cliffsDelta PrincipalComponentLoadings
-# model$data$loadings
-# id <- rownames(model$data$loadings)
-#
-#
-#
-#
-#
-#
-#
+
 #   function (ref, comp)
 #   {
 #     if (!is.numeric(ref) | !is.numeric(comp))
