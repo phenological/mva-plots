@@ -1,3 +1,22 @@
+#' Eeruption Plot.
+#'
+#' Eruption plot.
+#'
+#' @param model A pcResults object.
+#' @param factor A column from the data frame of metadata. Must be a two factor variable such as treatment and control.
+#' @param optns An empty list for additional options.
+#' @param plotTitle A parameter for the \code{optns} list. A character for the title of the plot. Default is "Eruption Plot".
+#' @param method A parameter for the \code{optns} list. Determines the method to adjust p-values by. The options the same as listed in stats::p.adjust ("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"). The default is "none".
+#' @param PC A parameter for the \code{optns} list. A numeric for which principal component to use for the loadings (for the plot y-axis) and scores (if correlation is chosen for \code{colourCoding}).
+#' @param colourCoding A parameter for the \code{optns} list. Colour coding for the eruption plot, either the adjsuted and rescaled p-value or the correlation. The default is the p-value. To switch set to "correlation".
+#' @return The model list appended with the eruption plot and the data to make the plot.
+#'
+#' @examples
+#' data(mtcars)
+#'
+#' a <- pcResults(data = mtcars[,1:7], annotation = mtcars[,8:11], center = TRUE, scale. = TRUE)
+#' b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(colourCoding = "correlation", plotTitle = "mtcars eruption"))
+#' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 eruptionPlot <- function(model, factor, optns = list()){
 
@@ -7,8 +26,7 @@ eruptionPlot <- function(model, factor, optns = list()){
     plotTitle <- "Eruption Plot"
   }
 
-  ###for pvalue adjustment, options the same as listed in stats::p.adjust c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY",
-  #   "fdr", "none")
+  ###for pvalue adjustment, options the same as listed in stats::p.adjust c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
   if("method" %in% names(optns)){
     method = optns$method
   }else{
@@ -120,7 +138,6 @@ if("colourCoding" %in% names(optns)){
 } else{plot<-ggplot(data=ed, aes(x = cd,
                                  y = PC1loadings,
                                  colour = pvalRescaled))
-
 }
 
 #plot

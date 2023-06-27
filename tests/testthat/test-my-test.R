@@ -32,6 +32,22 @@ test_that("plotLoadingGrid is a gg object",{
   expect_s3_class(object= p[["plots"]][["plotLoadingGrid"]], class = "gg")
 })
 
+#eruptionPlot
+test_that("plotLoadingGrid is a gg object",{
+  data("mtcars")
+  a <- pcResults(data=mtcars[,1:7], annotation =mtcars[,8:11])
+  p <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns = list())
+  expect_s3_class(object= p[["plots"]][["eruptionPlot"]], class = "gg")
+})
+
+
+
+
+
+
+
+
+
 
 test_that("Plot uses correct data", {
   p <- plot_fun(df)

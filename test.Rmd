@@ -7,8 +7,8 @@ for(i in functionList){
 ```
 
 ```{r}
-#testthat, ggplot2, GGally, roxygen2, stats, dplyr??, sp??(included), ggpubr??
-usethis::use_package("testthat")
+#testthat, ggplot2, GGally, roxygen2, stats, ggrepel, dplyr??, sp??(included), ggpubr??
+usethis::use_package("ggrepel")
 
 ```
 #load data to test functions
@@ -59,7 +59,7 @@ loadPackages(myPackages = c("ggplot2",
                             #"cowplot",
                             #"gridExtra",
                             #"rlist",
-                            #"ggrepel",
+                            "ggrepel",
                             #"ellipse",
                             #"HotellingEllipse",
                             "sp"))
@@ -100,8 +100,289 @@ fff[["plots"]][["plotLoadingGrid"]]
 ```{r}
 data("iris")
 a<-pcResults(data=iris[,1:4], annotation = iris[,5])
-b<-plotScores(model=a, optns=list(colourCoding=iris[,5], colourTitle="species", ellipse="T", outlierLabels=rownames(iris)))
+b<-plotScores(model=a, optns=list(colourCoding=iris[,5], colourTitle="species", ellipse="T", outlierLabels=rownames(iris), thresh=3))
 b[["plots"]][["pcaGrid"]]
+
+b[["plots"]][["pcaGrid"]][2,2]
+
+c<-plotLoadings(model = a)
+c[["plots"]][["plotLoadingGrid"]]
+
+#access single plot via [j,i]
+c[["plots"]][["plotLoadingGrid"]][1,1]
+```
+```{r}
+factor<-BIOspcglyc[,"covid_status"]
+
+a$data$rawData$factor <- as.numeric(as.factor(factor))
+
+    df <- a$data$rawData
+
+#correlations between scaled + centered original data and scores
+
+  corr<-t(as.data.frame(cor(a$data$scores[,1], a$data$dataSC)))
+
+# ##cliffs delta manually
+    rescale.factor = (n*m-1)/(n*m)
+    idx<- which(df[,"factor"]==1)
+    control <- df[idx,]
+    treatment <- df[-idx,]
+
+    #control
+    c<-list()
+    for(i in 1:(ncol(control)-1)){
+      c[[i]] <- sort(control[,i])
+    }
+
+    #treatment
+    t<-list()
+    for(i in 1:(ncol(treatment)-1)){
+      t[[i]] <- sort(treatment[,i])
+    }
+
+    #dominance matrix
+    d<-list()
+    for(i in 1:(ncol(df)-1)){
+      d[[i]] <-sign(outer(t[[i]], c[[i]], FUN="-"))
+    }
+
+    #cliffs delta
+    cd<-list()
+    for(i in 1:(ncol(df)-1)){
+      cd[[i]]<-mean(d[[i]])
+    }
+
+    for(i in 1:(ncol(df)-1)){
+      ifelse(test = abs(cd[[i]])==1, yes = cd[[i]]*rescale.factor, no=cd)
+    }
+unlist(cd)
+cd<-t(as.data.frame(cd))
+
+#adjusted p-value
+pval<-list()
+for(i in 1:(ncol(df)-1)){
+  pval[[i]]<-kruskal.test(df[,i],df[,"factor"])$p.value
+}
+
+unlist(pval)
+pvalAdjusted <- p.adjust(pval, method = "BH")
+pvalRescaled <- abs(log10(pvalAdjusted))
+pvalRescaled<-as.data.frame(pvalRescaled)
+
+#loadings and id
+
+pcLoadings<-as.data.frame(a$data$loadings[,1])
+
+id<-as.data.frame(row.names(pcLoadings))
+
+#eruption data frame
+ed<-cbind(cd, pvalRescaled, pcLoadings, id, corr)
+
+colnames(ed)<-c("cd", "pvalRescaled", "PC1loadings", "id", "correlation")
+
+ggplot(data=ed, aes(x=cd, y=PC1loadings, color=pvalRescaled))+ 
+  geom_label_repel(aes(label = id),
+                   colour = "black") 
+
+#plot
+ggplot(data=ed, aes(x = cd,
+                                    y = PC1loadings,
+                                    colour = corr)) +
+  geom_label_repel(aes(label = id),
+                   colour = "black",
+                   min.segment.length = 0.001) +
+  geom_point(size = 3,
+             shape = 1) +
+  geom_point(size = 3,
+             shape = 16,
+             alpha = 0.3) +
+  theme_bw() +
+  scale_x_continuous(limits = c(-1, 1)) +
+  scale_colour_gradientn(colours = rainbow(7)) +
+  labs(x = "Cliff's Delta",
+       y = "PC1 Loadings") +
+  theme(panel.grid.minor = element_blank(),
+        plot.tag = element_text(face = "bold",
+                                size = 25),
+        legend.position = "right",
+        legend.direction = "vertical")
+
+d<-eruptionPlot(model=a, factor=BIOspcglyc[,"covid_status"], optns=list())
+d[["plots"]][["eruptionPlot"]]
+
+
+data(mtcars)
+ 
+a <- pcResults(data = mtcars[,1:7], annotation=mtcars[,8:11], center = TRUE, scale. = TRUE)
+b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(colourCoding = "correlation", plotTitle = "mtcars eruption"))
+
+b[["plots"]][["eruptionPlot"]]
+```
+
+
+#cliffs delta
+```{r}
+
+df <- a$data$rawData
+df$factor <- as.numeric(as.factor(BIOspcglyc[,"covid_status"]))
+
+wilcox.test(SPC_All ~ factor, data = df)
+
+U <- list()
+for(i in 1:(ncol(df)-1)){
+  formula <- as.formula(paste(colnames(df)[i]," ~ factor", sep=""))
+  model <- wilcox.test(formula, data = df)
+  U[[i]] <- model[["statistic"]]
+}
+
+   n <- table(df$factor)[1]
+   m <- table(df$factor)[2]
+
+U <- (unlist(U))
+
+cd <- (U/(n*m)-0.5)*2 
+
+tt<-subset(a$data$rawData, select=-c(factor))
+
+colnames(subset(a$data$rawData, select=-c(factor)))
+rbind(colnames(subset(a$data$rawData, select=-c(factor))), cd)
+
+
+d<-eruptionPlot(model = a, factor=BIOspcglyc[,"covid_status"])
+
+rescale.factor = (n*m-1)/(n*m)
+idx<- which(df[,"factor"]==1)
+control <- df[idx,]
+treatment <- df[-idx,]
+
+tc<-list(control, treatment)
+
+
+
+
+
+
+control<-sort(control)
+treatment<-sort(treatment)
+
+
+dominance = sign(outer(treatment, control, FUN="-"))
+row.names(dominance) = treatment
+colnames(dominance) = control
+
+d = mean(dominance)
+
+d. = ifelse(abs(d)==1,d*rescale.factor,d)
+
+return(d.)
+
+tc<-list(df[which(factor==1),1], df[which(factor==2),1])   
+tc<-list(mod@X[which(Y==1),1],mod@X[which(Y==0),1])
+
+c<-list()
+for(i in 1:(ncol(control)-1)){
+  c[[i]] <- sort(control[,i])
+}
+
+t<-list()
+for(i in 1:(ncol(treatment)-1)){
+  t[[i]] <- sort(treatment[,i])
+}
+
+d<-list()
+for(i in 1:(ncol(df)-1)){
+d[[i]] <-sign(outer(t[[i]], c[[i]], FUN="-"))
+}
+
+dd<-list()
+for(i in 1:(ncol(df)-1)){
+dd[[i]]<-mean(d[[i]])
+}
+#0.5393317
+
+rescale.factor = (n*m-1)/(n*m)
+for(i in 1:(ncol(df)-1)){
+ifelse(test = abs(dd[[i]])==1, yes = dd[[i]]*rescale.factor, no=dd)
+}
+
+unlist(dd)
+
+
+
+sort(control[,1])
+c[i]= tc[[2]]
+treatment = tc[[1]]
+control<-sort(control)
+treatment<-sort(treatment)
+n1 = length(treatment)
+n2 = length(control)
+rescale.factor = (n1*n2-1)/(n1*n2)
+
+dominance = sign(outer(treatment, control, FUN="-")) 
+row.names(dominance) = treatment
+colnames(dominance) = control
+
+d = mean(dominance)
+
+```
+```{r}
+idx<-which(df$factor==1)
+idy<-which(df$factor==2)
+x<-df[idx,]
+y<-df[idy,]
+
+pval<-kruskal.test(df$SPC_All,df$factor)$p.value
+
+p.adjust(pval, method="bonferroni")
+
+abs(log10(pval))
+
+
+pval<-list()
+for(i in 1:(ncol(df)-1)){
+pval[[i]]<-kruskal.test(df[,i],df[,"factor"])$p.value  
+}
+
+unlist(pval)
+pvalAdjusted <- p.adjust(pval, method="bonferroni")
+pvalRescaled <- abs(log10(pvalAdjusted))
+loading<-as.data.frame(a$data$loadings[,1])
+id<-as.data.frame(row.names(loading))
+
+dd<-t(as.data.frame(dd))
+pvalRescaled<-as.data.frame(pvalRescaled)
+
+ed<-cbind(dd,pvalRescaled,loading[,1], id)
+
+colnames(ed)<-c("cd", "pvalRescaled", "PC1 loadings", "id")
+
+class(ed)
+
+ggplot(ed, aes(x = ed$cd,  y = ed$`PC1 loadings`, color=pvalRescaled)) + 
+geom_label_repel(aes(label = id), 
+                   colour = "black",
+                 min.segment.length = 0.001)+
+  geom_point(size = 3,
+             shape = 1) +
+  geom_point(size = 3,
+             shape = 16,
+             alpha = 0.3) +
+  theme_bw() +
+  scale_x_continuous(limits = c(-1, 1)) +
+  scale_colour_gradientn(colours = rainbow(7)) +
+  labs(x = "Cliff's Delta",
+       y = "PC1 Loadings") +
+  theme(panel.grid.minor = element_blank(),
+        plot.tag = element_text(face = "bold",
+                                size = 25),
+        legend.position = "top",
+        legend.direction = "horizontal")
+
+
+Xsc<-a$data$dataSC
+scores <- a$data$scores[,1]
+corr<-cor(a$data$scores[,1], a$data$dataSC)
+
 ```
 
 #tests plotLoadingsGrid
@@ -1164,8 +1445,8 @@ top_counts <- vapply(ref, function(x, y = comp) {
 
    out <- ((sum(top_counts[1, ]) - sum(top_counts[2, ]))/(length(ref) * 
      length(comp))) * (-1)
-
-   
+df<-
+tc<-list(df[which(factor==1),1], df[which(factor==2),1])   
 tc<-list(mod@X[which(Y==1),1],mod@X[which(Y==0),1])
 control = tc[[2]]
 treatment = tc[[1]]
