@@ -9,14 +9,12 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-Suggests: 
-    testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Imports: 
-    BioGenerics,
+Imports:
     GGally,
     ggplot2,
-    prcomp,
+    ggrepel,
     roxygen2,
     sp,
-    stats
+    stats,
+    testthat

@@ -15,18 +15,23 @@
 #' @param center The centering used.
 #' @param scale The scaling used.
 #' @param threshold The number of principal components needed to explain the amount of cumulative variance specified (or the default of 99%).
-
+#' @examples
+#' data(iris)
+#' a <- pcResults(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
 
 #calculate Principal Components using prcomp
 
-pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, optns=list()) {
+pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 10, optns=list()) {
 
   results <- prcomp(data,
+                    rank = rank,
                     center = center,
                     scale. = scale.)
 
   pcSum <- (as.data.frame(t(summary(results)[["importance"]]))) %>%
              mutate(across(where(is.double), ~.x*100))
+
+  #mutate(across(where(is.double), \(x) x*100))
 
   pcSum[,"Principal Component"] <- rownames(pcSum)
 
@@ -40,7 +45,11 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, optns=list
 
   scale <- results[["scale"]]
 
-  pcdf<- cbind(as.data.frame(scores), annotation)
+  pcdf <- cbind(as.data.frame(scores), annotation)
+
+  rawData <- data
+
+  dataSC<- as.data.frame(scale(rawData, scale=TRUE, center=T))
 
  if("cutoff" %in% optns){
    cutoff = optns$cutoff
@@ -92,7 +101,9 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, optns=list
                                     axis.title.y.right = element_text(color = "orange3"))
 
 
-  data<-list(scores = scores,
+  data<-list(rawData = rawData,
+             dataSC = dataSC,
+             scores = scores,
              loadings = loadings,
              sdev = sdev,
              center = center,

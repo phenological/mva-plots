@@ -12,6 +12,8 @@
 #' data(iris)
 #' a <- pcResults(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
 #' b <- plotLoadings(model = a, optns = list(gridTitle = "Iris Dataset PC Loadings", thresh = 3))
+#'
+#' To access a single plot from the grid: b[["plots]][["plotLoadingsGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 
 plotLoadings <- function(model, optns=list()){
@@ -19,7 +21,7 @@ plotLoadings <- function(model, optns=list()){
   if("gridTitle" %in% names(optns)){
     gridTitle = optns$gridTitle
   }else{
-    gridTitle <- "PCA Grid"
+    gridTitle <- "Plot Loadings Grid"
     #cat(yellow("Using default gridTitle", "!\n"))
   }
 
@@ -48,6 +50,7 @@ plotLoadings <- function(model, optns=list()){
                                      switch="both") +
                                      geom_point(color= "blue",
                                                size = 1) +
+                                    #geom_label(label = rownames(df))+
                                      geom_text_repel(aes(label = rownames(df)),
                                                         size = 3.5) +
                                      theme_bw() +

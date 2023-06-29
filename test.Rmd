@@ -7,8 +7,8 @@ for(i in functionList){
 ```
 
 ```{r}
-#ggplot2, prcomp, GGally, roxygen2, stats, BioGenerics, dplyr??, sp??(included), ggpubr??
-usethis::use_package("sp")
+#testthat, ggplot2, GGally, roxygen2, stats, ggrepel, dplyr??, sp??(included), ggpubr??
+usethis::use_package("ggrepel")
 
 ```
 #load data to test functions
@@ -48,53 +48,344 @@ BIOspcglyc$covid_status<-ifelse(BIOspcglyc$group =="COVID-pos","covid", ifelse(B
 
 loadPackages(myPackages = c("ggplot2",
                             "stats",
-                            "ggpmisc",
-                            "ggplotly",
-                            "plotly",
-                            "prcomp", 
+                            "roxygen2",
+                            "testthat",
+                            #"ggpmisc",
+                            #"ggplotly",
+                            #"plotly",
                             "tidyverse", 
-                            "ggpubr",
+                            #"ggpubr",
                             "GGally",
-                            "cowplot",
-                            "gridExtra",
+                            #"cowplot",
+                            #"gridExtra",
                             #"rlist",
                             "ggrepel",
-                            "ellipse",
-                            "HotellingEllipse",
+                            #"ellipse",
+                            #"HotellingEllipse",
                             "sp"))
 #1) create pcresults object
 a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
 
-#2) create screeCumulativeThresholdObject
-b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
+# #2) create screeCumulativeThresholdObject
+# b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
+# 
+# #3) gridplot tests various combinations
+# ##working
+# a1<-pcaGrid(screeCumulativeThresholdObject = b, gridTitle = "Trial Grid title", CO="covid_status", COtitle = "Covid", SH="sex",hotelStat = TRUE)
+# a1[["plots"]][["pcaGridPlot"]]
+# a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
+# 
+# a2 <- pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = 5, COtitle = "covid", SZtitle = "Age")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
+# 
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = 1, COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = 5, AL = "age", COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = 5, AL = "age", COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = "bmi", COtitle = "covid")
+# p1 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = "bmi", COtitle = "covid")
+# pcaGrid(screeCumulativeThresholdObject = b, CO = "work_activity", SH = NULL, SZ = 5, AL = 1, COtitle = "covid")
+# 
+# 
+# opt=list(colourCoding= "covid_status")
 
-#3) gridplot tests various combinations
-##working
-a1<-pcaGrid(screeCumulativeThresholdObject = b, gridTitle = "Trial Grid title", CO="covid_status", COtitle = "Covid", SH="sex",hotelStat = TRUE)
-a1[["plots"]][["pcaGridPlot"]]
-a3 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = "age", AL = "bmi", COtitle = "Covid", SZtitle = "Age", ALtitle = "BMI")
-
-a2 <- pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SZ = 5, COtitle = "covid", SZtitle = "Age")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
-
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = 1, COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = 5, AL = "age", COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = 1, COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = 5, AL = "age", COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = "sex", SZ = "age", AL = "bmi", COtitle = "covid")
-p1 <-pcaGrid(screeCumulativeThresholdObject = b, CO = "covid_status", SH = NULL, SZ = "age", AL = "bmi", COtitle = "covid")
-pcaGrid(screeCumulativeThresholdObject = b, CO = "work_activity", SH = NULL, SZ = 5, AL = 1, COtitle = "covid")
-
-
-opt=list(colourCoding= "covid_status")
-
-
-fff<- plotscores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], sizeCoding=3, alphaCoding=BIOspcglyc[,"age"], shapeCoding=BIOspcglyc[,"sex"], ellipse="normal", confidenceInterval=0.90, outlierLabels="patientID"))
+#2) 
+fff<- plotScores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], ellipse="hotellings", outlierLabels=BIOspcglyc[,"patientID"]))
 fff[["plots"]][["pcaGrid"]]
 
-ffff<- plotLoadings(model= a)
+#2)
+fff<- plotLoadings(model= a)
+fff[["plots"]][["plotLoadingGrid"]]
+```
+```{r}
+data("iris")
+a<-pcResults(data=iris[,1:4], annotation = iris[,5])
+b<-plotScores(model=a, optns=list(colourCoding=iris[,5], colourTitle="species", ellipse="T", outlierLabels=rownames(iris), thresh=3))
+b[["plots"]][["pcaGrid"]]
+
+b[["plots"]][["pcaGrid"]][2,2]
+
+c<-plotLoadings(model = a)
+c[["plots"]][["plotLoadingGrid"]]
+
+#access single plot via [j,i]
+c[["plots"]][["plotLoadingGrid"]][1,1]
+```
+
+```{r}
+factor<-BIOspcglyc[,"covid_status"]
+
+a$data$rawData$factor <- as.numeric(as.factor(factor))
+
+    df <- a$data$rawData
+
+#correlations between scaled + centered original data and scores
+
+  corr<-t(as.data.frame(cor(a$data$scores[,1], a$data$dataSC)))
+
+# ##cliffs delta manually
+    rescale.factor = (n*m-1)/(n*m)
+    idx<- which(df[,"factor"]==1)
+    control <- df[idx,]
+    treatment <- df[-idx,]
+
+    #control
+    c<-list()
+    for(i in 1:(ncol(control)-1)){
+      c[[i]] <- sort(control[,i])
+    }
+
+    #treatment
+    t<-list()
+    for(i in 1:(ncol(treatment)-1)){
+      t[[i]] <- sort(treatment[,i])
+    }
+
+    #dominance matrix
+    d<-list()
+    for(i in 1:(ncol(df)-1)){
+      d[[i]] <-sign(outer(t[[i]], c[[i]], FUN="-"))
+    }
+
+    #cliffs delta
+    cd<-list()
+    for(i in 1:(ncol(df)-1)){
+      cd[[i]]<-mean(d[[i]])
+    }
+
+    for(i in 1:(ncol(df)-1)){
+      ifelse(test = abs(cd[[i]])==1, yes = cd[[i]]*rescale.factor, no=cd)
+    }
+unlist(cd)
+cd<-t(as.data.frame(cd))
+
+#adjusted p-value
+pval<-list()
+for(i in 1:(ncol(df)-1)){
+  pval[[i]]<-kruskal.test(df[,i],df[,"factor"])$p.value
+}
+
+unlist(pval)
+pvalAdjusted <- p.adjust(pval, method = "BH")
+pvalRescaled <- abs(log10(pvalAdjusted))
+pvalRescaled<-as.data.frame(pvalRescaled)
+
+#loadings and id
+
+pcLoadings<-as.data.frame(a$data$loadings[,1])
+
+id<-as.data.frame(row.names(pcLoadings))
+
+#eruption data frame
+ed<-cbind(cd, pvalRescaled, pcLoadings, id, corr)
+
+colnames(ed)<-c("cd", "pvalRescaled", "PC1loadings", "id", "correlation")
+
+ggplot(data=ed, aes(x=cd, y=PC1loadings, color=pvalRescaled))+ 
+  geom_label_repel(aes(label = id),
+                   colour = "black") 
+
+#plot
+ggplot(data=ed, aes(x = cd,
+                                    y = PC1loadings,
+                                    colour = corr)) +
+  geom_label_repel(aes(label = id),
+                   colour = "black",
+                   min.segment.length = 0.001) +
+  geom_point(size = 3,
+             shape = 1) +
+  geom_point(size = 3,
+             shape = 16,
+             alpha = 0.3) +
+  theme_bw() +
+  scale_x_continuous(limits = c(-1, 1)) +
+  scale_colour_gradientn(colours = rainbow(7)) +
+  labs(x = "Cliff's Delta",
+       y = "PC1 Loadings") +
+  theme(panel.grid.minor = element_blank(),
+        plot.tag = element_text(face = "bold",
+                                size = 25),
+        legend.position = "right",
+        legend.direction = "vertical")
+
+d<-eruptionPlot(model=a, factor=BIOspcglyc[,"covid_status"], optns=list(PC=2))
+d[["plots"]][["eruptionPlot"]]
+
+
+data(mtcars)
+ 
+a <- pcResults(data = mtcars[,1:7], annotation=mtcars[,8:11], center = TRUE, scale. = TRUE)
+b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(plotTitle = "mtcars eruption", method = "bonferroni"))
+
+b[["plots"]][["eruptionPlot"]]
+```
+
+
+#cliffs delta
+```{r}
+
+df <- a$data$rawData
+df$factor <- as.numeric(as.factor(BIOspcglyc[,"covid_status"]))
+
+wilcox.test(SPC_All ~ factor, data = df)
+
+U <- list()
+for(i in 1:(ncol(df)-1)){
+  formula <- as.formula(paste(colnames(df)[i]," ~ factor", sep=""))
+  model <- wilcox.test(formula, data = df)
+  U[[i]] <- model[["statistic"]]
+}
+
+   n <- table(df$factor)[1]
+   m <- table(df$factor)[2]
+
+U <- (unlist(U))
+
+cd <- (U/(n*m)-0.5)*2 
+
+tt<-subset(a$data$rawData, select=-c(factor))
+
+colnames(subset(a$data$rawData, select=-c(factor)))
+rbind(colnames(subset(a$data$rawData, select=-c(factor))), cd)
+
+
+d<-eruptionPlot(model = a, factor=BIOspcglyc[,"covid_status"])
+
+rescale.factor = (n*m-1)/(n*m)
+idx<- which(df[,"factor"]==1)
+control <- df[idx,]
+treatment <- df[-idx,]
+
+tc<-list(control, treatment)
+
+
+
+
+
+
+control<-sort(control)
+treatment<-sort(treatment)
+
+
+dominance = sign(outer(treatment, control, FUN="-"))
+row.names(dominance) = treatment
+colnames(dominance) = control
+
+d = mean(dominance)
+
+d. = ifelse(abs(d)==1,d*rescale.factor,d)
+
+return(d.)
+
+tc<-list(df[which(factor==1),1], df[which(factor==2),1])   
+tc<-list(mod@X[which(Y==1),1],mod@X[which(Y==0),1])
+
+c<-list()
+for(i in 1:(ncol(control)-1)){
+  c[[i]] <- sort(control[,i])
+}
+
+t<-list()
+for(i in 1:(ncol(treatment)-1)){
+  t[[i]] <- sort(treatment[,i])
+}
+
+d<-list()
+for(i in 1:(ncol(df)-1)){
+d[[i]] <-sign(outer(t[[i]], c[[i]], FUN="-"))
+}
+
+dd<-list()
+for(i in 1:(ncol(df)-1)){
+dd[[i]]<-mean(d[[i]])
+}
+#0.5393317
+
+rescale.factor = (n*m-1)/(n*m)
+for(i in 1:(ncol(df)-1)){
+ifelse(test = abs(dd[[i]])==1, yes = dd[[i]]*rescale.factor, no=dd)
+}
+
+unlist(dd)
+
+
+
+sort(control[,1])
+c[i]= tc[[2]]
+treatment = tc[[1]]
+control<-sort(control)
+treatment<-sort(treatment)
+n1 = length(treatment)
+n2 = length(control)
+rescale.factor = (n1*n2-1)/(n1*n2)
+
+dominance = sign(outer(treatment, control, FUN="-")) 
+row.names(dominance) = treatment
+colnames(dominance) = control
+
+d = mean(dominance)
 
 ```
+```{r}
+idx<-which(df$factor==1)
+idy<-which(df$factor==2)
+x<-df[idx,]
+y<-df[idy,]
+
+pval<-kruskal.test(df$SPC_All,df$factor)$p.value
+
+p.adjust(pval, method="bonferroni")
+
+abs(log10(pval))
+
+
+pval<-list()
+for(i in 1:(ncol(df)-1)){
+pval[[i]]<-kruskal.test(df[,i],df[,"factor"])$p.value  
+}
+
+unlist(pval)
+pvalAdjusted <- p.adjust(pval, method="bonferroni")
+pvalRescaled <- abs(log10(pvalAdjusted))
+loading<-as.data.frame(a$data$loadings[,1])
+id<-as.data.frame(row.names(loading))
+
+dd<-t(as.data.frame(dd))
+pvalRescaled<-as.data.frame(pvalRescaled)
+
+ed<-cbind(dd,pvalRescaled,loading[,1], id)
+
+colnames(ed)<-c("cd", "pvalRescaled", "PC1 loadings", "id")
+
+class(ed)
+
+ggplot(ed, aes(x = ed$cd,  y = ed$`PC1 loadings`, color=pvalRescaled)) + 
+geom_label_repel(aes(label = id), 
+                   colour = "black",
+                 min.segment.length = 0.001)+
+  geom_point(size = 3,
+             shape = 1) +
+  geom_point(size = 3,
+             shape = 16,
+             alpha = 0.3) +
+  theme_bw() +
+  scale_x_continuous(limits = c(-1, 1)) +
+  scale_colour_gradientn(colours = rainbow(7)) +
+  labs(x = "Cliff's Delta",
+       y = "PC1 Loadings") +
+  theme(panel.grid.minor = element_blank(),
+        plot.tag = element_text(face = "bold",
+                                size = 25),
+        legend.position = "top",
+        legend.direction = "horizontal")
+
+
+Xsc<-a$data$dataSC
+scores <- a$data$scores[,1]
+corr<-cor(a$data$scores[,1], a$data$dataSC)
+
+```
+
 #tests plotLoadingsGrid
 ```{r}
 p2<- plotLoadingGrid(screeCumulativeThresholdObject = b, gridTitle = "Loadings")
@@ -917,7 +1208,7 @@ dat <- data.frame(
   final_plot <- gPairsLower(pcaHotelPlot)
   return(final_plot)
 }
-(pcaHotelGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "Covid"))
+(pcaHotelGrid(screeCumulativeThresholdObject = a, CO = "covid_status", COtitle = "Covid"))
 ```
 #stat_ellipse not hotelling's
 ```{r}
@@ -996,7 +1287,8 @@ pcaHotelGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, A
   final_plot <- gPairsLower(pcaHotelPlot)
   return(final_plot)
 }
-(pcaHotelGrid(screeCumulativeThresholdObject = b, CO = "covid_status", COtitle = "Covid"))
+(pcaHotelGrid(screeCumulativeThresholdObject = a
+              , CO = "covid_status", COtitle = "Covid"))
 ```
 #single working example of a PCA with outlier labels 
 ```{r}
@@ -1007,10 +1299,10 @@ pcaHotelGrid <-function(screeCumulativeThresholdObject, CO, SH = NULL, SZ = 1, A
 
  hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
  
-
+a$data$pcdf$CO<- rep_len("red", nrow(a$data$pcdf))
 idx<- which(BIOspcglyc[,"covid_status"]=="covid")
- p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
-  geom_point(aes(shape=a$pcdf$sex))+
+ p <- ggplot(data=a$data$pcdf, aes(x=a$data$pcdf$PC1, y=a$data$pcdf$PC2)) +
+  geom_point(aes(shape=a$data$pcdf$sex, color=a$data$pcdf$CO))
   #scale_color_brewer(palette = "Set2")+
   stat_ellipse( type = "t", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
    #geom_text(aes(label = a$pcdf$patientID), size=2, hjust = 0, vjust = 0)
@@ -1057,5 +1349,152 @@ p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
   geom_point(aes(colour=colourCode,shape = shapeCode))
   
 
+a$data$pcdf$CO<- rep_len("green", nrow(a$data$pcdf))
 
+ p <- ggplot(data=a$data$pcdf, aes(x=a$data$pcdf$PC1, y=a$data$pcdf$PC2)) +
+  geom_point(aes(shape=a$data$pcdf$sex, colour = (rep_len("green", nrow(a$data$pcdf)))))
+p
+
+
+p <- ggplot(data=a$data$pcdf, aes(x=a$data$pcdf$PC1, y=a$data$pcdf$PC2), color="green") +
+  geom_point(aes(shape=a$data$pcdf$sex))
+p
+```
+#cliffs delta
+```{r}
+
+BIOspcglyc$covid_status_factor<- as.numeric(factor(BIOspcglyc[,"covid_status"]))
+
+idx <- which(BIOspcglyc$covid_status_factor==1)
+
+control<- BIOspcglyc[idx,] %>%
+  select("SPC1")
+trial <- BIOspcglyc[-idx,] %>%
+  select("SPC1")
+#two tailed wilcoxon (allows for effect in two directions)
+wt<-stats::wilcox.test(
+  SPC_All ~ covid_status_factor, data=BIOspcglyc
+)
+
+wt[["statistic"]]
+#3364
+
+table(BIOspcglyc$covid_status)
+#control   covid 
+#   100      38 
+
+((wt[["statistic"]])/(n*m)-0.5)*2
+(3364/(100*38)-0.5)*2
+
+
+
+
+uni <- t(apply(X, 2, function(x, idx = which(Y == comp),
+    y = Y) {
+    (cd(x[idx], x[-idx]))
+  }))
+
+cd<-function (ref, comp) 
+ {top_counts <- vapply(ref, function(x, y = comp) {
+     names(x) <- NULL
+     names(y) <- NULL
+     c(length(which(x > y)), length(which(x < y)))
+   }, FUN.VALUE = c(2, length(ref)))
+   out <- ((sum(top_counts[1, ]) - sum(top_counts[2, ]))/(length(ref) * 
+     length(comp))) * (-1)
+   return(out)
+ }
+
+idx<- which(BIOspcglyc[,"covid_status"]=="control")
+yy<- BIOspcglyc[-idx,]
+xx<- BIOspcglyc[idx,]
+
+cd(xx$SPC_All, yy$SPC_All)
+#[1] -0.7705263
+
+reseff<-effsize::cliff.delta(y, x, return.dm = TRUE)
+#-0.7705263
+
+# x= yy$SPC_All
+# y= xx$SPC_All
+
+idx<- which(BIOspcglyc[,"covid_status"]=="control")
+yy<- BIOspcglyc[-idx,]
+xx<- BIOspcglyc[idx,]
+ref = xx[,1]
+comp= yy[,1]
+top_counts <- vapply(ref, function(x, y = comp) {
+     names(x) <- NULL
+     names(y) <- NULL
+     c(length(which(x > y)), length(which(x < y)))
+   }, FUN.VALUE = c(2, length(ref)))
+
+#      names(x) <- NULL
+#      names(y) <- NULL
+#      c(length(which(x > y)), length(which(x < y)))
+#    #86 14
+# idx <- which(x > y)
+# idy <- which(x < y)
+# 
+# xxx<-x[idx]
+# sum(xxx)
+# 
+# yyy<-x[idy]
+# sum(yyy)
+# 
+# (sum(x[idx])-sum(x[idy]))/(86*14)
+
+   out <- ((sum(top_counts[1, ]) - sum(top_counts[2, ]))/(length(ref) * 
+     length(comp))) * (-1)
+df<-
+tc<-list(df[which(factor==1),1], df[which(factor==2),1])   
+tc<-list(mod@X[which(Y==1),1],mod@X[which(Y==0),1])
+control = tc[[2]]
+treatment = tc[[1]]
+control<-sort(control)
+treatment<-sort(treatment)
+n1 = length(treatment)
+n2 = length(control)
+rescale.factor = (n1*n2-1)/(n1*n2)
+
+dominance = sign(outer(treatment, control, FUN="-")) 
+row.names(dominance) = treatment
+colnames(dominance) = control
+
+d = mean(dominance)
+
+d. = ifelse(abs(d)==1,d*rescale.factor,d)
+
+#manually calculate cliffs delta
+#split into control and treatment
+idx<- which(BIOspcglyc[,"covid_status"]=="control")
+BIOspcglycR<- BIOspcglyc
+control <- BIOspcglycR[idx,]
+treatment <- BIOspcglycR[-idx,]
+
+#sort from smallest to largest for one sample col
+control<-sort(control$SPC_All)
+treatment<-sort(treatment$SPC_All)
+
+#find length of control and treatment
+n1 = length(treatment)
+n2 = length(control)
+
+#make a matrix using control and treatment: set as one column for treatment(eg 100x1 matrix) and one row for control (eg 1x38 matrix) using outer, and do minus using FUN. reassign any negative as -1, any positive as +1 any 0 is left as 0
+dominance = sign(outer(treatment, control, FUN="-")) 
+
+#calculate the mean of each entry in dominance. d is cliffs delta
+d = mean(dominance)
+
+
+#use the values 
+row.names(dominance) = treatment
+colnames(dominance) = control
+rescale.factor = (n1*n2-1)/(n1*n2)
+d. = ifelse(abs(d)==1,d*rescale.factor,d)
+
+#pvalue calculation 
+x<-BIOspcglyc$SPC_All
+y<-BIOspcglyc$covid_status_factor
+kruskal.test(x, y)$p.value
 ```
