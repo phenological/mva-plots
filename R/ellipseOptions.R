@@ -1,12 +1,11 @@
 ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = thresh, optns = optns){
-#add in option for CI % level
 
-#(ci = ci, thresh = thresh, model$data$pcdf = model$data$pcdf, pcaGridPlot = pcaGridPlot, ellipse = ellipse, outlierLabels = outlierLabels)
-
+#option for CI % level
   if("ci" %in% names(optns)) {
     ci <- optns$ci
   } else{ci <- 0.95}
 
+#option for outlier labels on plot
   if("outlierLabels" %in% names(optns)) {
     model$data$pcdf$outlierID <- optns$outlierLabels
   }

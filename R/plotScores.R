@@ -113,11 +113,6 @@ plotScores<-function(model, optns=list()){
     )}
   else{scale_color_brewer(palette = "Set2")}
 
-
-  # gs <- if(is(optns$colourCoding)[1] == "numeric"){
-  #   scale_colour_gradientn(colours = rainbow(7))
-  # }else{scale_color_brewer(palette = "Set2")}
-
   #correct input for ggplot and ggpairs objects
   gp<- if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1 ){
     geom_point(color = optns$colourCoding,
