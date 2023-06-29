@@ -82,6 +82,37 @@ plotScores<-function(model, optns=list()){
     alphaTitle = optns$alphaTitle
   } else{alphaTitle="Alpha"}
 
+  #ggplot2 treats integers and doubles as continuous variables, and treats only factors, characters, and logicals as discrete.
+
+  # library(colorRamps)
+  # > blue2green2red(15)
+  # [1] "#0000CC" "#0000FF" "#0055FF" "#00AAFF" "#00FFFF"
+  # [6] "#2BFFD5" "#55FFAA" "#80FF80" "#AAFF55" "#D4FF2B"
+  # [11] "#FFFF00" "#FFAA00" "#FF5500" "#FF0000" "#CC0000"
+  gs <- if(is(optns$colourCoding)[1] == "numeric"){
+    scale_color_gradientn(
+      colours = c(
+        "#0000CC",
+        "#0000FF",
+        "#0055FF",
+        "#00AAFF",
+        "#00FFFF",
+        "#2BFFD5",
+        "#55FFAA",
+        "#80FF80",
+        "#AAFF55",
+        "#D4FF2B",
+        "#FFFF00",
+        "#FFAA00",
+        "#FF5500",
+        "#FF0000",
+        "#CC0000"
+      ),
+      na.value = "grey50",
+      guide = "colourbar"
+    )}
+  else{scale_color_brewer(palette = "Set2")}
+
   #correct input for ggplot and ggpairs objects
   gp<- if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1 ){
     geom_point(color = optns$colourCoding,
@@ -221,10 +252,11 @@ plotScores<-function(model, optns=list()){
   test <- ggplot(data = model$data$pcdf,
                  aes(x = model$data$pcdf$PC1,
                      y = model$data$pcdf$PC2)) +
+    gs +
     gp +
     gu +
     scale_alpha(range = c(0.1, 1)) +
-    scale_color_brewer(palette="Set2") +
+    #scale_color_brewer(palette="Set2") +
     labs(color = colourTitle,
          shape = shapeTitle,
          size = sizeTitle,
@@ -259,6 +291,7 @@ plotScores<-function(model, optns=list()){
                                legend = testLegend,
                                progress = F,
                                switch = "both") +
+    gs +
     gp +
     theme_bw() +
     theme(legend.position = "right",

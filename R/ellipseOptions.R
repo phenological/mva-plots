@@ -1,12 +1,11 @@
 ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = thresh, optns = optns){
-#add in option for CI % level
 
-#(ci = ci, thresh = thresh, model$data$pcdf = model$data$pcdf, pcaGridPlot = pcaGridPlot, ellipse = ellipse, outlierLabels = outlierLabels)
-
+#option for CI % level
   if("ci" %in% names(optns)) {
     ci <- optns$ci
   } else{ci <- 0.95}
 
+#option for outlier labels on plot
   if("outlierLabels" %in% names(optns)) {
     model$data$pcdf$outlierID <- optns$outlierLabels
   }
@@ -22,9 +21,7 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
   hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(ci, 2, n - 2)
 
   outliers <- list()
-  #oH <- list()
-  #outlierT <- list()
-  #outlierNormal <- list()
+
 
 #create ellipses and outlier tables for output
   for(i in 1:thresh)
@@ -44,9 +41,13 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
         if(optns$ellipse == "hotellings"){
 
           ##for the plot
-          temp <- temp + gg_circle(rx = sqrt(var(model$data$pcdf[i]) * hotFisN),
-                                   ry = sqrt(var(model$data$pcdf[j]) * hotFisN),
-                                   xc = 0, yc = 0)
+          temp <-
+            temp + gg_circle(
+              rx = sqrt(var(model$data$pcdf[i]) * hotFisN),
+              ry = sqrt(var(model$data$pcdf[j]) * hotFisN),
+              xc = 0,
+              yc = 0
+            )
           ##for outliers
           rx <- sqrt(var(model$data$pcdf[i]) * hotFisN)
           ry <- sqrt(var(model$data$pcdf[j]) * hotFisN)
@@ -57,14 +58,18 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
           outlierIDX <- model$data$pcdf[idx,-1:-ncol(model$data$scores)]
 
           new_list <- setNames(list(outlierIDX), placeHolder)
-          #outliers <- list()
           outliers <- append(outliers, new_list)
-          #outliers <-new_list
-          #oH <- append(oH, new_list)
 
           ##label outliers
           if(optns$ellipse == "hotellings" & "outlierLabels" %in% names(optns)){
-          temp <- temp + geom_text(data=model$data$pcdf[idx,], aes(label = outlierID), size=2, hjust = 0, vjust = 0)
+            temp <-
+              temp + geom_text(
+                data = model$data$pcdf[idx, ],
+                aes(label = outlierID),
+                size = 2,
+                hjust = 0,
+                vjust = 0
+              )
           }
         }
 
@@ -73,7 +78,15 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
         if(optns$ellipse == "T"){
 
           ##for the plot
-          temp <- temp + stat_ellipse(type = "t", geom = "polygon", fill = "gray", level = ci, alpha = .5, linetype = 2)
+          temp <-
+            temp + stat_ellipse(
+              type = "t",
+              geom = "polygon",
+              fill = "gray",
+              level = ci,
+              alpha = .5,
+              linetype = 2
+            )
 
           ##for the outliers
           build <- ggplot_build(temp)$data
@@ -85,14 +98,19 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
           idx <-which(dat$in.ell == FALSE)
           outlierIDX <- model$data$pcdf[idx, -1:-ncol(model$data$scores)]
           new_list <- setNames(list(outlierIDX), placeHolder)
-          #outliers <- list()
           outliers <- append(outliers, new_list)
-          #outliers <- new_list
-          #outlierT <- append(outlierT, new_list)
+
 
           ##label outliers
           if(optns$ellipse == "T" & "outlierLabels" %in% names(optns) ){
-            temp <- temp + geom_text(data=model$data$pcdf[idx,], aes(label = outlierID), size=2, hjust = 0, vjust = 0)
+            temp <-
+              temp + geom_text(
+                data = model$data$pcdf[idx, ],
+                aes(label = outlierID),
+                size = 2,
+                hjust = 0,
+                vjust = 0
+              )
           }
 
         }
@@ -100,7 +118,15 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
         #stat_elipse with norm method
           if(optns$ellipse == "normal"){
             ##for plot
-            temp <- temp + stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = ci, alpha = .5, linetype = 2)
+            temp <-
+              temp + stat_ellipse(
+                type = "norm",
+                geom = "polygon",
+                fill = "gray",
+                level = ci,
+                alpha = .5,
+                linetype = 2
+              )
 
             ##for the outliers
             build <- ggplot_build(temp)$data
@@ -112,17 +138,22 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
             idx <-which(dat$in.ell == FALSE)
             outlierIDX <- model$data$pcdf[idx, -1:-ncol(model$data$scores)]
             new_list <- setNames(list(outlierIDX), placeHolder)
-            #outliers <- list()
             outliers <- append(outliers, new_list)
-            #outlierNormal <- append(outlierNormal, new_list)
-            #outliers <- new_list
 
             ##label outliers
             if(optns$ellipse == "normal" & "outlierLabels" %in% names(optns)){
-              temp <- temp + geom_text(data=model$data$pcdf[idx,], aes(label = outlierID), size = 2, hjust = 0, vjust = 0)
+              temp <-
+                temp + geom_text(
+                  data = model$data$pcdf[idx, ],
+                  aes(label = outlierID),
+                  size = 2,
+                  hjust = 0,
+                  vjust = 0
+                )
             }
             }
-          #stat_ellipse for separation
+
+        #stat_ellipse for separation
 
         if(optns$ellipse == "colour"){
           temp <- temp +

@@ -90,7 +90,7 @@ a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
 # opt=list(colourCoding= "covid_status")
 
 #2) 
-fff<- plotScores(model=a, optns=list(colourCoding=BIOspcglyc[,"covid_status"], ellipse="hotellings", outlierLabels=BIOspcglyc[,"patientID"]))
+fff<- plotScores(model=a, optns=list(colourCoding=BIOspcglyc[,"age"], shapeCoding=BIOspcglyc[,"sex"], ellipse="hotellings", outlierLabels=row.names(BIOspcglyc)))
 fff[["plots"]][["pcaGrid"]]
 
 #2)
@@ -112,13 +112,44 @@ c[["plots"]][["plotLoadingGrid"]]
 c[["plots"]][["plotLoadingGrid"]][1,1]
 ```
 
+#foldchange
+```{r}
+
+a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
+factor = BIOspcglyc[,"covid_status"]
+a$data$rawData$factor <- as.numeric(as.factor(factor))
+
+  df <- a$data$rawData
+
+  idx<- which(df[,"factor"] == 1)
+  control <- df[idx,]
+  treatment <- df[-idx,]
+
+ #logmeans
+ c <- log2(apply(X = control, MARGIN = 2, FUN = mean))
+ t <- log2(apply(X = treatment, MARGIN = 2, FUN = mean))
+
+ log2fc <- c-t
+log2fc <- as.data.frame(log2fc)
+
+foldChange(model = a, factor = BIOspcglyc[,"covid_status"])
+
+```
+
 ```{r}
 factor<-BIOspcglyc[,"covid_status"]
 
 a$data$rawData$factor <- as.numeric(as.factor(factor))
 
+id <- as.data.frame(colnames(a$data$rawData))
     df <- a$data$rawData
-
+    
+  if(any(id=="factor")){
+    idx <- which(id == "factor")
+    id <- as.data.frame(id[-idx,])
+  }
+    #else{print("NO")}
+    
 #correlations between scaled + centered original data and scores
 
   corr<-t(as.data.frame(cor(a$data$scores[,1], a$data$dataSC)))
@@ -215,7 +246,7 @@ d[["plots"]][["eruptionPlot"]]
 data(mtcars)
  
 a <- pcResults(data = mtcars[,1:7], annotation=mtcars[,8:11], center = TRUE, scale. = TRUE)
-b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(plotTitle = "mtcars eruption", method = "bonferroni"))
+b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(plotTitle = "mtcars eruption", method = "bonferroni", PC=2))
 
 b[["plots"]][["eruptionPlot"]]
 ```
