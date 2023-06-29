@@ -122,7 +122,27 @@ eruptionPlot <- plot +
              alpha = 0.3) +
   theme_bw() +
   scale_x_continuous(limits = c(-1, 1)) +
-  scale_colour_gradientn(colours = rainbow(7)) +
+  scale_color_gradientn(
+    colours = c(
+      "#0000CC",
+      "#0000FF",
+      "#0055FF",
+      "#00AAFF",
+      "#00FFFF",
+      "#2BFFD5",
+      "#55FFAA",
+      "#80FF80",
+      "#AAFF55",
+      "#D4FF2B",
+      "#FFFF00",
+      "#FFAA00",
+      "#FF5500",
+      "#FF0000",
+      "#CC0000"
+    ),
+    na.value = "grey50",
+    guide = "colourbar"
+  ) +
   ggtitle(plotTitle) +
   labs(x = "Cliff's Delta",
        y = paste0("PC", PC, "loadings")) +
