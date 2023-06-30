@@ -83,7 +83,7 @@ BIOspcglyc$covid_status<-ifelse(BIOspcglyc$group =="COVID-pos","covid", ifelse(B
 
 PCA (plotscores and plotloadings) uses the stats::prcomp function. Centering and scaling are set to TRUE by default, but you can change that. If you'd like to change the number of PCAs calculated, you can enter a rank. The default is 5 PC's. 
 
-You can display a summary plot to help inform the number of PC's you're interested in. A threshold number of PC's will be determined based on the amount of variance you wish to explain, the default is 99%. If you wish to change this, supply cutoff to the optns as shown below. This threshold will be the default for the number of PC's displayed later unless otherwise specified. 
+You can display a summary plot to help inform the number of PC's you're interested in. To choose not to generate the plots, set plot = FALSE, the default is TRUE. A threshold number of PC's will be determined based on the amount of variance you wish to explain, the default is 99%. If you wish to change this, supply cutoff to the optns as shown below. This threshold will be the default for the number of PC's displayed later unless otherwise specified. 
 
 ```{r, fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 # Perform PCA

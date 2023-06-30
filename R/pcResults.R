@@ -4,6 +4,7 @@
 #'
 #' @param data A data frame of the values for the principal component calculation.
 #' @param annotation A data frame of the accompanying metadata.
+#' @param plot To stop the generation of summary plots, set to FALSE. Default is TRUE.
 #' @param center A logical value indicating whether the variables should be shifted to be zero centered. The default is TRUE. Alternately, a vector of length equal the number of columns of \code{data} can be supplied. The value is passed to scale.
 #' @param scale A logical value indicating whether the variables should be scaled to have unit variance before the analysis takes place. The default is TRUE. Alternatively, a vector of length equal the number of columns of \code{data} can be supplied.
 #' @return A list of objects used in further calculations.
@@ -21,7 +22,7 @@
 
 #calculate Principal Components using prcomp
 
-pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, optns=list()) {
+pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns=list()) {
 
   results <- prcomp(data,
                     rank = rank,
@@ -55,6 +56,7 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, 
 
   t <- length(which(pcSum$`Cumulative Proportion` < cutoff))
 
+if (plot == TRUE) {
   #Make cumulative variance plot
 
   cumulativeVariance <- ggplot(data = pcSum,
@@ -98,6 +100,11 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, 
                               theme(axis.title.y = element_text(color = "orange3"),
                                     axis.title.y.right = element_text(color = "gray30"))
 
+  plots = list(combinedScreeCumulative = combinedScreeCumulative,
+               screeplot = screeplot,
+               cumulativeVariance = cumulativeVariance)
+
+} else{plots = list()}
 
   data<-list(rawData = rawData,
              dataSC = dataSC,
@@ -110,9 +117,9 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, 
              pcdf = pcdf,
              threshold = t)
 
-  plots = list(combinedScreeCumulative = combinedScreeCumulative,
-               screeplot = screeplot,
-               cumulativeVariance = cumulativeVariance)
+  # plots = list(combinedScreeCumulative = combinedScreeCumulative,
+  #              screeplot = screeplot,
+  #              cumulativeVariance = cumulativeVariance)
 
   return(list(data = data,
               plots = plots))
