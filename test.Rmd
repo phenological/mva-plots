@@ -17,21 +17,25 @@ ann<-local(get(load("~/OneDrive - Murdoch University/datasets/covid19/bioGune/da
 aaMeta1<-ann@obsDescr[[1]]
 
 aa<-local(get(load(file.path("~/OneDrive - Murdoch University/datasets/covid19/bioGune/dataElements/covid19_bioGune_PLA_SPC.daE"))))
-aaData<-data.frame(apply(aa@.Data,2,as.numeric)) #lipoproteins
-aaMeta2<-aa@obsDescr[[1]] #metadata from covid19_mauritius_PLA_LIPO.daE file
+aaData<-data.frame(apply(aa@.Data,2,as.numeric)) #spc/glyc data
+aaMeta2<-aa@obsDescr[[1]] #metadata from PLA_SPC.daE file
 
-# match Amino Acids and both Annotations
+# match SpcGlyc numeric and both Annotations
 aaMeta1<-aaMeta1[which(aaMeta1$sampleID %in% aaMeta2$sampleID),]
 aaData<-aaData[which(aaMeta2$sampleID %in% aaMeta1$sampleID),]
 aaMeta2<-aaMeta2[which(aaMeta2$sampleID %in% aaMeta1$sampleID),]
 
+#make a final annotation file
 aaMetaF<-merge(aaMeta1,
                   aaMeta2,
                   by.x ="sampleID",by.y = "sampleID")
 rm(aaMeta1, aaMeta2, aa, ann)
 
+#combine the numeric and meta data
 BIOspcglyc<-cbind(aaData, aaMetaF)
 rm(aaData, aaMetaF)
+
+#Organise the data as you wish 
 
 which(BIOspcglyc[, 1:8]=="Inf")
 which(is.na(BIOspcglyc[, 1:8]))
@@ -40,6 +44,47 @@ unique(BIOspcglyc$sex)
 
 unique(BIOspcglyc$group)
 BIOspcglyc$covid_status<-ifelse(BIOspcglyc$group =="COVID-pos","covid", ifelse(BIOspcglyc$group=="preCOVID","control", "control"))
+
+library(fusion)
+library(dplyr)
+lipo<-local(get(load("~/OneDrive - Murdoch University/datasets/covid19/cambridgeFollowUpPart2/DataElements/covid19_cambridge_ORI_FU1_FU2_PLA_LIPO.daE")))
+LIPO<-data.frame(apply(lipo@.Data,2,as.numeric))
+LIPO_ANN<-lipo@obsDescr[[1]]
+
+ann<-local(get(load("~/OneDrive - Murdoch University/datasets/covid19/cambridge/DataElements/covid19_cambridge_PLA_ANN_fix.daE")))
+#ann<-local(get(load("~/Downloads/covid19_cambridge_PLA_ANN.daE")))
+ann = ann@obsDescr[[1]]
+
+#matching the annotation file fo the LIPO_ANN file
+
+ann<-ann[which(ann$sampleID %in% LIPO_ANN$sampleID),]
+LIPO<- LIPO[which(LIPO_ANN$sampleID %in% ann$sampleID),]
+LIPO_ANN<- LIPO_ANN[which(LIPO_ANN$sampleID %in% ann$sampleID),]
+
+LIPO<- LIPO[match(ann$sampleID, LIPO_ANN$sampleID),]
+LIPO_ANN<- LIPO_ANN[match(ann$sampleID, LIPO_ANN$sampleID),]
+
+df<-cbind(LIPO, ann)
+rm(ann, LIPO, LIPO_ANN)
+```
+#####remove samples with NA for age or group_facet_letter
+```{r}
+df2 <-
+  df %>%
+  filter(!is.na(age)) %>%
+  filter(!is.na(group_facet_letter))%>%
+  group_by(group_facet_letter, gender) 
+```
+
+#####check for inf values
+```{r}
+which(df2 == "Inf", arr.ind = TRUE)
+
+#remove rows with Inf values for lipoprotein quantities
+df3 <- df2[-c(49,70,548),]
+
+rm(df, df2)
+```
 ```
 
 #tests pcagrid
@@ -65,7 +110,7 @@ loadPackages(myPackages = c("ggplot2",
                             "sp"))
 #1) create pcresults object
 a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
-
+a1 <- pcResults(df3[,1:112], annotation = df3[,-1:-112])
 # #2) create screeCumulativeThresholdObject
 # b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
 # 

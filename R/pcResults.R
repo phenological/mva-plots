@@ -21,19 +21,17 @@
 
 #calculate Principal Components using prcomp
 
-pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 10, optns=list()) {
+pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, optns=list()) {
 
   results <- prcomp(data,
                     rank = rank,
                     center = center,
                     scale. = scale.)
 
-  pcSum <- (as.data.frame(t(summary(results)[["importance"]]))) %>%
-             mutate(across(where(is.double), ~.x*100))
-
-  #mutate(across(where(is.double), \(x) x*100))
-
+  pcSum <- (as.data.frame(t(summary(results)[["importance"]])))
+  pcSum <- pcSum[1:rank,]*100
   pcSum[,"Principal Component"] <- rownames(pcSum)
+  pcSum[, "Principal Component"] <- factor(pcSum$`Principal Component`, levels = pcSum$`Principal Component`)
 
   scores <- results[["x"]]
 
@@ -97,8 +95,8 @@ pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 10,
                                   x = "PC",
                                   y = "Cumulative Variance (%)") +
                               scale_y_continuous(sec.axis = sec_axis(~.*0.5, name = "Proportion of Variance (%)")) +
-                              theme(axis.title.y = element_text(color = "gray30"),
-                                    axis.title.y.right = element_text(color = "orange3"))
+                              theme(axis.title.y = element_text(color = "orange3"),
+                                    axis.title.y.right = element_text(color = "gray30"))
 
 
   data<-list(rawData = rawData,
