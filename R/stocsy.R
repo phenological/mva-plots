@@ -6,6 +6,8 @@
 #' @param roi numeric, upper and lower limit of the Region Of Interest to be plotted
 #' @param breaks numeric, number of breaks in the x axis
 #' @return a ggplot2 object with covariances with the driver c. shift plotted in the vertical axis , lines coloured by the absolute value of correlation to the driver c. shift, and a dotted black line marking the driver shift if it is within the roi
+#' @import ggplot2
+#' @importFrom colorRamps matlab.like2
 #' @export
 stocsy <- function(x,Y,cshift,roi,breaks=10){
   cs <- which.min(abs(x-cshift))
@@ -22,9 +24,9 @@ stocsy <- function(x,Y,cshift,roi,breaks=10){
               ,aes(x=ppm
                    ,y=covariance
                    ,colour=cr)) + geom_line() + scale_x_reverse(n.breaks=breaks)
-  p <- p + scale_colour_gradientn(colors = matlab.like2(10)
+  p <- p + scale_colour_gradientn(colors = colorRamps::matlab.like2(10)
                                   , limits=c(0,1)
-                                  , name="|R|")
+                                  , name="|R|") + labs(caption=paste("Driver c. shift:",cshift,"ppm"))
   if (cshift >= min(x) & cshift <= max(x))
     p + theme_bw() + geom_vline(xintercept = cshift,linetype = 2)
   else
