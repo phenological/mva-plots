@@ -109,7 +109,7 @@ loadPackages(myPackages = c("ggplot2",
                             #"HotellingEllipse",
                             "sp"))
 #1) create pcresults object
-a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
+a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8], plot = FALSE)
 a1 <- pcResults(df3[,1:112], annotation = df3[,-1:-112])
 # #2) create screeCumulativeThresholdObject
 # b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
