@@ -8,7 +8,7 @@ for(i in functionList){
 
 ```{r}
 #testthat, ggplot2, GGally, roxygen2, stats, ggrepel, dplyr??, sp??(included), ggpubr??
-usethis::use_package("ggrepel")
+usethis::use_package("ggplot2")
 
 ```
 #load data to test functions
@@ -135,7 +135,7 @@ a1 <- pcResults(df3[,1:112], annotation = df3[,-1:-112])
 # opt=list(colourCoding= "covid_status")
 
 #2) 
-fff<- plotScores(model=a, optns=list(colourCoding=BIOspcglyc[,"age"], shapeCoding=BIOspcglyc[,"sex"], ellipse="hotellings", outlierLabels=row.names(BIOspcglyc)))
+fff<- plotScores(model=a, optns=list(colourCoding=BIOspcglyc[,"age"], shapeCoding=BIOspcglyc[,"sex"], ellipse="normal", outlierLabels=row.names(BIOspcglyc)))
 fff[["plots"]][["pcaGrid"]]
 
 #2)

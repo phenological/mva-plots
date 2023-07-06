@@ -94,12 +94,17 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
           ell <- build[[4]]
 
           ## Find which points are inside the ellipse
-          dat <- list(in.ell = as.logical(point.in.polygon(points$x, points$y, ell$x, ell$y)))
-          idx <-which(dat$in.ell == FALSE)
-          outlierIDX <- model$data$pcdf[idx, -1:-ncol(model$data$scores)]
+          rx <- (max(ell$x)-min(ell$x))/2
+          ry <- (max(ell$y)-min(ell$y))/2
+          h <- max(ell$x) - rx
+          k <- max(ell$y) - ry
+
+          insideOut <- list((((model$data$pcdf[i]-h)^2)/(rx^2)) + (((model$data$pcdf[j]-k)^2)/(ry^2)))
+          idx <- which(insideOut[[1]] > 1)
+          outlierIDX <- model$data$pcdf[idx,-1:-ncol(model$data$scores)]
+
           new_list <- setNames(list(outlierIDX), placeHolder)
           outliers <- append(outliers, new_list)
-
 
           ##label outliers
           if(optns$ellipse == "T" & "outlierLabels" %in% names(optns) ){
@@ -134,9 +139,15 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
             ell <- build[[4]]
 
             ## Find which points are inside the ellipse
-            dat <- list(in.ell = as.logical(point.in.polygon(points$x, points$y, ell$x, ell$y)))
-            idx <-which(dat$in.ell == FALSE)
-            outlierIDX <- model$data$pcdf[idx, -1:-ncol(model$data$scores)]
+            rx <- (max(ell$x)-min(ell$x))/2
+            ry <- (max(ell$y)-min(ell$y))/2
+            h <- max(ell$x) - rx
+            k <- max(ell$y) - ry
+
+            insideOut <- list((((model$data$pcdf[i]-h)^2)/(rx^2)) + (((model$data$pcdf[j]-k)^2)/(ry^2)))
+            idx <- which(insideOut[[1]] > 1)
+            outlierIDX <- model$data$pcdf[idx,-1:-ncol(model$data$scores)]
+
             new_list <- setNames(list(outlierIDX), placeHolder)
             outliers <- append(outliers, new_list)
 

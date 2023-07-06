@@ -270,7 +270,7 @@ plotScores<-function(model, optns=list()){
       (length(optns$alphaCoding)) == 1) {
     testLegend <- NULL
   } else{
-    testLegend <- grab_legend(test)
+    testLegend <- GGally::grab_legend(test)
   }
 
   #axis labels
@@ -318,6 +318,7 @@ plotScores<-function(model, optns=list()){
 
   model$data <- append(model$data, list(outliers = plotGT$outliers))
 
-  return(model)
+  #return(model)
+  invisible(model)
 
 }
