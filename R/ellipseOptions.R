@@ -186,4 +186,3 @@ if("ellipse" %in% names(optns)){
 
   return(output)
 }
-
