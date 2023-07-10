@@ -68,5 +68,6 @@ plotLoadings <- function(model, optns=list()){
 
   model$plots <- append(model$plots, list(plotLoadingGrid = plotLoadingGrid))
 
-  return(model)
+  print(plotLoadingGrid)
+  invisible(model)
 }

@@ -318,7 +318,8 @@ plotScores<-function(model, optns=list()){
 
   model$data <- append(model$data, list(outliers = plotGT$outliers))
 
-  #return(model)
+  print(pcaGridPlot)
   invisible(model)
+
 
 }
