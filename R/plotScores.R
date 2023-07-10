@@ -6,21 +6,21 @@
 #' @param optns An empty list for aesthetic options.
 #' @param gridTitle A parameter for the \code{optns} list. A character for the title of the grid.
 #' @param thresh A parameter for the \code{optns} list. A numeric for the number of PCAs to display in the grid. The default is calculated in the pcResults function.
-#' @param colourCoding A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the colour desired. Default colour is "black"
-#' @param shapeCoding A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the shape desired. Default shape is "circle".
-#' @param sizeCoding A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the size desired. Default size is 3.
-#' @param alphaCoding A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the alpha desired. Default size is 0.5.
-#' @param colourTitle A parameter for the \code{optns} list. A character of the desired colour legend title when \code{colourCoding} is a variable. No colour legend will appear if \code{colourCoding} is set to a simple aesthetic such as "green". Default "Colour".
-#' @param shapeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{shapeCoding} is a variable. No shape legend will appear if \code{shapeCoding} is set to a simple aesthetic such as "square". Default "Shape".
-#' @param sizeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{sizeCoding} is a variable. No size legend will appear if \code{sizeCoding} is set to a simple aesthetic such as 2. Default "Size".
-#' @param alphaTitle A parameter for the \code{optns} list. A character of the desired alpha legend title when \code{alphaCoding} is a variable. No size legend will appear if \code{alphaCoding} is set to a simple aesthetic such as 0.3. Default "Alpha".
+#' @param colour A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the colour desired. Default colour is "black"
+#' @param shape A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the shape desired. Default shape is "circle".
+#' @param size A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the size desired. Default size is 3.
+#' @param alpha A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the alpha desired. Default size is 0.5.
+#' @param colourTitle A parameter for the \code{optns} list. A character of the desired colour legend title when \code{colour} is a variable. No colour legend will appear if \code{colour} is set to a simple aesthetic such as "green". Default "Colour".
+#' @param shapeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{shape} is a variable. No shape legend will appear if \code{shape} is set to a simple aesthetic such as "square". Default "Shape".
+#' @param sizeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{size} is a variable. No size legend will appear if \code{size} is set to a simple aesthetic such as 2. Default "Size".
+#' @param alphaTitle A parameter for the \code{optns} list. A character of the desired alpha legend title when \code{alpha} is a variable. No size legend will appear if \code{alpha} is set to a simple aesthetic such as 0.3. Default "Alpha".
 #' @param ellipse A parameter for the \code{optns} list. A character or either "colour", "hotellings", "T", or "normal" depending on desired method of calculation.
 #' @param outlierLabels A parameter for the \code{optns} list. A column from the data frame to label outliers with (only compatible with ellipse set to hotellings, T or normal). You can set it to, for example, outlierLabels=row.names(iris) to more easily identify the outlier position in your dataframe.
 #' @return The model list appended with the grid of loadings under plots.
 #' @examples
 #' data(iris)
 #' a <- pcResults(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
-#' b <- plotscores(model = a, optns=list(colourCoding = iris[,"Species"], colourTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alphaCoding = 0.7))
+#' b <- plotscores(model = a, optns=list(colour = iris[,"Species"], colourTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alpha = 0.7))
 #' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 plotScores<-function(model, optns=list()){
@@ -38,32 +38,32 @@ plotScores<-function(model, optns=list()){
   }else{thresh = model$data$threshold}
 
   #colour (working)
-  if("colourCoding" %in% names(optns)){
-    if((length(optns$colourCoding))>1){
-      model$data$pcdf$colourCoding <- optns$colourCoding
+  if("colour" %in% names(optns)){
+    if((length(optns$colour))>1){
+      model$data$pcdf$colour <- optns$colour
     }
-  }else {optns$colourCoding="black"}
+  }else {optns$colour="black"}
 
   #shape (working)
-  if("shapeCoding" %in% names(optns)){
-    if((length(optns$shapeCoding))>1){
-      model$data$pcdf$shapeCoding <- optns$shapeCoding
+  if("shape" %in% names(optns)){
+    if((length(optns$shape))>1){
+      model$data$pcdf$shape <- optns$shape
     }
-  }else{optns$shapeCoding="circle"}
+  }else{optns$shape="circle"}
 
   #size (working)
-  if("sizeCoding" %in% names(optns)){
-    if((length(optns$sizeCoding))>1){
-      model$data$pcdf$sizeCoding <- optns$sizeCoding
+  if("size" %in% names(optns)){
+    if((length(optns$size))>1){
+      model$data$pcdf$size <- optns$size
     }
-  }else{optns$sizeCoding=3}
+  }else{optns$size=3}
 
   #alpha (working)
-  if("alphaCoding" %in% names(optns)){
-    if((length(optns$alphaCoding))>1){
-      model$data$pcdf$alphaCoding <- optns$alphaCoding
+  if("alpha" %in% names(optns)){
+    if((length(optns$alpha))>1){
+      model$data$pcdf$alpha <- optns$alpha
     }
-  }else{optns$alphaCoding=0.5}
+  }else{optns$alpha=0.5}
 
   #legend titles
   if("colourTitle" %in% names(optns)){
@@ -89,7 +89,7 @@ plotScores<-function(model, optns=list()){
   # [1] "#0000CC" "#0000FF" "#0055FF" "#00AAFF" "#00FFFF"
   # [6] "#2BFFD5" "#55FFAA" "#80FF80" "#AAFF55" "#D4FF2B"
   # [11] "#FFFF00" "#FFAA00" "#FF5500" "#FF0000" "#CC0000"
-  gs <- if(is(optns$colourCoding)[1] == "numeric"){
+  gs <- if(is(optns$colour)[1] == "numeric"){
     scale_color_gradientn(
       colours = c(
         "#0000CC",
@@ -114,137 +114,137 @@ plotScores<-function(model, optns=list()){
   else{scale_color_brewer(palette = "Set2")}
 
   #correct input for ggplot and ggpairs objects
-  gp<- if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1 ){
-    geom_point(color = optns$colourCoding,
-               shape = optns$shapeCoding,
-               size = optns$sizeCoding,
-               alpha = optns$alphaCoding)
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) > 1){
-    geom_point(aes(color = model$data$pcdf$colourCoding,
-                   shape = model$data$pcdf$shapeCoding,
-                   size = model$data$pcdf$sizeCoding,
-                   alpha = model$data$pcdf$alphaCoding))
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1){
-    geom_point(aes(color = model$data$pcdf$colourCoding),
-               shape = optns$shapeCoding,
-               size = optns$sizeCoding,
-               alpha = optns$alphaCoding)
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1){
-    geom_point(aes(shape = model$data$pcdf$shapeCoding),
-               color = optns$colourCoding,
-               size = optns$sizeCoding,
-               alpha = optns$alphaCoding)
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) == 1){
-    geom_point(aes(size = model$data$pcdf$sizeCoding),
-               color = optns$colourCoding,
-               shape = optns$shapeCoding,
-               alpha = optns$alphaCoding)
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) > 1){
-    geom_point(aes(alpha = model$data$pcdf$alphaCoding),
-               color = optns$colourCoding,
-               shape = optns$shapeCoding,
-               size = optns$sizeCoding)
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1){
-    geom_point(aes(color = model$data$pcdf$colourCoding,
-                   shape = model$data$pcdf$shapeCoding),
-               size = optns$sizeCoding,
-               alpha = optns$alphaCoding)
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$shapeCoding)) == 1 & (length(optns$alphaCoding)) == 1){
-    geom_point(aes(color = model$data$pcdf$colourCoding,
-                   size = model$data$pcdf$sizeCoding),
-               shape = optns$shapeCoding,
-               alpha = optns$alphaCoding)
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$alphaCoding)) > 1){
-    geom_point(aes(color = model$data$pcdf$colourCoding,
-                   alpha = model$data$pcdf$alphaCoding),
-               shape = optns$shapeCoding,
-               size = optns$sizeCoding)
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) == 1){
-    geom_point(aes(shape = model$data$pcdf$shapeCoding,
-                   size = model$data$pcdf$sizeCoding),
-               color = optns$colourCoding,
-               alpha = optns$alphaCoding)
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) > 1){
-    geom_point(aes(shape = model$data$pcdf$shapeCoding,
-                   alpha = model$data$pcdf$alphaCoding),
-               color = optns$colourCoding,
-               size = optns$sizeCoding)
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) > 1){
-    geom_point(aes(size = model$data$pcdf$sizeCoding,
-                   alpha = model$data$pcdf$alphaCoding),
-               color = optns$colourCoding,
-               shape = optns$shapeCoding)
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) == 1){
-    geom_point(aes(color = model$data$pcdf$colourCoding,
-                   shape = model$data$pcdf$shapeCoding,
-                   size = model$data$pcdf$sizeCoding),
-               alpha = optns$alphaCoding)
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) > 1){
-    geom_point(aes(color = model$data$pcdf$colourCoding,
-                   shape = model$data$pcdf$shapeCoding,
-                   alpha = model$data$pcdf$alphaCoding),
-               size = optns$sizeCoding)
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) >1){
-    geom_point(aes(color = model$data$pcdf$colourCoding,
-                   size = model$data$pcdf$sizeCoding,
-                   alpha = model$data$pcdf$alphaCoding),
-               shape = optns$shapeCoding)
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) > 1){
-    geom_point(aes(shape = model$data$pcdf$shapeCoding,
-                   size = model$data$pcdf$sizeCoding,
-                   alpha = model$data$pcdf$alphaCoding),
-               color = optns$colourCoding)
+  gp<- if((length(optns$colour)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1 ){
+    geom_point(color = optns$colour,
+               shape = optns$shape,
+               size = optns$size,
+               alpha = optns$alpha)
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) > 1 & (length(optns$size)) > 1 & (length(optns$alpha)) > 1){
+    geom_point(aes(color = model$data$pcdf$colour,
+                   shape = model$data$pcdf$shape,
+                   size = model$data$pcdf$size,
+                   alpha = model$data$pcdf$alpha))
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) == 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1){
+    geom_point(aes(color = model$data$pcdf$colour),
+               shape = optns$shape,
+               size = optns$size,
+               alpha = optns$alpha)
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) > 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1){
+    geom_point(aes(shape = model$data$pcdf$shape),
+               color = optns$colour,
+               size = optns$size,
+               alpha = optns$alpha)
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) > 1 & (length(optns$alpha)) == 1){
+    geom_point(aes(size = model$data$pcdf$size),
+               color = optns$colour,
+               shape = optns$shape,
+               alpha = optns$alpha)
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) == 1 & (length(optns$alpha)) > 1){
+    geom_point(aes(alpha = model$data$pcdf$alpha),
+               color = optns$colour,
+               shape = optns$shape,
+               size = optns$size)
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) > 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1){
+    geom_point(aes(color = model$data$pcdf$colour,
+                   shape = model$data$pcdf$shape),
+               size = optns$size,
+               alpha = optns$alpha)
+  } else if((length(optns$colour)) > 1 & (length(optns$size)) > 1 & (length(optns$shape)) == 1 & (length(optns$alpha)) == 1){
+    geom_point(aes(color = model$data$pcdf$colour,
+                   size = model$data$pcdf$size),
+               shape = optns$shape,
+               alpha = optns$alpha)
+  } else if((length(optns$colour)) > 1 & (length(optns$size)) == 1 & (length(optns$shape)) == 1 & (length(optns$alpha)) > 1){
+    geom_point(aes(color = model$data$pcdf$colour,
+                   alpha = model$data$pcdf$alpha),
+               shape = optns$shape,
+               size = optns$size)
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) > 1 & (length(optns$size)) > 1 & (length(optns$alpha)) == 1){
+    geom_point(aes(shape = model$data$pcdf$shape,
+                   size = model$data$pcdf$size),
+               color = optns$colour,
+               alpha = optns$alpha)
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) > 1 & (length(optns$size)) == 1 & (length(optns$alpha)) > 1){
+    geom_point(aes(shape = model$data$pcdf$shape,
+                   alpha = model$data$pcdf$alpha),
+               color = optns$colour,
+               size = optns$size)
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) > 1 & (length(optns$alpha)) > 1){
+    geom_point(aes(size = model$data$pcdf$size,
+                   alpha = model$data$pcdf$alpha),
+               color = optns$colour,
+               shape = optns$shape)
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) > 1 & (length(optns$size)) > 1 & (length(optns$alpha)) == 1){
+    geom_point(aes(color = model$data$pcdf$colour,
+                   shape = model$data$pcdf$shape,
+                   size = model$data$pcdf$size),
+               alpha = optns$alpha)
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) > 1 & (length(optns$size)) == 1 & (length(optns$alpha)) > 1){
+    geom_point(aes(color = model$data$pcdf$colour,
+                   shape = model$data$pcdf$shape,
+                   alpha = model$data$pcdf$alpha),
+               size = optns$size)
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) == 1 & (length(optns$size)) > 1 & (length(optns$alpha)) >1){
+    geom_point(aes(color = model$data$pcdf$colour,
+                   size = model$data$pcdf$size,
+                   alpha = model$data$pcdf$alpha),
+               shape = optns$shape)
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) > 1 & (length(optns$size)) > 1 & (length(optns$alpha)) > 1){
+    geom_point(aes(shape = model$data$pcdf$shape,
+                   size = model$data$pcdf$size,
+                   alpha = model$data$pcdf$alpha),
+               color = optns$colour)
   }
 
 
-  gu<- if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1 ){
+  gu<- if((length(optns$colour)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1 ){
     guides(color = "none",
            shape = "none",
            size = "none",
            alpha = "none")
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) > 1){
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) > 1 & (length(optns$size)) > 1 & (length(optns$alpha)) > 1){
     guides()
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1){
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) == 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1){
     guides(shape = "none",
            size = "none",
            alpha = "none")
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1){
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) > 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1){
     guides(color = "none",
            size = "none",
            alpha = "none")
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) == 1){
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) > 1 & (length(optns$alpha)) == 1){
     guides(color = "none",
            shape = "none",
            alpha = "none")
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) > 1){
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) == 1 & (length(optns$alpha)) > 1){
     guides(color = "none",
            shape = "none",
            size = "none")
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) == 1){
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) > 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1){
     guides(size = "none",
            alpha = "none")
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$shapeCoding)) == 1 & (length(optns$alphaCoding)) == 1){
+  } else if((length(optns$colour)) > 1 & (length(optns$size)) > 1 & (length(optns$shape)) == 1 & (length(optns$alpha)) == 1){
     guides(shape = "none",
            alpha = "none")
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$alphaCoding)) > 1){
+  } else if((length(optns$colour)) > 1 & (length(optns$size)) == 1 & (length(optns$shape)) == 1 & (length(optns$alpha)) > 1){
     guides(shape = "none",
            size = "none")
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) == 1){
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) > 1 & (length(optns$size)) > 1 & (length(optns$alpha)) == 1){
     guides(color = "none",
            alpha = "none")
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) > 1){
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) > 1 & (length(optns$size)) == 1 & (length(optns$alpha)) > 1){
     guides(color = "none",
            size = "none")
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) > 1){
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) > 1 & (length(optns$alpha)) > 1){
     guides(color = "none",
            shape = "none")
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) == 1){
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) > 1 & (length(optns$size)) > 1 & (length(optns$alpha)) == 1){
     guides(alpha = "none")
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) == 1 & (length(optns$alphaCoding)) > 1){
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) > 1 & (length(optns$size)) == 1 & (length(optns$alpha)) > 1){
     guides(size = "none")
-  } else if((length(optns$colourCoding)) > 1 & (length(optns$shapeCoding)) == 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) >1){
+  } else if((length(optns$colour)) > 1 & (length(optns$shape)) == 1 & (length(optns$size)) > 1 & (length(optns$alpha)) >1){
     guides(shape = "none")
-  } else if((length(optns$colourCoding)) == 1 & (length(optns$shapeCoding)) > 1 & (length(optns$sizeCoding)) > 1 & (length(optns$alphaCoding)) > 1){
+  } else if((length(optns$colour)) == 1 & (length(optns$shape)) > 1 & (length(optns$size)) > 1 & (length(optns$alpha)) > 1){
     guides(color = "none")
   }
 
@@ -264,10 +264,10 @@ plotScores<-function(model, optns=list()){
     theme_minimal()
 
 #ensure that lack of legend doesn't stop ggpairs from working
-  if ((length(optns$colourCoding)) == 1 &
-      (length(optns$shapeCoding)) == 1 &
-      (length(optns$sizeCoding)) == 1 &
-      (length(optns$alphaCoding)) == 1) {
+  if ((length(optns$colour)) == 1 &
+      (length(optns$shape)) == 1 &
+      (length(optns$size)) == 1 &
+      (length(optns$alpha)) == 1) {
     testLegend <- NULL
   } else{
     testLegend <- GGally::grab_legend(test)

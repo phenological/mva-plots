@@ -132,10 +132,10 @@ a1 <- pcResults(df3[,1:112], annotation = df3[,-1:-112], rank = 20)
 # pcaGrid(screeCumulativeThresholdObject = b, CO = "work_activity", SH = NULL, SZ = 5, AL = 1, COtitle = "covid")
 # 
 # 
-# opt=list(colourCoding= "covid_status")
+# opt=list(colour= "covid_status")
 
 #2) 
-fff<- plotScores(model=a, optns=list(colourCoding=BIOspcglyc[,"age"], shapeCoding=BIOspcglyc[,"sex"], ellipse="normal", outlierLabels=row.names(BIOspcglyc)))
+fff<- plotScores(model=a, optns=list(colour=BIOspcglyc[,"age"], shape=BIOspcglyc[,"sex"], ellipse="normal", outlierLabels=row.names(BIOspcglyc)))
 fff[["plots"]][["pcaGrid"]]
 
 #2)
@@ -145,7 +145,7 @@ fff[["plots"]][["plotLoadingGrid"]]
 ```{r}
 data("iris")
 a<-pcResults(data=iris[,1:4], annotation = iris[,5])
-b<-plotScores(model=a, optns=list(colourCoding=iris[,5], colourTitle="species", ellipse="T", outlierLabels=rownames(iris), thresh=3))
+b<-plotScores(model=a, optns=list(colour=iris[,5], colourTitle="species", ellipse="T", outlierLabels=rownames(iris), thresh=3))
 b[["plots"]][["pcaGrid"]]
 
 b[["plots"]][["pcaGrid"]][2,2]
