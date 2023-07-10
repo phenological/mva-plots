@@ -104,7 +104,7 @@ if (plot == TRUE) {
   plots = list(combinedScreeCumulative = combinedScreeCumulative,
                screeplot = screeplot,
                cumulativeVariance = cumulativeVariance)
-
+  print(combinedScreeCumulative)
 } else{plots = list()}
 
   data<-list(rawData = rawData,
@@ -118,6 +118,6 @@ if (plot == TRUE) {
              pcdf = pcdf,
              threshold = t)
 
-  return(list(data = data,
+  invisible(list(data = data,
               plots = plots))
 }
