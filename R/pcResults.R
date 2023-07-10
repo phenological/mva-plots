@@ -24,6 +24,7 @@
 
 pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns=list()) {
 
+  library(ggplot2)
   results <- prcomp(data,
                     rank = rank,
                     center = center,
