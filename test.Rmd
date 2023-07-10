@@ -108,11 +108,11 @@ loadPackages(myPackages = c("ggplot2",
                             #"ellipse",
                             #"HotellingEllipse",
                             "sp"))
-#1) create pcresults object
-a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8], plot = FALSE)
-a1 <- pcResults(df3[,1:112], annotation = df3[,-1:-112], rank = 20)
+#1) create PCA object
+a <- PCA(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
+a1 <- PCA(df3[,1:112], annotation = df3[,-1:-112], rank = 20)
 # #2) create screeCumulativeThresholdObject
-# b <- screeCumulativeThreshold(pcResultsObject = a, cutoff = 95)
+# b <- screeCumulativeThreshold(PCAObject = a, cutoff = 95)
 # 
 # #3) gridplot tests various combinations
 # ##working
@@ -144,7 +144,7 @@ fff[["plots"]][["plotLoadingGrid"]]
 ```
 ```{r}
 data("iris")
-a<-pcResults(data=iris[,1:4], annotation = iris[,5])
+a<-PCA(data=iris[,1:4], annotation = iris[,5])
 b<-plotScores(model=a, optns=list(colour=iris[,5], colourTitle="species", ellipse="T", outlierLabels=rownames(iris), thresh=3))
 b[["plots"]][["pcaGrid"]]
 
@@ -160,7 +160,7 @@ c[["plots"]][["plotLoadingGrid"]][1,1]
 #foldchange
 ```{r}
 
-a <- pcResults(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
+a <- PCA(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
 factor = BIOspcglyc[,"covid_status"]
 a$data$rawData$factor <- as.numeric(as.factor(factor))
 
@@ -290,7 +290,7 @@ d[["plots"]][["eruptionPlot"]]
 
 data(mtcars)
  
-a <- pcResults(data = mtcars[,1:7], annotation=mtcars[,8:11], center = TRUE, scale. = TRUE)
+a <- PCA(data = mtcars[,1:7], annotation=mtcars[,8:11], center = TRUE, scale. = TRUE)
 b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(plotTitle = "mtcars eruption", method = "bonferroni", PC=2))
 
 b[["plots"]][["eruptionPlot"]]

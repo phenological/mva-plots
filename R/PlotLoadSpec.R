@@ -1,21 +1,21 @@
 #' PlotLoadSpec
 #'
 #' Allow to plot loadings of PCA, PLS, OPLS,PLS-DA and OPLS-DA
-#' 
+#'
 #' @param model are the output from :
-#'                            pcResults()
+#'                            PCA()
 #'                            prcomp()
 #'                            ropls::opls()
 #' @param PC is the number of components that you want to plot the loadings of
 #' Default is 1 and only require to change when plotting PCA or PLS model
-#' @return plot of the loadings                         
+#' @return plot of the loadings
 #' @import scales
 #' @import colorRamps
 
-#' @examples 
-#' pcResults_pca_model<-pcResults(NOESY,annotation = ANN$COVID)  # PCA
+#' @examples
+#' PCA_pca_model<-PCA(NOESY,annotation = ANN$COVID)  # PCA
 #' prcomp_pca_model<-prcomp(NOESY,scale. = T,rank. = 2) # PCA
-#' 
+#'
 #' Y<-ANN$COVID
 #' Y<-as.numeric(gsub("preCOVID",1,gsub("COVID-pos",2,Y))) for (pls-da)
 #' Y1<-as.factor(ANN$COVID)  # for OPLS-DA
@@ -35,7 +35,7 @@ PlotLoadSpec<-function(model,PC = 1,option = list()){
     cen<-data.frame(model$center)
     method = "PCA"
   }
-  if(class(model)[1]=="list"){  # need to change this, for now, pcResults() using library(prcomp) return list of 2 
+  if(class(model)[1]=="list"){  # need to change this, for now, PCA() using library(prcomp) return list of 2
     res<-model$data$pcSum$`Proportion of Variance`
     df<-as.data.frame(-model$data$loadings)
     x<-as.numeric(rownames(df))
@@ -50,7 +50,7 @@ PlotLoadSpec<-function(model,PC = 1,option = list()){
       method<-model@typeC
   }
   if(!class(model)[1]%in%c("opls","list","prcomp")){
-    stop("Check the Model class: must be prcomp,opls, or the results from pcResults")
+    stop("Check the Model class: must be prcomp,opls, or the results from PCA")
   }
   if(PC<= ncol(df)){
     m<-abs(df[,PC])
@@ -59,15 +59,15 @@ PlotLoadSpec<-function(model,PC = 1,option = list()){
     df<-data.frame(x = x,y = y,col = col)
   } else{
     stop("PC selected is larger than the dimension of the model")
-  } 
-  
+  }
+
   if(method=="PCA"){
     p1<-ggplot(df,aes(x = x, y = y,color = col))+geom_line()+
       scale_x_reverse(breaks = scales::breaks_pretty(n = 15))+
       scale_colour_gradientn(colors = colorRamps::matlab.like2(10),
-                             name = expression("|p"["sc"] * "|")) + 
+                             name = expression("|p"["sc"] * "|")) +
       labs(title = method,
-           caption = paste0("PC: ", PC, " loadings"), 
+           caption = paste0("PC: ", PC, " loadings"),
            x = expression(delta ~ {}^1 * H ~ (ppm)),
            y = "") +
       theme_bw()
@@ -75,14 +75,14 @@ PlotLoadSpec<-function(model,PC = 1,option = list()){
     p1<-ggplot(df,aes(x = x, y = y,color = col))+geom_line()+
       scale_x_reverse(breaks = scales::breaks_pretty(n = 15))+
       scale_colour_gradientn(colors = colorRamps::matlab.like2(10),
-                             name = expression("|p"["sc"] * "|")) + 
+                             name = expression("|p"["sc"] * "|")) +
       labs(title = method,
-           caption = paste0("component: ", PC, " loadings"), 
+           caption = paste0("component: ", PC, " loadings"),
            x = expression(delta ~ {}^1 * H ~ (ppm)),
            y = "") +
       theme_bw()
   }
-  
+
   return(p1)
 
-} 
+}

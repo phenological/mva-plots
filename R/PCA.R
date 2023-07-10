@@ -18,11 +18,11 @@
 #' @param threshold The number of principal components needed to explain the amount of cumulative variance specified (or the default of 99%).
 #' @examples
 #' data(iris)
-#' a <- pcResults(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
+#' a <- PCA(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
 
 #calculate Principal Components using prcomp
 
-pcResults <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns=list()) {
+PCA <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns=list()) {
 
   library(ggplot2)
   results <- prcomp(data,

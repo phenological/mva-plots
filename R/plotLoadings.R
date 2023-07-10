@@ -2,15 +2,15 @@
 #'
 #' Grid of the loadings plots using GGally::ggpairs up to a threshold number.
 #'
-#' @param model A pcResults object.
+#' @param model A PCA object.
 #' @param optns An empty list for aesthetic options.
 #' @param gridTitle A parameter for the optns list. A character for the title of the grid.
-#' @param thresh A parameter for the optns list. A numeric for the number of PCAs to display in the grid. The default is calculated in the pcResults function.
+#' @param thresh A parameter for the optns list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.
 #'
 #' @return The model list appended with the grid of loadings under plots.
 #' @examples
 #' data(iris)
-#' a <- pcResults(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
+#' a <- PCA(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
 #' b <- plotLoadings(model = a, optns = list(gridTitle = "Iris Dataset PC Loadings", thresh = 3))
 #'
 #' To access a single plot from the grid: b[["plots]][["plotLoadingsGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.

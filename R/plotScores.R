@@ -2,10 +2,10 @@
 #'
 #' Grid of the score plots using GGally::ggpairs up to a threshold number.
 #'
-#' @param model A pcResults object.
+#' @param model A PCA object.
 #' @param optns An empty list for aesthetic options.
 #' @param gridTitle A parameter for the \code{optns} list. A character for the title of the grid.
-#' @param thresh A parameter for the \code{optns} list. A numeric for the number of PCAs to display in the grid. The default is calculated in the pcResults function.
+#' @param thresh A parameter for the \code{optns} list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.
 #' @param colour A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the colour desired. Default colour is "black"
 #' @param shape A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the shape desired. Default shape is "circle".
 #' @param size A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the size desired. Default size is 3.
@@ -19,7 +19,7 @@
 #' @return The model list appended with the grid of loadings under plots.
 #' @examples
 #' data(iris)
-#' a <- pcResults(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
+#' a <- PCA(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
 #' b <- plotscores(model = a, optns=list(colour = iris[,"Species"], colourTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alpha = 0.7))
 #' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 

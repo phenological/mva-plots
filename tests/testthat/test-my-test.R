@@ -1,25 +1,25 @@
 test_that("multiplication works", {
   expect_equal(2 * 2, 4)
 })
-test_that("pcresults",{
+test_that("PCA",{
   expect_known
 })
 
 
-#pcResults
+#PCA
 
 
 #plotScores
 test_that("pcaGrid is a gg object",{
   data("iris")
-  a <- pcResults(data=iris[,1:4], annotation =iris[,5])
+  a <- PCA(data=iris[,1:4], annotation =iris[,5])
   p <- plotScores(model = a, optns = list())
   expect_s3_class(object= p[["plots"]][["pcaGrid"]], class = "gg")
 })
 
 test_that("plots is a list",{
   data("iris")
-  a <- pcResults(data=iris[,1:4], annotation =iris[,5])
+  a <- PCA(data=iris[,1:4], annotation =iris[,5])
   p <- plotScores(model = a, optns = list())
   expect_type(p$plots,"list")
 })
@@ -27,7 +27,7 @@ test_that("plots is a list",{
 #plotLoadings
 test_that("plotLoadingGrid is a gg object",{
   data("iris")
-  a <- pcResults(data=iris[,1:4], annotation =iris[,5])
+  a <- PCA(data=iris[,1:4], annotation =iris[,5])
   p <- plotLoadings(model = a, optns = list())
   expect_s3_class(object= p[["plots"]][["plotLoadingGrid"]], class = "gg")
 })
@@ -35,7 +35,7 @@ test_that("plotLoadingGrid is a gg object",{
 #eruptionPlot
 test_that("plotLoadingGrid is a gg object",{
   data("mtcars")
-  a <- pcResults(data=mtcars[,1:7], annotation =mtcars[,8:11])
+  a <- PCA(data=mtcars[,1:7], annotation =mtcars[,8:11])
   p <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns = list())
   expect_s3_class(object= p[["plots"]][["eruptionPlot"]], class = "gg")
 })

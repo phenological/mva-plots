@@ -2,7 +2,7 @@
 #'
 #' Eruption plot.
 #'
-#' @param model A pcResults object.
+#' @param model A PCA object.
 #' @param factor A column from the data frame of metadata. Must be a two factor variable such as treatment and control.
 #' @param optns An empty list for additional options.
 #' @param plotTitle A parameter for the \code{optns} list. A character for the title of the plot. Default is "Eruption Plot".
@@ -14,7 +14,7 @@
 #' @examples
 #' data(mtcars)
 #'
-#' a <- pcResults(data = mtcars[,1:7], annotation = mtcars[,8:11], center = TRUE, scale. = TRUE)
+#' a <- PCA(data = mtcars[,1:7], annotation = mtcars[,8:11], center = TRUE, scale. = TRUE)
 #' b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(colourCoding = "correlation", plotTitle = "mtcars eruption", method = "bonferroni"))
 #' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 

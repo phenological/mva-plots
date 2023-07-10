@@ -87,7 +87,7 @@ You can display a summary plot to help inform the number of PC's you're interest
 
 ```{r, fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 # Perform PCA
-a = pcResults(data = BIOspcglyc[,1:8], 
+a = PCA(data = BIOspcglyc[,1:8], 
               annotation = BIOspcglyc[,-1:-8],
               optns = list(cutoff = 95))
 
