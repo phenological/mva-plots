@@ -9,6 +9,7 @@
 #' @return Interactive/non-interactive spectra plot
 #' @importFrom dplyr
 #' @importFrom ggplot2
+#' @importFrom plotly
 #' 
 #' @examples 
 #' nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
@@ -38,7 +39,7 @@ matspec<-function (X, ppm, roi = c(0, 9.5), interactive = TRUE, ...)
     df$col <- rep(cols, length(which(fi==TRUE)))
     p <- suppressWarnings(plotly::plot_ly(data = df, x = ~Var2, y = ~value, 
                                   color = ~I(col), name = ~Var1, hovertemplate = "%{x} ppm<extra></extra>") %>% 
-                            layout(xaxis = x, yaxis = y) %>%add_lines())
+                            layout(xaxis = x, yaxis = y) %>%plotly::add_lines())
     return(p)
   }
   matplot(ppm[fi], t(X[, fi]), type = "l", xlim = rev(range(ppm[fi])), 
