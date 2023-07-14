@@ -9,6 +9,9 @@ for(i in functionList){
 ```{r}
 #testthat, ggplot2, GGally, roxygen2, stats, ggrepel, dplyr??, ggpubr??
 usethis::use_package("ggplot2")
+usethis::use_package("plotly") # used for matspec
+usethis::use_package("PRROC") # used for 
+
 
 ```
 #load data to test functions
