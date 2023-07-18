@@ -28,7 +28,7 @@
 library(PRROC)
 
 plotPRROC<-function(model = NULL,x = NULL,y = NULL,PC = c(1,2),col = c("red","black"),caption = FALSE){
-  if(exists("model")){ 
+  if(!is.null(model)){ 
     if(class(model)[1]=="opls"){
       method<-model@typeC
       Y = as.numeric(factor(model@suppLs$y))
@@ -38,7 +38,7 @@ plotPRROC<-function(model = NULL,x = NULL,y = NULL,PC = c(1,2),col = c("red","bl
       stop("model is not from ropls function, Try x and y input instead")
     }
   }
-  if(!exists("model")){
+  if(is.null(model)){
     if(exists("x") &exists("y")){
       x<-x
       y<-y
