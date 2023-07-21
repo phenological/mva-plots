@@ -17,7 +17,7 @@
 #' X<-nmr@.Data
 #' matspec(X[1:3,],ppm,roi = c(3.0,4.5),interactive = T)
 
-matspec<-function (X, ppm, roi = c(0, 9.5), interactive = TRUE, ...) 
+matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...) 
 {
   if (is.null(ppm)) {
     ppm <- as.numeric(colnames(X))
@@ -39,7 +39,7 @@ matspec<-function (X, ppm, roi = c(0, 9.5), interactive = TRUE, ...)
     df$col <- rep(cols, length(which(fi==TRUE)))
     p <- suppressWarnings(plotly::plot_ly(data = df, x = ~Var2, y = ~value, 
                                   color = ~I(col), name = ~Var1, hovertemplate = "%{x} ppm<extra></extra>") %>% 
-                            layout(xaxis = x, yaxis = y) %>%plotly::add_lines())
+                            plotly::layout(xaxis = x, yaxis = y) %>%plotly::add_lines())
     return(p)
   }
   matplot(ppm[fi], t(X[, fi]), type = "l", xlim = rev(range(ppm[fi])), 
