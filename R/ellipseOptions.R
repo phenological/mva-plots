@@ -166,9 +166,9 @@ ellipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh = th
 
         #stat_ellipse for separation
 
-        if(optns$ellipse == "colour"){
+        if(optns$ellipse == "color"){
           temp <- temp +
-            stat_ellipse(aes(color = model$data$pcdf$colourCoding))
+            stat_ellipse(aes(color = model$data$pcdf$color))
         }
         pcaGridPlot[j, i] <- temp
       }

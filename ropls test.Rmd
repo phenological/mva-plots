@@ -111,14 +111,15 @@ aaData<-data.frame(apply(aa@.Data,2,as.numeric)) #spc/glyc data
 ```
 ```{r}
 #1 make the model
-lo<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$covid_status, type = "OPLS", optns=list(predI = 3, permI= 100))
+lo<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$age, type = "PLS", optns=list(predI = 3, permI= 100))
 
 #2 predict with newdata 
-lot <-oplsdaPredict(object = lo, newdata = aaData)
+lot <-oplsdaPredict(model = lo, newdata = aaData)
 
 #mtcars test
 il<- oplsda(X=mtcars[,1:7], Y=mtcars[,8], type = "PLS", optns=list(scaleC="none"))
 
+singlePlot(model=lot, optns = list(ellipse = "hotellings"))
 ```
 
 ```{r}
@@ -127,14 +128,97 @@ a <- PCA(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
 a1 <- PCA(df3[,1:112], annotation = df3[,-1:-112], rank = 20)
 
 #2
-fff<- plotScores(model=a, optns=list(colour=BIOspcglyc[,"age"], shape=BIOspcglyc[,"sex"], ellipse="normal", outlierLabels=row.names(BIOspcglyc)))
+fff<- plotScores(model=a, optns=list(color=BIOspcglyc$age, ellipse="hotellings", shape=BIOspcglyc$sex, outlierLabels=row.names(BIOspcglyc)))
 fff[["plots"]][["pcaGrid"]]
+
+plotScores(model = lo, optns = list(color =BIOspcglyc$age, ellipse = "hotellings"))
 
 #2
 fff<- plotLoadings(model= a)
 fff[["plots"]][["plotLoadingGrid"]]
+```
+```{r}
+df2 <- as.data.frame(cbind(lo@loadingMN, lo@orthoLoadingMN))
+df2 <-cbind(df2, lo@suppLs[["yMCN"]])
 
+singlePlot(model = fff, optns=list( i=2, j=3, plotTitle="PC2vPC3"))
+i=2 
+j=3
+onePlot <- fff[["plots"]][["pcaGrid"]][j,i]+
+      ggtitle("plotTitle") +
+      labs(shape = fff$extra$shapeTitle,
+           color = fff$extra$colorTitle,
+           size = fff$extra$sizeTitle,
+           alpha = fff$extra$alphaTitle,
+           x = fff$extra$axisTitle[i],
+           y = fff$extra$axisTitle[j+1]) +
+      theme_minimal()
 
+#score plot
+gg_circle2 <- function(rx, ry, xc, yc, color = "grey", fill = NA, linetype="dashed", ...) {
+  x <- xc + rx * cos(seq(0, pi, length.out = 100))
+  ymax <- yc + ry * sin(seq(0, pi, length.out = 100))
+  ymin <- yc + ry * sin(seq(0, -pi, length.out = 100))
+  annotate(
+    "ribbon",
+    x = x, ymin = ymin, ymax = ymax,
+    color = color, fill = fill, linetype = linetype)
+}
+
+df <- as.data.frame(cbind(lo@scoreMN))
+df <-cbind(df, lo@suppLs[["yMCN"]])
+ci<-0.95
+    n <- nrow(df)
+
+    hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(ci, 2, n - 2)
+ggplot(data = df, aes(x=df[,1], y=df[,2])) + 
+  geom_point(aes(color=y1, shape=BIOspcglyc$sex))+ 
+  scale_color_gradientn(
+        colors = c(
+          "#0000CC",
+          "#0000FF",
+          "#0055FF",
+          "#00AAFF",
+          "#00FFFF",
+          "#2BFFD5",
+          "#55FFAA",
+          "#80FF80",
+          "#AAFF55",
+          "#D4FF2B",
+          "#FFFF00",
+          "#FFAA00",
+          "#FF5500",
+          "#FF0000",
+          "#CC0000"
+        ),
+        na.value = "grey50",
+        guide = "colorbar"
+      )+
+  geom_hline(yintercept = 0, colour = "gray70") + 
+  geom_vline(xintercept = 0, colour = "gray70")+ 
+  labs(caption = expression("no ellipse")) + 
+  theme_bw() +
+  gg_circle2(rx = sqrt(var(df[,1]) * hotFisN),
+                      ry = sqrt(var(df[,2]) * hotFisN),
+                      xc = 0,
+                      yc = 0) +
+  labs(color="over")
+# + geom_text(
+#                   data = df[idx, ],
+#                   aes(label = p1),
+#                   size = 2,
+#                   hjust = 0,
+#                   vjust = 0
+#                 )
+
+##for outliers
+rx <- sqrt(var(df[,1]) * hotFisN)
+ry <- sqrt(var(df[,2]) * hotFisN)
+
+insideOut <- list((df[,1]^2)/(rx^2) + (df[,2]^2)/(ry^2))
+idx <- which(insideOut[[1]] > 1)
+
+outlierIDX <- df[idx,-1:-ncol(df)]
 
 ```
 
@@ -550,6 +634,6 @@ if(object@suppLs[["naxL"]]) {
 ```
 ```{r}
 
-lo<-ropls::opls(x = BIOspcglyc[,1:8], y = BIOspcglyc$covid_status, predI = NA, orthoI = 0, permI=20, subset = "odd")
+lot<-ropls::opls(x = BIOspcglyc[,1:8], y = BIOspcglyc$covid_status, predI = 1, orthoI = NA, permI=20, subset = "odd")
 ```
 

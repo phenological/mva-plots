@@ -67,7 +67,7 @@ if("permI" %in% names(optns)){
   permI <- optns$permI
 } else {permI <- 20}
 
-  object <- ropls::opls(x = X,
+  model <- ropls::opls(x = X,
                         y = Y,
                         predI = predI,
                         orthoI = orthoI,
@@ -75,8 +75,9 @@ if("permI" %in% names(optns)){
                         scaleC = scaleC,
                         log10L = log10L,
                         subset = subset,
-                        permI = permI)
+                        permI = permI,
+                        fig.pdfC = "none")
 
-return(object)
+invisible(model)
 }
 
