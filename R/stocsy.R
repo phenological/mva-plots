@@ -62,7 +62,7 @@ plotStocsy <- function(df, cshift=NULL, breaks=10){
   if(!is.null(cshift)){
     p <- p + labs(caption=paste("Driver c. shift:",cshift,"ppm"))
     if (cshift >= min(df$ppm) & cshift <= max(df$ppm))
-      p + theme_bw() + geom_vline(xintercept = cshift,linetype = 2)
+      p <- p + geom_vline(xintercept = cshift,linetype = 2)
   }
   return(p)
 }
