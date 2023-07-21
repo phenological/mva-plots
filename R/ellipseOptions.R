@@ -183,6 +183,6 @@ if("ellipse" %in% names(optns)){
   output <- list(pcaGridPlot = pcaGridPlot,
                  outliers = outliers
                 )
-
+#individual###############?
   return(output)
 }

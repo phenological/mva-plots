@@ -315,7 +315,7 @@ plotScores<-function(model, optns=list()){
     print(pcaGridPlot)
     invisible(model)}
 
-###########single PCA ############
+###########single PCA ############TBA
 
 
 ##########ropls objects############

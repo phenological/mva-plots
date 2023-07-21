@@ -131,6 +131,7 @@ a1 <- PCA(df3[,1:112], annotation = df3[,-1:-112], rank = 20)
 fff<- plotScores(model=a, optns=list(color=BIOspcglyc$age, ellipse="hotellings", shape=BIOspcglyc$sex, outlierLabels=row.names(BIOspcglyc)))
 fff[["plots"]][["pcaGrid"]]
 
+#ropls objects
 plotScores(model = lo, optns = list(color =BIOspcglyc$age, ellipse = "hotellings"))
 
 #2
