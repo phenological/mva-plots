@@ -4,7 +4,7 @@
 #'
 #' @param model A PCA object.
 #' @param optns An empty list for aesthetic options.
-#' @param gridTitle A parameter for the \code{optns} list. A character for the title of the grid.
+#' @param plotTitle A parameter for the \code{optns} list. A character for the title of the plot.
 #' @param thresh A parameter for the \code{optns} list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.
 #' @param color A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the color desired. Default color is "black"
 #' @param shape A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the shape desired. Default shape is "circle".
@@ -25,26 +25,26 @@
 
 plotScores<-function(model, optns=list()){
 
-  #Grid title (working)
-  if("gridTitle" %in% names(optns)){
+  #plot title
+  if("plotTitle" %in% names(optns)){
     plotTitle = optns$plotTitle
   }else{
     plotTitle <- "Scores Plot"
   }
 
-  #color (working)
+  #color
   if(!("color" %in% names(optns))){
     optns$color="black"}
 
-  #shape (working)
+  #shape
   if(!("shape" %in% names(optns))){
     optns$shape="circle"}
 
-  #size (working)
+  #size
   if(!("size" %in% names(optns))){
     optns$size=3}
 
-  #alpha (working)
+  #alpha
   if(!("alpha" %in% names(optns))){
     optns$alpha=0.5}
 
@@ -68,32 +68,10 @@ plotScores<-function(model, optns=list()){
   # [1] "#0000CC" "#0000FF" "#0055FF" "#00AAFF" "#00FFFF"
   # [6] "#2BFFD5" "#55FFAA" "#80FF80" "#AAFF55" "#D4FF2B"
   # [11] "#FFFF00" "#FFAA00" "#FF5500" "#FF0000" "#CC0000"
-  gs <- if(is(optns$color)[1] == "numeric"){
-    scale_color_gradientn(
-      colors = c(
-        "#0000CC",
-        "#0000FF",
-        "#0055FF",
-        "#00AAFF",
-        "#00FFFF",
-        "#2BFFD5",
-        "#55FFAA",
-        "#80FF80",
-        "#AAFF55",
-        "#D4FF2B",
-        "#FFFF00",
-        "#FFAA00",
-        "#FF5500",
-        "#FF0000",
-        "#CC0000"
-      ),
-      na.value = "grey50",
-      guide = "colorbar"
-    )}
-  else{scale_color_brewer(palette = "Set2")}
+
 
   #correct input for ggplot and ggpairs objects
-#point aesthetics
+#geom_point
   gp<- if((length(optns$color)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1 ){
     geom_point(color = optns$color,
                shape = optns$shape,
@@ -176,7 +154,7 @@ plotScores<-function(model, optns=list()){
                color = optns$color)
   }
 
-#graph guides
+#geom_guide
   gu<- if((length(optns$color)) == 1 & (length(optns$shape)) == 1 & (length(optns$size)) == 1 & (length(optns$alpha)) == 1 ){
     guides(color = "none",
            shape = "none",
@@ -228,97 +206,8 @@ plotScores<-function(model, optns=list()){
     guides(color = "none")
   }
 
-#########PCA Grid##################
-  if(is(model)[1]=="list"){
 
-    #number of pcas (working)
-    if("thresh" %in% names(optns)){
-      thresh = optns$thresh[1]
-    }else{thresh = model$data$threshold}
-
-    #axis labels
-    title <- list()
-    for (i in 1:thresh) {
-      title[[i]] <- paste0('PC', i, ' (', round(model$data$pcSum$`Proportion of Variance`[i], 1), '%)')
-    }
-    title<-unlist(title)
-
-    #plot used for its legend
-    test <- ggplot(data = model$data$pcdf,
-                   aes(x = model$data$pcdf$PC1,
-                       y = model$data$pcdf$PC2)) +
-      gs +
-      gp +
-      gu +
-      scale_alpha(range = c(0.1, 1)) +
-      #scale_color_brewer(palette="Set2") +
-      labs(color = optns$colorTitle,
-           shape = optns$shapeTitle,
-           size = optns$sizeTitle,
-           alpha = optns$alphaTitle ) +
-      theme_minimal()
-
-    #ensure that lack of legend doesn't stop ggpairs from working
-    if ((length(optns$color)) == 1 &
-        (length(optns$shape)) == 1 &
-        (length(optns$size)) == 1 &
-        (length(optns$alpha)) == 1) {
-      testLegend <- NULL
-    } else{
-      testLegend <- GGally::grab_legend(test)
-    }
-
-    #grid of PCAs
-    pcaGridPlot<-GGally::ggpairs(data = model$data$pcdf[,1:thresh],
-                                 columnLabels = c(title),
-                                 title = plotTitle,
-                                 diag="blank",
-                                 upper="blank",
-                                 #upper=list(continuous = my_fn1),
-                                 lower=list(continuous = myFn1),
-                                 legend = testLegend,
-                                 progress = F,
-                                 switch = "both") +
-      gs +
-      gp +
-      theme_bw() +
-      theme(legend.position = "right",
-            strip.background = element_rect(fill = "white"),
-            axis.text.x = (element_text(size = rel(0.7),
-                                        angle = 0)),
-            axis.text.y = (element_text(size = rel(0.7),
-                                        angle = 0)),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            panel.border = element_rect(fill = NA,
-                                        color = "grey35"))
-
-
-    plotGT <- ellipseOptions (model = model,
-                              pcaGridPlot = pcaGridPlot,
-                              thresh = thresh,
-                              optns = optns
-    )
-
-    pcaGridPlot <- gPairsLower(plotGT$pcaGridPlot)
-
-    model$plots <- append(model$plots, list(pcaGrid = pcaGridPlot))
-
-    model$data <- append(model$data, list(outliers = plotGT$outliers))
-
-    # model$extra <- append(model$extra, list(axisTitle = title,
-    #                                         colorTitle = colorTitle,
-    #                                         shapeTitle = shapeTitle,
-    #                                         sizeTitle = sizeTitle,
-    #                                         alphaTitle = alphaTitle))
-
-    print(pcaGridPlot)
-    invisible(model)}
-
-###########single PCA ############TBA
-
-
-##########ropls objects############
+  ##########ropls objects############
 
   #ropls score plots
   if(is(model)[1]=="opls"){
@@ -336,6 +225,7 @@ plotScores<-function(model, optns=list()){
     }
 
     df <- cbind(df, model@suppLs[["yMCN"]])
+    df$rownames <- row.names(df)
 
     #colors
     if(grepl("DA", model@typeC) == TRUE){
@@ -355,25 +245,189 @@ plotScores<-function(model, optns=list()){
                                                 "#FF5500",
                                                 "#FF0000",
                                                 "#CC0000"),
-                                              na.value = "grey50",
-                                              guide = "colorbar")
+                                     na.value = "grey50",
+                                     guide = "colorbar")
+    }
+  }
+
+#########PCA objects##################
+  if(is(model)[1]=="list"){
+
+    gc <- if(is(optns$color)[1] == "numeric"){
+      scale_color_gradientn(
+        colors = c(
+          "#0000CC",
+          "#0000FF",
+          "#0055FF",
+          "#00AAFF",
+          "#00FFFF",
+          "#2BFFD5",
+          "#55FFAA",
+          "#80FF80",
+          "#AAFF55",
+          "#D4FF2B",
+          "#FFFF00",
+          "#FFAA00",
+          "#FF5500",
+          "#FF0000",
+          "#CC0000"
+        ),
+        na.value = "grey50",
+        guide = "colorbar"
+      )}
+    else{scale_color_brewer(palette = "Set2")}
+
+    #number of pcas (working)
+    if("thresh" %in% names(optns)){
+      thresh = optns$thresh[1]
+    }else{thresh = model$data$threshold}
+
+    #axis labels
+    title <- list()
+    for (i in 1:thresh) {
+      title[[i]] <- paste0('PC', i, ' (', round(model$data$pcSum$`Proportion of Variance`[i], 1), '%)')
+    }
+    title<-unlist(title)
+
+    if("PCi" %in% names(optns)){
+      PCi <- optns$PCi
+      PCj <- optns$PCj
+      gl <- labs(x = title[PCi], y = title[PCj])
+    }
+  }
+##########ropls or LEGEND#############
+
+    if(!("PCi" %in% names(optns))){
+      PCi <- 1
+      PCj <- 2
+      if(is(model)[1]=="list"){
+        gl <- labs()
+      }
+      }
+
+########ALL##############
+  onePlot <- ggplot(data = df,
+                    aes(x = df[,PCi], y = df[,PCj])) +
+          ggtitle(plotTitle) +
+          gl +
+          gc +
+          gp +
+          gu +
+          scale_alpha(range = c(0.1, 1)) +
+          labs(color = optns$colorTitle,
+               shape = optns$shapeTitle,
+               size = optns$sizeTitle,
+               alpha = optns$alphaTitle ) +
+          geom_hline(yintercept = 0, colour = "gray70") +
+          geom_vline(xintercept = 0, colour = "gray70") +
+          theme_bw()
+
+#########ellipse & outliers########
+if(is(model)[1] == "opls" & "ellipse" %in% names(optns)){
+
+  #make ellipse
+  output <- ellipseOptions2(df = df, PCi = PCi, PCj = PCj, plot = onePlot, optns = optns)
+
+  idx <- output$outliers
+  onePlot <- output$plot
+
+  #add labels
+  if("outlierLabels" %in% optns){
+    if(grepl("O", model@typeC) == TRUE){
+      onePlot <- onePlot +
+        geom_label(data = df[idx,],
+                   aes(x = p1,
+                       y = o1,
+                       label = rownames),
+                   size = 2,
+                   hjust = 0,
+                   vjust = 0,
+                   label.size = NA,
+                   fill=NA)
     }
 
-    onePlot <- ggplot(data = df, aes(x=df[,1], y=df[,2])) +
-      gp +
-      gu +
-      labs(color = optns$colorTitle,
-           shape = optns$shapeTitle,
-           size = optns$sizeTitle,
-           alpha = optns$alphaTitle ) +
-      gc +
-      gl +
-      geom_hline(yintercept = 0, colour = "gray70") +
-      geom_vline(xintercept = 0, colour = "gray70") +
-      theme_bw()+
-      ggtitle(plotTitle)
+    if(grepl("O", model@typeC) == FALSE){
+      onePlot <- onePlot + geom_label(data = df[idx,],
+                                      aes(x = p1,
+                                          y = p2,
+                                          label = rownames),
+                                      size = 2,
+                                      hjust = 0,
+                                      vjust = 0,
+                                      label.size = NA,
+                                      fill=NA)
+    }
+  }
 
-    onePlot <- ellipseOptions2(df = df, plot = onePlot, optns = optns)
+  return(onePlot)
+  #invisible(output)
+}
+  if(is(model)[1] == "opls" & !("ellipse" %in% names(optns))){return(onePlot)}
+
+if(is(model)[1] == "list"){
+  if("PCi" %in% names(optns)){
+    onePlot <- ellipseOptions2(df = model$data$pcdf, PCi = PCi, PCj = PCj, plot = onePlot, optns = optns)
     print(onePlot)
   }
+
+}
+
+###########GRID###########
+if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
+  #ensure that lack of legend doesn't stop ggpairs from working
+  if ((length(optns$color)) == 1 &
+      (length(optns$shape)) == 1 &
+      (length(optns$size)) == 1 &
+      (length(optns$alpha)) == 1) {
+    testLegend <- NULL
+  } else{
+    testLegend <- GGally::grab_legend(onePlot)
+  }
+
+  #grid of PCAs
+  pcaGridPlot<-GGally::ggpairs(data = model$data$pcdf[,1:thresh],
+                               columnLabels = c(title),
+                               title = plotTitle,
+                               diag="blank",
+                               upper="blank",
+                               #upper=list(continuous = my_fn1),
+                               lower=list(continuous = myFn1),
+                               legend = testLegend,
+                               progress = F,
+                               switch = "both") +
+    gc +
+    gp +
+    theme_bw() +
+    theme(legend.position = "right",
+          strip.background = element_rect(fill = "white"),
+          axis.text.x = (element_text(size = rel(0.7),
+                                      angle = 0)),
+          axis.text.y = (element_text(size = rel(0.7),
+                                      angle = 0)),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_rect(fill = NA,
+                                      color = "grey35"))
+
+
+  plotGT <- ellipseOptions (model = model,
+                            pcaGridPlot = pcaGridPlot,
+                            thresh = thresh,
+                            optns = optns
+  )
+
+  pcaGridPlot <- gPairsLower(plotGT$pcaGridPlot)
+
+  model$plots <- append(model$plots, list(pcaGrid = pcaGridPlot))
+
+  model$data <- append(model$data, list(outliers = plotGT$outliers))
+
+  print(pcaGridPlot)
+  invisible(model)}
+
+
+
+###########single PCA ############TBA
+
+
 }

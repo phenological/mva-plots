@@ -4,7 +4,7 @@
 #'
 #' @param model A PCA object.
 #' @param optns An empty list for aesthetic options.
-#' @param gridTitle A parameter for the optns list. A character for the title of the grid.
+#' @param plotTitle A parameter for the optns list. A character for the title of the grid.
 #' @param thresh A parameter for the optns list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.
 #'
 #' @return The model list appended with the grid of loadings under plots.
@@ -18,10 +18,10 @@
 
 plotLoadings <- function(model, optns=list()){
   #Grid title (working)
-  if("gridTitle" %in% names(optns)){
-    gridTitle = optns$gridTitle
+  if("plotTitle" %in% names(optns)){
+    plotTitle = optns$plotTitle
   }else{
-    gridTitle <- "Plot Loadings Grid"
+    plotTitle <- "Loadings Plot"
     #cat(yellow("Using default gridTitle", "!\n"))
   }
 
@@ -41,7 +41,7 @@ plotLoadings <- function(model, optns=list()){
 
   plotLoadingGrid <- GGally::ggpairs(data = df[,1:thresh],
                                      columnLabels = c(title),
-                                     title = gridTitle,
+                                     title = plotTitle,
                                      diag="blank",
                                      upper="blank",
                                      #upper=list(continuous =my_fn1),
