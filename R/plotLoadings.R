@@ -17,13 +17,48 @@
 
 
 plotLoadings <- function(model, optns=list()){
-  #Grid title (working)
+  #plot title (working)
   if("plotTitle" %in% names(optns)){
     plotTitle = optns$plotTitle
   }else{
     plotTitle <- "Loadings Plot"
-    #cat(yellow("Using default gridTitle", "!\n"))
   }
+
+  #########ropls objects##################
+  if(is(model)[1]=="opls"){
+
+    if(grepl("O", model@typeC) == TRUE){
+      df <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN))
+      gl <- labs(x = paste0('p1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
+                 y = paste0('po1'))
+    }else{
+      df <- as.data.frame(model@loadingMN)
+      gl <- labs(x = paste0('p1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
+                 y = paste0('p2 (', round(model@modelDF[["R2X"]][2]*100, 1), '%)'))
+    }
+
+      PCi <- 1
+      PCj <- 2
+
+      onePlot <- ggplot(data = df,
+                        aes(x = df[,PCi], y = df[,PCj])) +
+        ggtitle(plotTitle) +
+        gl +
+        geom_point(color= "blue",
+                   size = 1) +
+        geom_text_repel(aes(label = rownames(df)),
+                        size = 3.5) +
+        geom_hline(yintercept = 0, colour = "gray70") +
+        geom_vline(xintercept = 0, colour = "gray70") +
+        theme_bw()
+
+      print(onePlot)
+    }
+
+  #########PCA objects##################
+  if(is(model)[1]=="list"){
+
+    df<- as.data.frame(model$data$loadings)
 
   #number of pcas (working)
   if("thresh" %in% names(optns)){
@@ -37,37 +72,59 @@ plotLoadings <- function(model, optns=list()){
   }
   title<-unlist(title)
 
- df<- as.data.frame(model$data$loadings)
+  if("PCi" %in% names(optns)){
+    PCi <- optns$PCi
+    PCj <- optns$PCj
+    gl <- labs(x = title[PCi], y = title[PCj])
 
-  plotLoadingGrid <- GGally::ggpairs(data = df[,1:thresh],
-                                     columnLabels = c(title),
-                                     title = plotTitle,
-                                     diag="blank",
-                                     upper="blank",
-                                     #upper=list(continuous =my_fn1),
-                                     lower=list(continuous =myFn2),
-                                     progress = F,
-                                     switch="both") +
-                                     geom_point(color= "blue",
-                                               size = 1) +
-                                    #geom_label(label = rownames(df))+
-                                     geom_text_repel(aes(label = rownames(df)),
-                                                        size = 3.5) +
-                                     theme_bw() +
-                                     theme(strip.background = element_rect(fill = "white"),
-                                          axis.text.x = (element_text(size = rel(0.7),
-                                                                    angle = 0)),
-                                          axis.text.y = (element_text(size = rel(0.7),
-                                                                      angle = 0)),
-                                          panel.grid.major = element_blank(),
-                                          panel.grid.minor = element_blank(),
-                                          panel.border = element_rect(fill = NA,
-                                                                      colour = "grey35"))
+    onePlot <- ggplot(data = df,
+                      aes(x = df[,PCi], y = df[,PCj])) +
+      ggtitle(plotTitle) +
+      gl +
+      geom_point(color= "blue",
+                 size = 1) +
+      geom_text_repel(aes(label = rownames(df)),
+                      size = 3.5) +
+      geom_hline(yintercept = 0, colour = "gray70") +
+      geom_vline(xintercept = 0, colour = "gray70") +
+      theme_bw()
 
-  plotLoadingGrid <- gPairsLower(plotLoadingGrid)
+    print(onePlot)
+    }
 
-  model$plots <- append(model$plots, list(plotLoadingGrid = plotLoadingGrid))
+  if(!("PCi" %in% names(optns))){
+    plotLoadingGrid <- GGally::ggpairs(data = df[,1:thresh],
+                                       columnLabels = c(title),
+                                       title = plotTitle,
+                                       diag="blank",
+                                       upper="blank",
+                                       #upper=list(continuous =my_fn1),
+                                       lower=list(continuous =myFn2),
+                                       progress = F,
+                                       switch="both") +
+      geom_point(color= "blue",
+                 size = 1) +
+      geom_text_repel(aes(label = rownames(df)),
+                      size = 3.5) +
+      theme_bw() +
+      theme(strip.background = element_rect(fill = "white"),
+            axis.text.x = (element_text(size = rel(0.7),
+                                        angle = 0)),
+            axis.text.y = (element_text(size = rel(0.7),
+                                        angle = 0)),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(),
+            panel.border = element_rect(fill = NA,
+                                        colour = "grey35"))
 
-  print(plotLoadingGrid)
-  invisible(model)
-}
+    plotLoadingGrid <- gPairsLower(plotLoadingGrid)
+
+    model$plots <- append(model$plots, list(plotLoadingGrid = plotLoadingGrid))
+
+    print(plotLoadingGrid)
+    invisible(model)
+  }
+  }
+
+  }
+

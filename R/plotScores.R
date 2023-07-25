@@ -14,7 +14,7 @@
 #' @param shapeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{shape} is a variable. No shape legend will appear if \code{shape} is set to a simple aesthetic such as "square". Default "Shape".
 #' @param sizeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{size} is a variable. No size legend will appear if \code{size} is set to a simple aesthetic such as 2. Default "Size".
 #' @param alphaTitle A parameter for the \code{optns} list. A character of the desired alpha legend title when \code{alpha} is a variable. No size legend will appear if \code{alpha} is set to a simple aesthetic such as 0.3. Default "Alpha".
-#' @param ellipse A parameter for the \code{optns} list. A character or either "color", "hotellings", "T", or "normal" depending on desired method of calculation. If using color, a discrete variable must be supplied to color.
+#' @param ellipse A parameter for the \code{optns} list. A character or either "color", "hotellings", "t", or "normal" depending on desired method of calculation. If using color, a discrete variable must be supplied to color.
 #' @param outlierLabels A parameter for the \code{optns} list. Only compatible with ellipse set to hotellings, T or normal. For ropls object, supply "outlierLabels" and rownames will appear. For PCA modek, supply a column from the data frame to label outliers. You can set it to, for example, outlierLabels=row.names(iris) to identify the outlier position in your dataframe.
 #' @return The model list appended with the grid of loadings under plots.
 #' @examples
@@ -333,7 +333,7 @@ plotScores<-function(model, optns=list()){
 if(is(model)[1] == "opls" & "ellipse" %in% names(optns)){
 
   #make ellipse
-  output <- ellipseOptions2(df = df, PCi = PCi, PCj = PCj, plot = onePlot, optns = optns)
+  output <- singleEllipseOptions(df = df, PCi = PCi, PCj = PCj, plot = onePlot, optns = optns)
 
   idx <- output$outliers
   onePlot <- output$plot
@@ -373,7 +373,7 @@ if(is(model)[1] == "opls" & "ellipse" %in% names(optns)){
 
 if(is(model)[1] == "list"){
   if("PCi" %in% names(optns)){
-    output <- ellipseOptions2(df = model$data$pcdf, PCi = PCi, PCj = PCj, plot = onePlot, optns = optns)
+    output <- singleEllipseOptions(df = model$data$pcdf, PCi = PCi, PCj = PCj, plot = onePlot, optns = optns)
     idx <- output$outliers
     onePlot <- output$plot
 
@@ -432,7 +432,7 @@ if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
                                       color = "grey35"))
 
 
-  plotGT <- ellipseOptions (model = model,
+  plotGT <- gridEllipseOptions (model = model,
                             pcaGridPlot = pcaGridPlot,
                             thresh = thresh,
                             optns = optns
