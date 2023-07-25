@@ -120,7 +120,7 @@ lot <-oplsdaPredict(model = lo, newdata = aaData)
 #mtcars test
 il<- oplsda(X=mtcars[,1:7], Y=mtcars[,8], type = "PLS", optns=list(scaleC="none"))
 
-plotScores(model=lot, optns = list(shape = BIOspcglyc$sex,ellipse="norm", "outlierLabels"))
+plotScores(model=lo, optns = list(ellipse="norm", "outlierLabels"))
 
 plotScores(model=a, optns=list(color = BIOspcglyc$age, ellipse="T"))
 
@@ -136,7 +136,7 @@ fff<- plotScores(model=a, optns=list(color=BIOspcglyc$age, ellipse="hotellings",
 fff[["plots"]][["pcaGrid"]]
 
 #ropls objects
-plotScores(model = lo, optns = list(color = BIOspcglyc$age, ellipse = "hotellings"))
+plotScores(model = a, optns = list(color = BIOspcglyc$age, ellipse = "T", PCi=2, PCj=3))
 
 #2
 fff<- plotLoadings(model= a)
