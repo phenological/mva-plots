@@ -14,7 +14,9 @@ ellipseOptions2 <- function(df, PCi, PCj, plot, optns){
   if("ellipse" %in% names(optns)){
     if(optns$ellipse == "color"){
       #colour
-      ellipse <- stat_ellipse(aes(color = y1))
+      ellipse <- stat_ellipse(aes(color = df$y1))
+      gl <- labs()
+      idx <-list()
     }
 
     #option for CI % level
