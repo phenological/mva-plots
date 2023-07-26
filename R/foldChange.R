@@ -1,10 +1,16 @@
 #' Fold Change
 
-foldChange  <- function(model, factor){
+foldChange  <- function(model, optns = optns){
 
-  model$data$rawData$factor <- as.numeric(as.factor(factor))
+  if(is(model)[1] == "list"){
+    model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
+    df <- model$data$rawData
+  }
 
-  df <- model$data$rawData
+  if(is(model)[1]=="opls"){
+    df <- as.data.frame(model@suppLs[["x"]])
+    df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+  }
 
   idx<- which(df[,"factor"] == 1)
   control <- df[idx,]

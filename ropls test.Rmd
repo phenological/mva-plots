@@ -111,6 +111,7 @@ aaData<-data.frame(apply(aa@.Data,2,as.numeric)) #spc/glyc data
 ```
 ```{r}
 #1 make the model
+
 lo<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$age, type = "PLS", optns=list(predI = 3, permI= 100))
 lot<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$covid_status, type = "OPLS", optns=list(predI = 3, permI= 100))
 
@@ -120,10 +121,24 @@ lot <-oplsdaPredict(model = lo, newdata = aaData)
 #mtcars test
 il<- oplsda(X=mtcars[,1:7], Y=mtcars[,8], type = "PLS", optns=list(scaleC="none"))
 
-plotScores(model=lo, optns = list(ellipse="norm", "outlierLabels"))
+plotScores(model=lot, optns = list(ellipse = "color"))
 
-plotScores(model=a, optns=list(color = BIOspcglyc$age, ellipse="T"))
+plotScores(model=a, optns=list(ellipse = "hotellings"))
 
+plotLoadings(model = a, optns = list())
+```
+
+```{r}
+eruptionPlot(model = a, optns=list(factor=BIOspcglyc[,"covid_status"], colourCoding ="correlation"))
+
+lot@suppLs[["yMCN"]]
+#append to ropls object 
+#slot(lo,"original") <- BIOspcglyc[,1:8]
+
+
+lot@suppLs[["original"]] <-append(x = data.frame(), values = originalX)
+
+as.data.frame(lo@suppLs[["original"]])
 ```
 
 ```{r}
@@ -133,7 +148,7 @@ a1 <- PCA(df3[,1:112], annotation = df3[,-1:-112], rank = 20)
 
 #2
 fff<- plotScores(model=a, optns=list(color=BIOspcglyc$age, ellipse="hotellings", shape=BIOspcglyc$sex, outlierLabels=row.names(BIOspcglyc)))
-fff[["plots"]][["pcaGrid"]]
+fff[["plots"]][["pcaGrid"]][1,1]
 
 #ropls objects
 plotScores(model = a, optns = list(color = BIOspcglyc$age, ellipse = "T", PCi=2, PCj=3))
@@ -142,6 +157,7 @@ plotScores(model = a, optns = list(color = BIOspcglyc$age, ellipse = "T", PCi=2,
 fff<- plotLoadings(model= a)
 fff[["plots"]][["plotLoadingGrid"]]
 ```
+
 ```{r}
 df2 <- as.data.frame(cbind(lot@scoreMN, lot@orthoScoreMN))
 df2 <-cbind(df2, lot@suppLs[["yMCN"]])
@@ -625,6 +641,6 @@ if(object@suppLs[["naxL"]]) {
 ```
 ```{r}
 
-lot<-ropls::opls(x = BIOspcglyc[,1:8], y = BIOspcglyc$covid_status, predI = 1, orthoI = NA, permI=20, subset = "odd")
+lot2<-ropls::opls(x = BIOspcglyc[,1:8], y = BIOspcglyc$covid_status, predI = 1, orthoI = NA, permI=20)
 ```
 

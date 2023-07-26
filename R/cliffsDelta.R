@@ -1,11 +1,17 @@
 #' Cliff's Delta
 
 
-cliffsDelta <- function(model, factor) {
+cliffsDelta <- function(model, optns = optns) {
 
-  model$data$rawData$factor <- as.numeric(as.factor(factor))
+  if(is(model)[1] == "list"){
+    model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
+    df <- model$data$rawData
+  }
 
-  df <- model$data$rawData
+  if(is(model)[1] == "opls"){
+    df <- as.data.frame(model@suppLs[["x"]])
+    df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+  }
 
   n <- table(df$factor)[1]
   m <- table(df$factor)[2]

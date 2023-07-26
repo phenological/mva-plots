@@ -78,6 +78,9 @@ if("permI" %in% names(optns)){
                         permI = permI,
                         fig.pdfC = "none")
 
+
+  model@suppLs[["x"]] <-append(x = data.frame(), values = X)
+
 invisible(model)
 }
 
