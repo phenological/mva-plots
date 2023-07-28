@@ -2,7 +2,7 @@
 #'
 #' Grid of the score plots using GGally::ggpairs up to a threshold number.
 #'
-#' @param model A PCA or ropls model.
+#' @param model A PCA or oplsda model.
 #' @param optns An empty list for aesthetic options.
 #' @param plotTitle A parameter for the \code{optns} list. A character for the title of the plot.
 #' @param thresh A parameter for the \code{optns} list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.

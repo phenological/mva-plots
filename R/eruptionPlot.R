@@ -17,7 +17,7 @@
 #' data(mtcars)
 #'
 #' a <- PCA(data = mtcars[,1:7], annotation = mtcars[,8:11], center = TRUE, scale. = TRUE)
-#' b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(color = "corr", plotTitle = "mtcars eruption", method = "bonferroni"))
+#' b <- eruptionPlot(model = a,  optns=list(factor=mtcars[,"vs"], color = "corr", plotTitle = "mtcars eruption", method = "bonferroni"))
 
 eruptionPlot <- function(model, optns = list()){
 

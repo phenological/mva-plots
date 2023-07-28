@@ -22,7 +22,7 @@
 
 #calculate Principal Components using prcomp
 
-PCA <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns=list()) {
+PCA <- function(data, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns=list()) {
 
   library(ggplot2)
   results <- prcomp(data,
@@ -45,7 +45,7 @@ PCA <- function(data, annotation, center = TRUE, scale. = TRUE, rank = 5, plot =
 
   scale <- results[["scale"]]
 
-  pcdf <- cbind(as.data.frame(scores), annotation)
+  pcdf <- cbind(as.data.frame(scores))
 
   rawData <- data
 
