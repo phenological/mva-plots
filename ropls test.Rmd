@@ -129,18 +129,88 @@ plotLoadings(model = a, optns = list())
 ```
 
 ```{r}
-eruptionPlot(model = a, optns=list(factor=BIOspcglyc[,"covid_status"], colourCoding ="correlation"))
+lot2 <-eruptionPlot(model = lot, optns=list(y="pval", x="fc", factor = BIOspcglyc$covid_status)) 
 
 lot@suppLs[["yMCN"]]
 #append to ropls object 
 #slot(lo,"original") <- BIOspcglyc[,1:8]
-
+b<-metabom8::opls(X = BIOspcglyc[,1:8], Y = BIOspcglyc$covid_status, center = TRUE, scale = TRUE)
 
 lot@suppLs[["original"]] <-append(x = data.frame(), values = originalX)
 
 as.data.frame(lo@suppLs[["original"]])
-```
 
+optns<-list(x="pval", y="cd")
+labels<-list("Cliff's Delta", "Log2FC", "|log10pval|", "|loadings|", "id", "|corr|")
+names(labels)<-c("cd", "fc", "pval", "loadings", "id", "corr")
+
+```
+```{r}
+maiC <- paste0("pR2Y = ",
+                   lot@summaryDF[, "pR2Y"],
+                   ", pQ2 = ",
+                   lot@summaryDF[, "pQ2"])
+ plot(c(min(lot@suppLs[["permMN"]][, "sim"]), 1),
+       c(min(lot@suppLs[["permMN"]][, c("R2Y(cum)", "Q2(cum)")]), 1),
+       main = maiC,
+       type = "n",
+       xlab = expression(Similarity(bold(y), bold(y[perm]))),
+       ylab = "")
+ points(lot@suppLs[["permMN"]][, "sim"], lot@suppLs[["permMN"]][, "Q2(cum)"],
+           col = "black",
+           pch = 18)
+    abline(h = lot@suppLs[["permMN"]][1, "Q2(cum)"],
+           col = "black")
+    points(lot@suppLs[["permMN"]][, "sim"], lot@suppLs[["permMN"]][, "R2Y(cum)"],
+           col = "grey",
+           pch = 18)
+    abline(h = lot@suppLs[["permMN"]][1, "R2Y(cum)"],
+           col = "grey")
+    .plotLegendF(c("R2Y", "Q2Y"),
+                 "bottomright",
+                 colVc = c("grey", "black"))
+
+df <- as.data.frame(lot@suppLs[["permMN"]])
+
+ggplot() + 
+  geom_point(data=df[-1,], aes(x =`sim`, y =`Q2(cum)` ), color="red", alpha=0.4,  size = 3)+
+  geom_point(data=df[-1,], aes(x =`sim`, y =`R2Y(cum)` ), color="blue", alpha=0.4,  size = 3)+
+  geom_point(data=df[1,], aes(x =`sim`, y =`Q2(cum)`), color="red", size = 3 )+
+  geom_point(data=df[1,], aes(x =`sim`, y =`R2Y(cum)`), color="blue", size = 3) +
+  geom_hline(yintercept = df[1, "Q2(cum)"], colour = "red")+
+   geom_hline(yintercept = df[1, "R2Y(cum)"], colour = "blue")+
+  labs(x = expression(Similarity(bold(y), bold(y[perm]))),
+       y ="Value",
+       caption = paste0("pR2Y = ",
+                 lot@summaryDF[, "pR2Y"],
+                 ", pQ2 = ",
+                 lot@summaryDF[, "pQ2"])) +
+  theme_bw() +
+  labs("red" = "test")
+  
+permutationPlot(model = lot, optns=list(shape="square", colorQ="purple", size = 5))
+
+Qdf<-  df[,c("Q2(cum)", "sim")] 
+Qdf <-data.frame(append(Qdf, c(st='Q2'), after=2))
+Rdf <- df[,c("R2Y(cum)", "sim")]
+Rdf <-data.frame(append(Rdf, c(st='R2Y'), after=2))
+dfmlt<- rbind(Qdf, Rdf)
+
+colors <- c("Q2(cum)" = "blue", "R2Y(cum)" = "red")
+
+ggplot(df, aes(x = sim)) +
+    geom_point(data= df[1,],aes(y = `Q2(cum)`, color = "Q2(cum)"), size = 1.5) +
+    geom_point(data= df[1,],aes(y = `R2Y(cum)`, color = "R2Y(cum)"), size = 3) +
+    geom_point(data= df[-1,],aes(y = `Q2(cum)`, color = "Q2(cum)"), size = 1.5, alpha = 0.4) +
+    geom_point(data= df[-1,],aes(y = `R2Y(cum)`, color = "R2Y(cum)"), size = 3) +
+    geom_hline(yintercept = df[1, "Q2(cum)"], colour = "blue") +
+   geom_hline(yintercept = df[1, "R2Y(cum)"], colour = "red") +
+    labs(x = "Year",
+         y = "(%)",
+         color = "Legend") +
+    scale_color_manual(values = colors)
+
+```
 ```{r}
 #1 create PCA object
 a <- PCA(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])

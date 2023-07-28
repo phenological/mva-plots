@@ -18,7 +18,6 @@
 #'
 #' a <- PCA(data = mtcars[,1:7], annotation = mtcars[,8:11], center = TRUE, scale. = TRUE)
 #' b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(color = "corr", plotTitle = "mtcars eruption", method = "bonferroni"))
-#' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 eruptionPlot <- function(model, optns = list()){
 
