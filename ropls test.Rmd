@@ -188,7 +188,7 @@ ggplot() +
   theme_bw() +
   labs("red" = "test")
   
-permutationPlot(model = lot, optns=list(shape="square", colorQ="purple", size = 5))
+permutationPlot(model = lot, optns=list(shape="square", colorQ="#FF5500", size = 5))
 
 Qdf<-  df[,c("Q2(cum)", "sim")] 
 Qdf <-data.frame(append(Qdf, c(st='Q2'), after=2))
@@ -208,24 +208,32 @@ ggplot(df, aes(x = sim)) +
     labs(x = "Year",
          y = "(%)",
          color = "Legend") +
-    scale_color_manual(values = colors)
+    scale_color_manual(values = colors) +
+ theme(
+    legend.position = c(0.9, 0.1),
+    legend.justification = c("right", "bottom"),
+    #legend.box.just = "right",
+    #legend.margin = margin(6, 6, 6, 6)
+    )
 
 ```
 ```{r}
 #1 create PCA object
-a <- PCA(BIOspcglyc[,1:8], annotation = BIOspcglyc[,-1:-8])
-a1 <- PCA(df3[,1:112], annotation = df3[,-1:-112], rank = 20)
+a <- PCA(BIOspcglyc[,1:8])
+a1 <- PCA(df3[,1:112], rank = 20)
 
 #2
 fff<- plotScores(model=a, optns=list(color=BIOspcglyc$age, ellipse="hotellings", shape=BIOspcglyc$sex, outlierLabels=row.names(BIOspcglyc)))
 fff[["plots"]][["pcaGrid"]][1,1]
 
 #ropls objects
-plotScores(model = a, optns = list(color = BIOspcglyc$age, ellipse = "T", PCi=2, PCj=3))
+fff <-plotScores(model = a, optns = list(color = BIOspcglyc$age, ellipse = "t", outlierLabels=BIOspcglyc$covid_status, annotation = BIOspcglyc[,10:12]))
 
 #2
 fff<- plotLoadings(model= a)
 fff[["plots"]][["plotLoadingGrid"]]
+
+eruptionPlot(model = a, optns=list(factor=BIOspcglyc$covid_status))
 ```
 
 ```{r}
@@ -330,7 +338,7 @@ d <-metabom8::predict_opls(opls_model = c, newdata = aaData)
 
 
 f <- ropls::opls(x=BIOspcglyc[,1:8], y=BIOspcglyc[,"age"], predI = 0, orthoI = NA)
-g <- metabom8::opls(X=BIOspcglyc[,1:8], Y=BIOspcglyc[,"age"])
+g <- metabom8::opls(X=BIOspcglyc[,1:8], Y=BIOspcglyc[,"covid_status"])
 
 b <-ropls::predict(object = f, aaData)
 d <-metabom8::predict_opls(opls_model = c, newdata = aaData)

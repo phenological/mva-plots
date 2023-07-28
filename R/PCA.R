@@ -3,7 +3,6 @@
 #' The prcomp function is applied and uses the singular value decomposition (SVD) method. The maximum number of principal components calculated is 8.
 #'
 #' @param data A data frame or matrix of the numeric values for the principal component calculation.
-#' @param annotation A data frame of the accompanying metadata.
 #' @param plot To stop the generation of summary plots, set to FALSE. Default is TRUE.
 #' @param center A logical value indicating whether the variables should be shifted to be zero centered. The default is TRUE. Alternately, a vector of length equal the number of columns of \code{data} can be supplied. The value is passed to scale.
 #' @param scale A logical value indicating whether the variables should be scaled to have unit variance before the analysis takes place. The default is TRUE. Alternatively, a vector of length equal the number of columns of \code{data} can be supplied.

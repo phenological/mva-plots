@@ -16,14 +16,26 @@
 #' @param alphaTitle A parameter for the \code{optns} list. A character of the desired alpha legend title when \code{alpha} is a variable. No size legend will appear if \code{alpha} is set to a simple aesthetic such as 0.3. Default "Alpha".
 #' @param ellipse A parameter for the \code{optns} list. A character or either "color", "hotellings", "t", or "normal" depending on desired method of calculation. If using color, a discrete variable must be supplied to color.
 #' @param outlierLabels A parameter for the \code{optns} list. Only compatible with ellipse set to hotellings, T or normal. For ropls object, supply "outlierLabels" and rownames will appear. For PCA modek, supply a column from the data frame to label outliers. You can set it to, for example, outlierLabels=row.names(iris) to identify the outlier position in your dataframe.
+#' @param annotation A parameter for the \code{optns} list when supplying PCA object. Supply the columns you'd like listed for the outliers, otherwise only that listed for outlierLabels will be listed.
 #' @return The model list appended with the grid of loadings under plots.
 #' @examples
 #' data(iris)
-#' a <- PCA(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
+#' a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
 #' b <- plotscores(model = a, optns=list(color = iris[,"Species"], colorTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alpha = 0.7))
 #' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 plotScores<-function(model, optns=list()){
+
+  #outlier annotation
+  if("annotation" %in% names(optns)){
+    model$data$pcdf <- cbind(model$data$pcdf, optns$annotation)
+  }
+
+  if("outlierLabels" %in% names(optns)){
+    if(!("annotation" %in% names(optns))){
+      model$data$pcdf <- cbind(model$data$pcdf, optns$outlierLabels)
+    }
+  }
 
   #plot title
   if("plotTitle" %in% names(optns)){
