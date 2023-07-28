@@ -191,7 +191,7 @@ singleEllipseOptions <- function(df, PCi, PCj, plot, optns){
   if("ellipse" %in% names(optns)){
     if(optns$ellipse == "color"){
       #colour
-      if("y1" %in% colnames(df3)){
+      if("y1" %in% colnames(df)){
         ellipse <- stat_ellipse(aes(color = df$y1))
       } else {ellipse <- stat_ellipse(aes(color = optns$color))}
       gl <- labs()
