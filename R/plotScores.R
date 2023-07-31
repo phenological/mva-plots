@@ -10,6 +10,8 @@
 #' @param shape A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the shape desired. Default shape is "circle".
 #' @param size A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the size desired. Default size is 3.
 #' @param alpha A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the alpha desired. Default size is 0.5.
+#' @param discretePalette A parameter for the \code{optns} list. Color palette for discrete values, you can assign colors to specific factors, example: discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply a concatenated list, example (and the default): discretePalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC"). Hexadecimal or color names accepted.
+#' @param continuousPalette A parameter for the \code{optns} list. Color palette for continuous values, use hexadecimal values (example and default: continuousPalette =c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF","#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00","#FF5500","#FF0000","#CC0000")), grDevices names (example: continousPalette = rainbow(4)) or color names (example : continuousPalette =c("purple", "orange")).
 #' @param colorTitle A parameter for the \code{optns} list. A character of the desired color legend title when \code{color} is a variable. No color legend will appear if \code{color} is set to a simple aesthetic such as "green". Default "color".
 #' @param shapeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{shape} is a variable. No shape legend will appear if \code{shape} is set to a simple aesthetic such as "square". Default "Shape".
 #' @param sizeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{size} is a variable. No size legend will appear if \code{size} is set to a simple aesthetic such as 2. Default "Size".
@@ -21,7 +23,7 @@
 #' @examples
 #' data(iris)
 #' a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
-#' b <- plotscores(model = a, optns=list(color = iris[,"Species"], colorTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alpha = 0.7))
+#' b <- plotscores(model = a, optns=list(color = iris[,"Species"], discretePalette = c("setosa" = "purple", "versicolor = "orange", "virginica" = "steelblue"), colorTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alpha = 0.7))
 #' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 plotScores<-function(model, optns=list()){
@@ -77,6 +79,37 @@ plotScores<-function(model, optns=list()){
 
   if(!("alphaTitle" %in% names(optns))){
     optns$alphaTitle <- "Alpha"}
+
+  #palettes
+  if(!("continuousPalette" %in% names(optns))){
+    optns$continuousPalette <- c(
+                                "#0000CC",
+                                "#0000FF",
+                                "#0055FF",
+                                "#00AAFF",
+                                "#00FFFF",
+                                "#2BFFD5",
+                                "#55FFAA",
+                                "#80FF80",
+                                "#AAFF55",
+                                "#D4FF2B",
+                                "#FFFF00",
+                                "#FFAA00",
+                                "#FF5500",
+                                "#FF0000",
+                                "#CC0000")
+  }
+
+  if(!("discretePalette" %in% names(optns))){
+    optns$discretePalette <- c("#66C2A5",
+                               "#FC8D62",
+                               "#8DA0CB",
+                               "#E78AC3",
+                               "#A6D854",
+                               "#FFD92F",
+                               "#E5C494",
+                               "#B3B3B3")
+  }
 
   #ggplot2 treats integers and doubles as continuous variables, and treats only factors, characters, and logicals as discrete.
 
@@ -246,22 +279,8 @@ plotScores<-function(model, optns=list()){
 
     #colors
     if(grepl("DA", model@typeC) == TRUE){
-      gc <- scale_color_brewer(palette = "Set2")
-    }else{gc <-scale_color_gradientn(colors = c("#0000CC",
-                                                "#0000FF",
-                                                "#0055FF",
-                                                "#00AAFF",
-                                                "#00FFFF",
-                                                "#2BFFD5",
-                                                "#55FFAA",
-                                                "#80FF80",
-                                                "#AAFF55",
-                                                "#D4FF2B",
-                                                "#FFFF00",
-                                                "#FFAA00",
-                                                "#FF5500",
-                                                "#FF0000",
-                                                "#CC0000"),
+      gc <- scale_colour_manual(values = optns$discretePalette)
+    }else{gc <-scale_color_gradientn(colors = optns$continuousPalette,
                                      na.value = "grey50",
                                      guide = "colorbar")
     }
@@ -274,27 +293,11 @@ plotScores<-function(model, optns=list()){
 
     gc <- if(is(optns$color)[1] == "numeric"){
       scale_color_gradientn(
-        colors = c(
-          "#0000CC",
-          "#0000FF",
-          "#0055FF",
-          "#00AAFF",
-          "#00FFFF",
-          "#2BFFD5",
-          "#55FFAA",
-          "#80FF80",
-          "#AAFF55",
-          "#D4FF2B",
-          "#FFFF00",
-          "#FFAA00",
-          "#FF5500",
-          "#FF0000",
-          "#CC0000"
-        ),
+        colors = optns$continuousPalette,
         na.value = "grey50",
         guide = "colorbar"
       )}
-    else{scale_color_brewer(palette = "Set2")}
+    else{scale_colour_manual(values = optns$discretePalette)}
 
     #number of pcas (working)
     if("thresh" %in% names(optns)){
