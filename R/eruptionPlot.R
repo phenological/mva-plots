@@ -9,6 +9,7 @@
 #' @param method A parameter for the \code{optns} list. Determines the method to adjust p-values by. The options the same as listed in stats::p.adjust ("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none"). The default is "bonferroni".
 #' @param PC A parameter for the \code{optns} list when supplying a PCA object. A numeric for which principal component to use for the loadings (for the plot y-axis) and scores (if correlation is chosen for \code{colourCoding}).
 #' @param color A parameter for the \code{optns} list. Color coding for the eruption plot, choose from the adjusted and re-scaled p-value "pval", correlation "corr", log2 fold change "fc" or cliff's delta "cd". The default is the correlation.
+#' @param continuousPalette A parameter for the \code{optns} list. Color palette for continuous values, use hexadecimal values (example and default: continuousPalette =c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF","#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00","#FF5500","#FF0000","#CC0000")), grDevices names (example: continousPalette = rainbow(4)) or color names (example : continuousPalette =c("purple", "orange")).
 #' @param x A parameter for the \code{optns} list. Choose your x-axis using the same options stated for color. The default is cliff's delta.
 #' @param y A parameter for the \code{optns} list. Choose your y-axis using the same options stated for color. The default is loadings.
 #' @return The eruption plot is printed and the model is appended with the eruption data (cliffs Delta, p-value, correlation, loadings). For ropls object, eruptionData is found in suppLs.
@@ -25,6 +26,26 @@ eruptionPlot <- function(model, optns = list()){
     plotTitle = optns$plotTitle
   }else{
     plotTitle <- "Eruption Plot"
+  }
+
+  #palettes
+  if(!("continuousPalette" %in% names(optns))){
+    optns$continuousPalette <- c(
+      "#0000CC",
+      "#0000FF",
+      "#0055FF",
+      "#00AAFF",
+      "#00FFFF",
+      "#2BFFD5",
+      "#55FFAA",
+      "#80FF80",
+      "#AAFF55",
+      "#D4FF2B",
+      "#FFFF00",
+      "#FFAA00",
+      "#FF5500",
+      "#FF0000",
+      "#CC0000")
   }
 
   ###for pvalue adjustment, options the same as listed in stats::p.adjust c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
@@ -133,23 +154,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
   theme_bw() +
   scale_x_continuous(limits = c(-1, 1)) +
   scale_color_gradientn(
-    colours = c(
-      "#0000CC",
-      "#0000FF",
-      "#0055FF",
-      "#00AAFF",
-      "#00FFFF",
-      "#2BFFD5",
-      "#55FFAA",
-      "#80FF80",
-      "#AAFF55",
-      "#D4FF2B",
-      "#FFFF00",
-      "#FFAA00",
-      "#FF5500",
-      "#FF0000",
-      "#CC0000"
-    ),
+    colours = optns$continuousPalette,
     na.value = "grey50",
     guide = "colourbar") +
   ggtitle(plotTitle) +
