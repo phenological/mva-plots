@@ -4,13 +4,15 @@
 #'
 #' @param model oplsda model (or ropls built model).
 #' @param newdata Matrix or data frame of the same X variables as the model (O-PLS-DA).
+#' @param optns An empty list for confusion matrix addition.
+#' @param real A parameter for the \code{optns} list. The "real" clasifications for the newdata as a factor. If supplied, a confusion matrix will be calculated.
 #' @returns The prediction model including the predictive scores and orthogonal scores.
 #' @examples
 #' data(mtcars)
 #' a <- oplsda(X = mtcars[,1:7], Y = [,8], type = "PLS", optns = list(permI = 50))
-#' b <- oplsdaPredict(model = a, Y = [,8], newdata = )
+#' b <- oplsdaPredict(model = a, newdata = , optns = list(real = as.factor()))
 
-oplsdaPredict <- function (model, newdata){
+oplsdaPredict <- function (model, newdata, optns=list()){
 
   #center and scale new data
   xteMN <- scale(newdata, model@xMeanVn, model@xSdVn)
@@ -97,12 +99,40 @@ oplsdaPredict <- function (model, newdata){
 
   }
 
+    if("real" %in% names(optns)){
+      conf <- caret::confusionMatrix(data = predMCNFcVcn, reference = optns$real)
+    } else (conf <-list())
+
 prediction <- list(orthoScoreMN = xtoMN,
                    predScoreMN = t_pred,
-                   predY = predMCNFcVcn)
+                   predY = predMCNFcVcn,
+                   confusionMatrix = conf)
 
 invisible(prediction)
 }
+
+##confusion matrix
+# caret::confusionMatrix(iris$Species, sample(iris$Species))
+# model@suppLs[["yMCN"]]
+# model@suppLs[["yPreMN"]]
+
+# if("real" %in% names(optns)){
+#   caret::confusionMatrix(data = predMCNFcVcn, reference = optns$real)
+# }
+
+
+#caret::confusionMatrix(data = lot2[["predY"]], reference = lot@suppLs[["y"]])
+
+
+
+
+
+
+
+
+
+
+
 
 # function (opls_model, newdata, idx_scale = NULL)
 # {

@@ -121,7 +121,7 @@ lot <-oplsdaPredict(model = lo, newdata = aaData)
 #mtcars test
 il<- oplsda(X=mtcars[,1:7], Y=mtcars[,8], type = "PLS", optns=list(scaleC="none"))
 
-plotScores(model=lot, optns = list(ellipse = "color"))
+plotScores(model=lot, optns = list(ellipse = "color", discretePalette = c("covid" = "purple", "control" = "orange")))
 
 plotScores(model=a, optns=list(ellipse = "hotellings"))
 
@@ -223,11 +223,11 @@ a <- PCA(BIOspcglyc[,1:8])
 a1 <- PCA(df3[,1:112], rank = 20)
 
 #2
-fff<- plotScores(model=a, optns=list(color=BIOspcglyc$age, ellipse="hotellings", shape=BIOspcglyc$sex, outlierLabels=row.names(BIOspcglyc)))
+fff<- plotScores(model=a, optns=list(color=BIOspcglyc$age, continuousPalette = viridis, ellipse="hotellings", shape=BIOspcglyc$sex, outlierLabels=row.names(BIOspcglyc)))
 fff[["plots"]][["pcaGrid"]][1,1]
 
 #ropls objects
-fff <-plotScores(model = a, optns = list(color = BIOspcglyc$age, ellipse = "t", outlierLabels=BIOspcglyc$covid_status, annotation = BIOspcglyc[,10:12]))
+fff <-plotScores(model = a, optns = list(color = BIOspcglyc$covid_status, discretePalette = c("covid" = "purple", "control" = "orange"),ellipse = "t", outlierLabels=BIOspcglyc$covid_status, annotation = BIOspcglyc[,10:12]))
 
 #2
 fff<- plotLoadings(model= a)
@@ -273,11 +273,27 @@ ci<-0.95
 PCi = 1
 PCj = 2
     ggplot(data = df, aes(x=df[,PCi], y=df[,PCj])) + 
-  geom_point(aes(color=y1, shape=BIOspcglyc$sex))+ 
-  geom_label(data=df[idx,],
-             aes(x=p1, y = p2,label=row.names(df[idx,])))+
-  scale_color_gradientn(
-        colors = c(
+  geom_point(aes(color=BIOspcglyc$age, shape=BIOspcglyc$sex))+ 
+  # geom_label(data=df[idx,],
+  #            aes(x=p1, y = p2,label=row.names(df[idx,])))+
+  #scale_colour_manual(values=palette) +
+      scale_color_gradientn(
+        colors = palette,
+        na.value = "grey50",
+        guide = "colorbar"
+      )+
+  geom_hline(yintercept = 0, colour = "gray70") + 
+  geom_vline(xintercept = 0, colour = "gray70")+ 
+  theme_bw() +
+  gg_circle2(rx = sqrt(var(df[,1]) * hotFisN),
+                      ry = sqrt(var(df[,2]) * hotFisN),
+                      xc = 0,
+                      yc = 0) 
+ 
+  palette = c("purple","orange")
+ palette <- rainbow(4)   
+ palette<-c(
+  # "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC"
           "#0000CC",
           "#0000FF",
           "#0055FF",
@@ -293,18 +309,9 @@ PCj = 2
           "#FF5500",
           "#FF0000",
           "#CC0000"
-        ),
-        na.value = "grey50",
-        guide = "colorbar"
-      )+
-  geom_hline(yintercept = 0, colour = "gray70") + 
-  geom_vline(xintercept = 0, colour = "gray70")+ 
-  theme_bw() +
-  gg_circle2(rx = sqrt(var(df[,1]) * hotFisN),
-                      ry = sqrt(var(df[,2]) * hotFisN),
-                      xc = 0,
-                      yc = 0) 
-  
+        )
+ 
+ palette <- scale_color_brewer(palette = "Set2")
 ```
 
 Need to ensure 
