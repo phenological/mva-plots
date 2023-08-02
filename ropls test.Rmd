@@ -113,10 +113,11 @@ aaData<-data.frame(apply(aa@.Data,2,as.numeric)) #spc/glyc data
 #1 make the model
 
 lo<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$age, type = "PLS", optns=list(predI = 3, permI= 100))
-lot<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$covid_status, type = "OPLS", optns=list(predI = 3, permI= 100))
+lot<-oplsda(X=BIOspcglyc[,1:8], Y= as.factor(BIOspcglyc$covid_status), type = "OPLS", optns=list(predI = 3, permI= 100))
 
 #2 predict with newdata 
-lot <-oplsdaPredict(model = lo, newdata = aaData)
+lot <-oplsdaPredict(model = lot, newdata = aaData)
+lot3 <-oplsdaPredict(model = lot, newdata = BIOspcglyc[,1:8], optns=list(real = as.factor(BIOspcglyc$covid_status)))
 
 #mtcars test
 il<- oplsda(X=mtcars[,1:7], Y=mtcars[,8], type = "PLS", optns=list(scaleC="none"))
@@ -129,7 +130,7 @@ plotLoadings(model = a, optns = list())
 ```
 
 ```{r}
-lot2 <-eruptionPlot(model = lot, optns=list(y="pval", x="fc", factor = BIOspcglyc$covid_status)) 
+lot2 <-eruptionPlot(model = lot, optns=list(y="pval", x="fc", factor = BIOspcglyc$covid_status, continuousPalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC")))
 
 lot@suppLs[["yMCN"]]
 #append to ropls object 

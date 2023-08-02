@@ -168,8 +168,10 @@ gridEllipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh 
 
         if(optns$ellipse == "color"){
           temp <- temp +
-            stat_ellipse(aes(color = model$data$pcdf$color))
-        }
+            stat_ellipse(aes(color = optns$color))
+            #stat_ellipse(aes(color = model$data$pcdf$color))
+          outliers <- list()
+          }
         pcaGridPlot[j, i] <- temp
       }
     }
@@ -187,13 +189,19 @@ if("ellipse" %in% names(optns)){
   return(output)
 }
 
-singleEllipseOptions <- function(df, PCi, PCj, plot, optns){
+singleEllipseOptions <- function(model, df, PCi, PCj, plot, optns){
   if("ellipse" %in% names(optns)){
     if(optns$ellipse == "color"){
-      #colour
-      if("y1" %in% colnames(df)){
+    #####colour#########
+      # if("y1" %in% colnames(df)){
+      #   ellipse <- stat_ellipse(aes(color = df$y1))
+      # } else {ellipse <- stat_ellipse(aes(color = optns$color))}
+      if(is(model)[1] == "opls"){
         ellipse <- stat_ellipse(aes(color = df$y1))
-      } else {ellipse <- stat_ellipse(aes(color = optns$color))}
+      }
+      if(is(model)[1]=="list") {
+        ellipse <- stat_ellipse(aes(color = optns$color))
+        }
       gl <- labs()
       idx <-list()
     }
@@ -251,7 +259,7 @@ singleEllipseOptions <- function(df, PCi, PCj, plot, optns){
 
   plot <- plot + ellipse + gl
 
-  if(optns$ellipse == "t" | optns$ellipse =="norm"){
+  if(optns$ellipse == "t" | optns$ellipse =="normal"){
 
     ##for outliers
     build <- ggplot_build(plot)$data
