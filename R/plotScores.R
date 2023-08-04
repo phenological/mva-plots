@@ -298,7 +298,7 @@ plotScores<-function(model, optns=list()){
 
     df <- model$data$pcdf
 
-    gc <- if(is(optns$color)[1] == "numeric"){
+    gc <- if(is(optns$color)[1] == "numeric" | is(optns$color)[1] == "integer" | is(optns$color)[1] == "double"){
       scale_color_gradientn(
         colors = optns$continuousPalette,
         na.value = "grey50",
