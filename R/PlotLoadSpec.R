@@ -115,7 +115,8 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
       cv<-cov(X[,idx],df)
       raCol <- c(0, max(cc))
       df<-data.frame(x = x,y = cv,col = cc)
-    }else{
+    }
+    if(type != "Backscaled" & type !="Statistical reconstruction"){
       stop("Name for the visualization type must be 'Backscaled' or 'Statistical reconstruction'. ")
     }
   }
