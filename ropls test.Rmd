@@ -112,7 +112,7 @@ aaData<-data.frame(apply(aa@.Data,2,as.numeric)) #spc/glyc data
 ```{r}
 #1 make the model
 
-lo<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$age, type = "PLS", optns=list(predI = 3, permI= 100))
+lo<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$age, type = "PLS", optns=list(predI = 3, permI= 100, scaleC="none"))
 lot<-oplsda(X=BIOspcglyc[,1:8], Y= as.factor(BIOspcglyc$covid_status), type = "OPLS", optns=list(predI = 3, permI= 100))
 
 #2 predict with newdata 
@@ -122,9 +122,9 @@ lot3 <-oplsdaPredict(model = lot, newdata = BIOspcglyc[,1:8], optns=list(real = 
 #mtcars test
 il<- oplsda(X=mtcars[,1:7], Y=mtcars[,8], type = "PLS", optns=list(scaleC="none"))
 
-plotScores(model=lot, optns = list(ellipse = "color", discretePalette = c("covid" = "purple", "control" = "orange")))
+plotScores(model=lot, optns = list(ellipse = "hotellings", discretePalette = c("covid" = "purple", "control" = "orange")))
 
-plotScores(model=a, optns=list(ellipse = "hotellings"))
+plotScores(model=a, optns=list(color = BIOspcglyc$age ,ellipse = "hotellings"))
 
 plotLoadings(model = a, optns = list())
 ```
@@ -222,19 +222,34 @@ ggplot(df, aes(x = sim)) +
 #1 create PCA object
 a <- PCA(BIOspcglyc[,1:8])
 a1 <- PCA(df3[,1:112], rank = 20)
+##plotScores(pca,optns=list(color=type, ellipse="color", plotTitle="2022 All Wines NMR PCA"))
 
+#PCA tests
+ plotScores(model=a, optns=list(color=BIOspcglyc$age, ellipse = "color", shape=BIOspcglyc$sex, outlierLabels=row.names(BIOspcglyc)))
+
+plotScores(model = a, optns = list(color = BIOspcglyc$covid_status, discretePalette = c("covid" = "purple", "control" = "orange"), ellipse = "color", PCi = 2, PCj = 3, ci = 0.9, theme = theme(legend.position = "left", text=element_text(size=5))))
+ 
 #2
-fff<- plotScores(model=a, optns=list(color=BIOspcglyc$age, continuousPalette = viridis, ellipse="hotellings", shape=BIOspcglyc$sex, outlierLabels=row.names(BIOspcglyc)))
+fff<- plotScores(model=a, optns=list(gt = theme(legend.position = "left", text=element_text(size=5)), color=BIOspcglyc$covid_status, ellipse="color", shape=BIOspcglyc$sex, outlierLabels=row.names(BIOspcglyc)))
 fff[["plots"]][["pcaGrid"]][1,1]
 
 #ropls objects
-fff <-plotScores(model = a, optns = list(color = BIOspcglyc$covid_status, discretePalette = c("covid" = "purple", "control" = "orange"),ellipse = "t", outlierLabels=BIOspcglyc$covid_status, annotation = BIOspcglyc[,10:12]))
+fff <-plotScores(model = a, optns = list(color = BIOspcglyc$covid_status, discretePalette = c("covid" = "purple", "control" = "orange"), ellipse = "color", PCi = 1, PCj = 2,  annotation = BIOspcglyc[,10:15], outlierLabels = BIOspcglyc$covid_status))
 
 #2
 fff<- plotLoadings(model= a)
 fff[["plots"]][["plotLoadingGrid"]]
 
-eruptionPlot(model = a, optns=list(factor=BIOspcglyc$covid_status))
+eruptionPlot(model = lot, optns=list(factor=BIOspcglyc$covid_status, plotTitle = "Biogune SpcGlyc Eruption "))
+
+myfunc <- function(v1) {
+    deparse(substitute(v1))
+}
+
+myfunc(opt$col)
+
+b <- PCA(data = SER_NOESY_data[,-38623], rank = 3)
+plotScores(model=b, optns=list(color=(SER_NOESY_meta$Age)))
 ```
 
 ```{r}
@@ -289,10 +304,25 @@ PCj = 2
   gg_circle2(rx = sqrt(var(df[,1]) * hotFisN),
                       ry = sqrt(var(df[,2]) * hotFisN),
                       xc = 0,
-                      yc = 0) 
- 
+                      yc = 0) +
+ theme(legend.position = "left",
+          strip.background = element_rect(fill = "white"),
+          axis.text.x = (element_text(size = rel(0.7),
+                                      angle = 0)),
+          axis.text.y = (element_text(size = rel(0.7),
+                                      angle = 0)),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_rect(fill = NA,
+                                      color = "grey35")) +
+       theme(legend.position = "left") +
+      theme(text=element_text(size=16))
+    
+    
   palette = c("purple","orange")
- palette <- rainbow(4)   
+ 
+  
+  palette <- rainbow(4)   
  palette<-c(
   # "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC"
           "#0000CC",

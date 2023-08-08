@@ -6,6 +6,7 @@
 #' @param plot To stop the generation of summary plots, set to FALSE. Default is TRUE.
 #' @param center A logical value indicating whether the variables should be shifted to be zero centered. The default is TRUE. Alternately, a vector of length equal the number of columns of \code{data} can be supplied. The value is passed to scale.
 #' @param scale A logical value indicating whether the variables should be scaled to have unit variance before the analysis takes place. The default is TRUE. Alternatively, a vector of length equal the number of columns of \code{data} can be supplied.
+#' @param cutoff A parameter for the \code{optns} list. The maximum percentage of cumulative variance you wish to explain. The default is 99%. for example, optns=list(cutoff= 90) to set a 90% cutoff. Set rank. = NULL if using this.
 #' @return A list of objects used in further calculations.
 #' @param results A list with class prcomp, for details of this list see the prcomp documentation.
 #' @param pcSum A data frame of the summary information (Standard deviation, Proportion of Variance and Cumulative Proportion) for the principal component calculation.
@@ -28,6 +29,8 @@ PCA <- function(data, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns
                     rank = rank,
                     center = center,
                     scale. = scale.)
+
+  rank <- ncol(results[["rotation"]])
 
   pcSum <- (as.data.frame(t(summary(results)[["importance"]])))
   pcSum <- pcSum[1:rank,]*100
