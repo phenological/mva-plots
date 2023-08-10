@@ -57,7 +57,7 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
     df<-data.frame(x = x,y = cv,col = cc)
     
   }
-  if(is(model)[1]=="list" & is(model)[3]=="AssayData"){  # need to change this, for now, PCA() using library(prcomp) return list of 2
+  if(is(model)[1]=="list" & length(model)==2){  # need to change this, for now, PCA() using library(prcomp) return list of 2
     res<-model$data$pcSum$`Proportion of Variance`
     df<-as.data.frame(-model$data$loadings)
     x<-as.numeric(rownames(df))
