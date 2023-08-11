@@ -5,6 +5,7 @@
 #' @param model A PCA object.
 #' @param optns An empty list for aesthetic options.
 #' @param plotTitle A parameter for the optns list. A character for the title of the grid.
+#' @param theme A parameter for the \code{optns} list. Personalize the plot theme you would like applied as you would using theme() in ggplot. Example set theme = theme(legend.position = "left", text=element_text(size=5)) in optns.
 #' @param thresh A parameter for the optns list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.
 #'
 #' @return The model list appended with the grid of loadings under plots.
@@ -23,6 +24,11 @@ plotLoadings <- function(model, optns=list()){
   }else{
     plotTitle <- "Loadings Plot"
   }
+
+  #theme
+  if(!("theme" %in% names(optns))){
+    theme <- theme()
+  } else{theme <- optns$theme}
 
   #########ropls objects##################
   if(is(model)[1]=="opls"){
@@ -50,7 +56,8 @@ plotLoadings <- function(model, optns=list()){
                         size = 3.5) +
         geom_hline(yintercept = 0, colour = "gray70") +
         geom_vline(xintercept = 0, colour = "gray70") +
-        theme_bw()
+        theme_bw() +
+        theme
 
       print(onePlot)
     }
@@ -87,7 +94,8 @@ plotLoadings <- function(model, optns=list()){
                       size = 3.5) +
       geom_hline(yintercept = 0, colour = "gray70") +
       geom_vline(xintercept = 0, colour = "gray70") +
-      theme_bw()
+      theme_bw() +
+      theme
 
     print(onePlot)
     }
@@ -115,7 +123,8 @@ plotLoadings <- function(model, optns=list()){
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank(),
             panel.border = element_rect(fill = NA,
-                                        colour = "grey35"))
+                                        colour = "grey35")) +
+      theme
 
     plotLoadingGrid <- gPairsLower(plotLoadingGrid)
 

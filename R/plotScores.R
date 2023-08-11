@@ -12,6 +12,7 @@
 #' @param alpha A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the alpha desired. Default size is 0.5.
 #' @param discretePalette A parameter for the \code{optns} list. Color palette for discrete values, you can assign colors to specific factors, example: discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply a concatenated list, example (and the default): discretePalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC"). Hexadecimal or color names accepted.
 #' @param continuousPalette A parameter for the \code{optns} list. Color palette for continuous values, use hexadecimal values (example and default: continuousPalette =c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF","#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00","#FF5500","#FF0000","#CC0000")), grDevices names (example: continousPalette = rainbow(4)) or color names (example : continuousPalette =c("purple", "orange")).
+#' @param theme A parameter for the \code{optns} list. Personalize the plot theme you would like applied as you would using theme() in ggplot. Example set theme = theme(legend.position = "left", text=element_text(size=5)) in optns.
 #' @param colorTitle A parameter for the \code{optns} list. A character of the desired color legend title when \code{color} is a variable. No color legend will appear if \code{color} is set to a simple aesthetic such as "green". Default "color".
 #' @param shapeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{shape} is a variable. No shape legend will appear if \code{shape} is set to a simple aesthetic such as "square". Default "Shape".
 #' @param sizeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{size} is a variable. No size legend will appear if \code{size} is set to a simple aesthetic such as 2. Default "Size".
@@ -39,6 +40,11 @@ plotScores<-function(model, optns=list()){
       model$data$pcdf <- cbind(model$data$pcdf, optns$outlierLabels)
     }
   }
+
+  #theme
+  if(!("theme" %in% names(optns))){
+   theme <- theme()
+  } else{theme <- optns$theme}
 
   #plot title
   if("plotTitle" %in% names(optns)){
@@ -292,7 +298,7 @@ plotScores<-function(model, optns=list()){
 
     df <- model$data$pcdf
 
-    gc <- if(is(optns$color)[1] == "numeric"){
+    gc <- if(is(optns$color)[1] == "numeric" | is(optns$color)[1] == "integer" | is(optns$color)[1] == "double"){
       scale_color_gradientn(
         colors = optns$continuousPalette,
         na.value = "grey50",
@@ -343,7 +349,8 @@ plotScores<-function(model, optns=list()){
                alpha = optns$alphaTitle ) +
           geom_hline(yintercept = 0, colour = "gray70") +
           geom_vline(xintercept = 0, colour = "gray70") +
-          theme_bw()
+          theme_bw() +
+          theme
 
 #########ellipse & outliers########
 if(is(model)[1] == "opls" & "ellipse" %in% names(optns)){
@@ -447,7 +454,8 @@ if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
           panel.border = element_rect(fill = NA,
-                                      color = "grey35"))
+                                      color = "grey35")) +
+    theme
 
 
   plotGT <- gridEllipseOptions (model = model,

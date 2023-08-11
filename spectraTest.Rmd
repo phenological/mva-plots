@@ -319,14 +319,52 @@ rm(SER_NOESY_meta1, SER_NOESY_meta2)
 
 ## tests
 
-```{r pressure, echo=FALSE}
+```{r pressure}
 
 
-mod<-PCA(data = X, annotation = NOESY_ANN,rank = 2)
-plotScores(model = mod, optns = list(color = factor(NOESY_ANN$sampleType)))
+mod<-PCA(data = SER_NOESY_data[,-38623], rank = 2)
 
-a <- PCA(data = SER_NOESY_data[,-38623], annotation = SER_NOESY_meta, rank = 2, plot = FALSE)
-plotScores(model  = a, optns= list(color=factor(SER_NOESY_meta$device)))
+idx<- is.na(SER_NOESY_meta$Have.you.ever.been.tested.positive.to.COVID.19..)
+SER_NOESY_meta[idx,106] <- 2
+mod2 <- oplsda(X = SER_NOESY_data[,-38623], Y = as.factor(SER_NOESY_meta[,106]), type = "PLS")
+mod3 <- oplsda(X = SER_NOESY_data[,-38623], Y = as.factor(SER_NOESY_meta[,106]), type = "OPLS")
+
+PlotLoadSpec(model=mod2, roi = c(0.5, 6))
+
+model = mod2 
+PC = 1 
+type = "Backscaled"
+roi = c(6,9.5)
+
+
+    method<-model@typeC
+    res<-model@summaryDF
+  
+      df<-data.frame(-model@loadingMN)
+      x<-as.numeric(rownames(df))
+      idx<-which(x>roi[1] & x<roi[2])
+      cen<--data.frame(model@xSdVn[idx])
+      df<-df[idx,PC]
+      x<-x[idx]
+      m<-abs(df)
+      y<-df*cen
+      names(y)[1]<-"y"
+      col<-(m - min(m))/(max(m) - min(m))
+      df<-data.frame(x = x,y = y,col = col)
+      raCol = NULL
+
+   ggplot(df,aes(x = x, y = y,color = col))+geom_line()+
+      scale_x_reverse(breaks = scales::breaks_pretty(n = 15))+
+      scale_colour_gradientn(colors = colorRamps::matlab.like2(10),
+                             limits = raCol,
+                             name = expression("|p"["sc"] * "|")) +
+      labs(title = method,
+           subtitle = type,
+           caption = paste0("component: ", PC, " loadings"),
+           x = expression(delta ~ {}^1 * H ~ (ppm)),
+           y = "") +
+      theme_bw()
+  
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

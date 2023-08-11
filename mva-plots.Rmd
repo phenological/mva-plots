@@ -34,6 +34,10 @@ functionList <- list.files(path = functionDir)
 for(i in functionList){
   source(paste0(functionDir,i))
 }
+rm(i)
+
+# "nmr-spectra-processing" for NMR pre-processing
+devtools::load_all("~/git/phenological/nmr-spectra-processing/")
 ```
 
 ```{r, fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
@@ -78,6 +82,111 @@ unique(BIOspcglyc$sex)
 unique(BIOspcglyc$group)
 BIOspcglyc$covid_status<-ifelse(BIOspcglyc$group =="COVID-pos","covid", ifelse(BIOspcglyc$group=="preCOVID","control", "control"))
 ```
+
+
+
+
+## NMR spectra pre-processing
+"nmr-spectra-processing" has a few function that are useful to prepare a dataset.
+
+For this example, we will use serum NOESY data and assume the LTR check has been done and passed all.
+```{r}
+da<-local(get(load("~/OneDrive - Murdoch University/datasets/covid19/bioGune/dataElements/covid19_bioGune_PLA_NMR_NOESY.daE")))
+ppm<-as.numeric(da@varName)
+an<-da@obsDescr[[1]]
+NOESY<-da@.Data
+
+# remove ltrs and match with BIOspcglyc
+    ## note for NOESY if there is a re-runs, usually take the re-runs and discard the original
+sample<-an$sampleID[which(an$sampleType=="sample")]
+reruns<-sample[which(nchar(sample)>8)]
+  # no reruns found
+rm(sample,reruns)
+    ## reduce the dimension of NOESY data and corresponding annotation (an) by finding which sampleID in annotation are also found in BIOspcglyc data sampleiD column
+    ## By doing this step, ltrs are automatically removed
+NOESY<-NOESY[which(an$sampleID %in% BIOspcglyc$sampleID),]
+an<-an[which(an$sampleID %in% BIOspcglyc$sampleID),]
+
+    ## BIOspcglyc has 4 more samples (rows) compared to NOESY data
+    ### this may occur because ........@@@ check and update this part @@@
+    # BIOspcglyc$sampleID[-which(BIOspcglyc$sampleID %in% an$sampleID)]
+    #  "COV02362" "COV02371" "COV02513" "COV02521" are missing in NOESY data
+    ## reduce the dimension of BIOspcglyc data
+BIOspcglyc<-BIOspcglyc[which(BIOspcglyc$sampleID %in% an$sampleID),]
+
+    # now match the order of NOESY data and its annotation as the same as BIOspcglyc.
+NOESY<-NOESY[match(BIOspcglyc$sampleID,an$sampleID ),]
+an<-an[match(BIOspcglyc$sampleID,an$sampleID ),]
+
+rm(an,da)
+```
+
+
+### Step 1: Calibration
+in "nmr-spectra-processing" there is a function called "calibrateSpectra()"
+
+*x* = ppm
+
+*Y* = spectraData (i.e., NOESY)
+
+*ref* option of "glucose" c(")
+
+                "tsp"
+                
+                "alanine"
+*rOref* to manually select the region you want to use as the alignment references
+  
+```{r}
+X<-calibrateSpectra(x = ppm, Y = NOESY,ref = "glucose")
+# you can use the matspec function (explained at line @@) to check the calibration
+matspec(X[1:5,],ppm,roi = c(5.0,5.3))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# matspec
+plot multiple spectra at once
+
+*X* : spectra data matrix (i.e., NOESY in this case)
+
+*ppm*: numerical ppm values
+
+*roi*: region of interest which must be numeric (default is 0.5 to 9.5 )
+
+*interactive* with plotly() it allows you to zoom-in, select the spectra to show etc., (default is TRUE)
+
+*To make the labels are from the rowname of the X so you can simply change by overwriting the rowname of X*
+
+    e.g., rownames(NOESY)<-BIOspcglyc$sampleID
+```{r,message=FALSE,warning=FALSE}
+# using original rownames (which is the file.path)
+matspec(X = NOESY[1:5,],
+        ppm = ppm,
+        roi = c(0.5,4.5),
+        interactive = T
+        )
+# over write the rownames with sampleID 
+ rownames(NOESY)<-BIOspcglyc$sampleID
+ matspec(X = NOESY[1:5,],
+        ppm = ppm,
+        roi = c(0.5,4.5),
+        interactive = T
+        )
+```
+
+
+
 
 # Principal Component Analysis
 
