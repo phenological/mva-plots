@@ -60,11 +60,11 @@
 # # bin to 0.001 ppm width
 # 
 # binSpectra<-function (X, ppm, width = NULL, npoints = NULL){
-#   if (is.null(ppm) && (is.matrix(X) | is.data.frame(X)) && 
+#   if (is.null(ppm) && (is.matrix(X) | is.data.frame(X)) &&
 #       !is.null(colnames(X))) {
 #     ppm <- as.numeric(colnames(X))
 #   }else {
-#     if (length(ppm)!=ncol(X)) 
+#     if (length(ppm)!=ncol(X))
 #       stop("Non-matching dimensions X matrix and ppm vector or missing values in ppm.\n")
 #   }
 #   if (!is.null(width) & !is.null(npoints)) {
@@ -78,12 +78,12 @@
 #       stop("Bin width must be greater than original ppm intervals (ppm[2]-ppm[1]).")
 #     }
 #     res = (ppm[2] - ppm[1])         # ppm interval == current resolution
-#     new_res = width/round(width/res)   
+#     new_res = width/round(width/res)
 #     step = round(width/res)         # how many data points you need to create one new binned spectra data point
 #     ppm_new = seq(min(ppm), max(ppm), by = new_res)
-#     iid = floor(length(ppm_new)/step) # how many data points in total after binning 
-#     ybin = rep(seq(iid), each = step) 
-#     Xb <- t(apply(X, 1, function(x, ppmt = ppm_new, ppm_fres = ppm, 
+#     iid = floor(length(ppm_new)/step) # how many data points in total after binning
+#     ybin = rep(seq(iid), each = step)
+#     Xb <- t(apply(X, 1, function(x, ppmt = ppm_new, ppm_fres = ppm,
 #                                  yb = ybin) {
 #       sInter <- approxfun(ppm_fres, x)  # {stats} approxfun: Interpolation Functions
 #       s = sInter(ppmt)
@@ -128,59 +128,98 @@
 # 
 # Xb<-binSpectra(X = X, ppm = ppm, width = 0.001)
 # ppm_bin<-as.numeric(colnames(Xb))
-# 
-# 
-# 
+#
 # library(ggplot2)
-# matspec(Xb,ppm_bin,roi = c(1.5,2.5))
+# # Xc : center Xb
+# Xc<-scale(Xb,center = TRUE,scale = FALSE)
+# #roi: pick the chemical shift range where you want to run STOCSY for (e.g., doublet ppm range)
+# roi<-c(1.13,1.16)
+# #roi_idx: index of the ppm_bin that is close to the roi
+# roi_idx<-which(ppm_bin>roi[1] & ppm_bin<roi[2])
+# #idx_ref: reference spectra index
+# idx_ref<-which(apply(Xc[,roi_idx],1,max)>4000)
+# # reference spectra of the roi
+# ref<-Xc[idx_ref,roi_idx]
+# #Note: make sure the maximum of the ref is the driver you want to use for the STOCSY driver
+# b = 5  # b is number of point from the Stocsy driver to the base of the lorentzian fit
+# q = 0.0 # p-val threshold
+# subset = 0
+# subset1 = 1:nrow(Xc)
+# i = 1
+# 
+# X = Xb
+# ppm = ppm_bin
+
+storm<-function(X, ppm, b=5, q=0.01, idx_ref=NULL, roi=NULL,calibrate = FALSE){
+  
+  if(is.null(roi)){
+    roi = c(1.13,1.16)
+  }
+  if(calibrate==TRUE){
+    X<-calibrateSpectra(x = ppm, Y =X,rOref = roi ,using = c(9.4,9.5))
+  }
+  # Xc : center Xb
+  Xc<-scale(X,center = TRUE,scale = FALSE)
+  #roi: pick the chemical shift range where you want to run STOCSY for (e.g., doublet ppm range)
+  # roi<-c(1.13,1.16)
+
+  #roi_idx: index of the ppm_bin that is close to the roi
+  roi_idx<-which(ppm>roi[1] & ppm<roi[2])
+  #idx_ref: reference spectra index
+  idx_ref<-which.max(apply(Xc[,roi_idx],1,max))
+  # reference spectra of the roi
+  ref<-Xc[idx_ref,roi_idx]
+  #Note: make sure the maximum of the ref is the driver you want to use for the STOCSY driver
+  # b = 5  # b is number of point from the Stocsy driver to the base of the lorentzian fit
+  # q = 0.05 # p-val threshold
+  subset = 0
+  subset1 = 1:nrow(Xc)
+  i = 0
+  while(length(which(!subset %in% subset1))>0){
+    i<-i+1
+    cat("\n",i,"\n",length(subset1))
+    subset = subset1
+    Xr = Xc[subset,roi_idx] # create a subset of centered scale data 
+    r = cor(t(Xr),ref) # pearson correlation of the subset data with ref
+    a = -abs(r * sqrt((length(r)-2)/(1-r^2)))
+    pval = 2 * pt(q = a,df = (length(r)-2))  # pt()The Student t Distribution from {stats}
+    subset1 = subset[r>0]
+    pval = pval[r>0]
+    index = order(pval)
+    subset1 = subset1[index]
+    
+    # stocsy with new subset1
+    index = which.max(ref) #stocsy driver
+    r = cor(Xc[subset1,(roi_idx[index]-(b+1)):(roi_idx[index]+(b+1))],Xc[subset1,roi_idx[index]])
+    co = cov(Xc[subset1,(roi_idx[index]-(b+1)):(roi_idx[index]+(b+1))],Xc[subset1,roi_idx[index]])
+    
+    # update ref (reference spectrum) and roi_idx(reference index)
+    a=-abs(r * sqrt((length(r)-2)/(1-r^2)))
+    pval=2*pt(a,(length(r)-2))
+    
+    ref=co[r>0]
+    ref = ref[pval<q]
+    roi_idx=(roi_idx[index]-(b+1)):(roi_idx[index]+(b+1))
+    idx_ref<-subset1[which.max(Xc[subset1,roi_idx[index]])]
+    ref<-Xc[idx_ref,roi_idx]
+  }
+  return(subset1)
+}
+
+# C_cali<-calibrateSpectra(x = ppm,Y = X, rOref = c(7.52,7.58))
+# test<-storm(X = Xb, ppm = ppm_bin,roi = c(7.52,7.58),calibrate = TRUE)
+# 
+# matspec(Xb[test,],ppm_bin,roi = c(7.2,7.86))
+# matspec(Xb,ppm_bin,roi = c(7.2,7.88))
+# 
+# s0<-stocsy(x = ppm_bin, Y = Xb[test,], driver = 7.555586, plot = TRUE, breaks = 10)
+# 
+# stocsy(x = ppm_bin, Y = Xb[test,],roi = c(1.13,1.16), driver = 1.141586, plot = TRUE, breaks = 10)
+# stocsy(x = ppm_bin, Y = Xb[test,], driver = 1.141586, plot = TRUE, breaks = 10)
+# stocsy(x = ppm_bin, Y = Xb[test,],roi = c(6.5,8.0), driver = 1.141586, plot = TRUE, breaks = 10)
 # 
 # 
-# storm<-function(X, ppm, b=30, q=0.05, idx.refSpec=NULL, shift=c(1.117,1.25)){
-#   
-#   # center X, define reference index and reference spectrum
-#   Xc=scale_rcpp(Xb, center=TRUE, scale=0)
-#   Xc1<-scale(Xb,center = TRUE,scale = FALSE)
-#   plot(ppm_bin,Xb[1,])
-#   ref.idx=get.idx(range=shift, ppm)
-#   ref=X[idx.refSpec, ref.idx]
-#   
-#   # initialise
-#   subset=0
-#   subset1=1:nrow(X)
-#   i=1
-#   
-#   # perform storm
-#   while(length(which(!subset %in% subset1))>0){
-#     #print(table(subset %in% subset1))
-#     
-#     # correlation based subset selection
-#     subset=subset1
-#     Xr=X[subset, ref.idx]
-#     r=cor(t(Xr), ref)
-#     a=-abs(r * sqrt((length(r)-2)/(1-r^2)))
-#     pval=2*pt(a, (length(r)-2))
-#     
-#     subset1=subset[r>0]
-#     pval=pval[r>0]
-#     index=order(pval)
-#     subset1=subset1[index]
-#     
-#     
-#     # Stocsy with driver=max intensity reference spectrum
-#     index=which.max(ref)
-#     r=cor(X[subset1, (ref.idx[index]-(b+1)):(ref.idx[index]+(b+1))], X[subset1,ref.idx[index]])
-#     co=cov(X[subset1, (ref.idx[index]-(b+1)):(ref.idx[index]+(b+1))], X[subset1,ref.idx[index]])
-#     
-#     # update reference spectrum and reference index
-#     a=-abs(r * sqrt((length(r)-2)/(1-r^2)))
-#     pval=2*pt(a,(length(r)-2))
-#     
-#     ref=co[pval<q & r>0]
-#     ref.idx=(ref.idx[index]-(b+1)):(ref.idx[index]+(b+1))
-#     ref.idx=ref.idx[pval<q & r>0]
-#     
-#   }
-#   
-#   return(subset1)
-#   
-# }
+# 
+# stocsy(x = ppm_bin, Y = Xb,roi = c(1.13,1.16), driver = 1.141586, plot = TRUE, breaks = 10)
+# stocsy(x = ppm_bin, Y = Xb, driver = 1.141586, plot = TRUE, breaks = 10)
+# stocsy(x = ppm_bin, Y = Xb,roi = c(6.5,8.0), driver = 1.141586, plot = TRUE, breaks = 10)
