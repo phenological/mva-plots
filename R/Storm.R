@@ -128,7 +128,6 @@
 #   }
 #   return(NULL)
 # }
-
 # Xb<-binSpectra(X = X, ppm = ppm, width = 0.001)
 # ppm_bin<-as.numeric(colnames(Xb))
 # 
