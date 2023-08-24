@@ -1,6 +1,6 @@
 #' oplsdaPredict
 #'
-#' Function that uses ropls::opls model to make predictions on a new data set.
+#' Function that uses ropls::opls model to make predictions on a new data set. Only the first opls predicitve and orthogonal component used currently.
 #'
 #' @param model oplsda model (or ropls built model).
 #' @param newdata Matrix or data frame of the same X variables as the model (O-PLS-DA).
