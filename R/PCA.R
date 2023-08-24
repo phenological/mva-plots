@@ -30,7 +30,6 @@ PCA <- function(data, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns
                     center = center,
                     scale. = scale.)
 
-
   rank <- ncol(results[["rotation"]])
 
   pcSum <- (as.data.frame(t(summary(results)[["importance"]])))
