@@ -68,7 +68,7 @@ oplsdaPredict <- function (model, newdata, optns=list()){
     attr(yTesMN, "scaled:center") <- NULL
     attr(yTesMN, "scaled:scale") <- NULL
 
-  if(is.factor(fitted(model))) {
+  if(is.factor(model@suppLs[["y"]])) {
 
     yTestMCN <- model@suppLs[[".char2numF"]](yTesMN,
                                              c2nL = FALSE)
@@ -76,9 +76,9 @@ oplsdaPredict <- function (model, newdata, optns=list()){
     names(predMCNFcVcn) <- rownames(newdata)
     predMCNFcVcn <- factor(predMCNFcVcn, levels = levels(model@suppLs[["y"]]))
 
-  } else if(is.vector(fitted(model))) {
+  } else if(is.vector(model@suppLs[["y"]])) {
 
-    if(is.character(fitted(model))) {
+    if(is.character(model@suppLs[["y"]])) {
 
       yTestMCN <- model@suppLs[[".char2numF"]](yTesMN, c2nL = FALSE)
       predMCNFcVcn <- as.character(yTestMCN)
@@ -91,9 +91,9 @@ oplsdaPredict <- function (model, newdata, optns=list()){
 
     }
 
-  } else if (is.matrix(fitted(model))) {
+  } else if (is.matrix(model@suppLs[["y"]])) {
 
-    if (mode(fitted(model)) == "character") {
+    if (mode(model@suppLs[["y"]]) == "character") {
       predMCNFcVcn  <- model@suppLs[[".char2numF"]](yTesMN, c2nL = FALSE)
     } else
       predMCNFcVcn <- yTesMN
