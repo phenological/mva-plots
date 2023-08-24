@@ -17,9 +17,11 @@ oplsdaPredict <- function (model, newdata, optns=list()){
   #center and scale new data
   xteMN <- scale(newdata, model@xMeanVn, model@xSdVn)
 
+#check there is an orthogonal component
   if(model@summaryDF[, "ort"] > 0) {
 
-    for(noN in 1:model@summaryDF[, "ort"]) {
+    #can only use the first orthogonal component hence model@summaryDF[,1] not model@summaryDF[,"ort"] in for statement
+    for(noN in 1:model@summaryDF[, 1]) {
       if(model@suppLs[["naxL"]]) {
 
         #make empty matrix
