@@ -190,7 +190,7 @@ storm<-function(X, ppm, b=5, q=0.01, idx_ref=NULL, roi=NULL,calibrate = FALSE,me
     
     if(plot==TRUE){
       index = which.max(ref) #stocsy driver
-      s0<-stocsy(x = ppm,Y = Xc[subset1,],driver = ppm_bin[roi_idx[index]])
+      s0<-stocsy(x = ppm,Y = Xc[subset1,],driver = ppm[roi_idx[index]])
       plot(s0)
     }
     
