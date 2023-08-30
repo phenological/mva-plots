@@ -2,7 +2,7 @@
 #'
 #' Grid of the loadings plots using GGally::ggpairs up to a threshold number.
 #'
-#' @param model A PCA object.
+#' @param model A PCA, oplsda or ropls object.
 #' @param optns An empty list for aesthetic options.
 #' @param plotTitle A parameter for the optns list. A character for the title of the grid.
 #' @param theme A parameter for the \code{optns} list. Personalize the plot theme you would like applied as you would using theme() in ggplot. Example set theme = theme(legend.position = "left", text=element_text(size=5)) in optns.
