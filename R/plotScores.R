@@ -414,6 +414,8 @@ if(is(model)[1] == "list"){
                                         fill = NA)
     }
     }
+    model$plots <- append(model$plots, list(pcaSingle = onePlot))
+    invisible(model)
     print(onePlot)
   }
 
