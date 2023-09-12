@@ -416,7 +416,7 @@ if(is(model)[1] == "list"){
     }
     model$plots <- append(model$plots, list(pcaSingle = onePlot))
     invisible(model)
-    print(onePlot)
+    return(onePlot)
   }
 
 }

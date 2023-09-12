@@ -110,21 +110,29 @@ aaData<-data.frame(apply(aa@.Data,2,as.numeric)) #spc/glyc data
 # rm(aaData, aaMetaF)
 ```
 ```{r}
+lo<-ropls::opls(x = BIOspcglyc[,1:8], y = BIOspcglyc[,"covid_status"], predI = 1, orthoI = 0, crossvalI = 10, permI = 50)
+lopredict<-ropls::predict(object = lo, newdata=aaData)
+
+
 #1 make the model
 
-lo<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$age, type = "PLS", optns=list(predI = 3, permI= 100, scaleC="none"))
+lo<-oplsda(X=BIOspcglyc[,1:8], Y=BIOspcglyc$covid_status, type = "PLS", optns=list(predI = 3, permI= 100, scaleC="none"))
 lot<-oplsda(X=BIOspcglyc[,1:8], Y= as.factor(BIOspcglyc$covid_status), type = "OPLS", optns=list(predI = 3, permI= 100))
 
 #2 predict with newdata 
-lot <-oplsdaPredict(model = lot, newdata = aaData)
-lot3 <-oplsdaPredict(model = lot, newdata = BIOspcglyc[,1:8], optns=list(real = as.factor(BIOspcglyc$covid_status)))
+lotpred <-oplsdaPredict(model = lo, newdata = aaData)
+lot3pred <-oplsdaPredict(model = lot, newdata = BIOspcglyc[,1:8], optns=list(real = as.factor(BIOspcglyc$covid_status)))
 
 #mtcars test
-il<- oplsda(X=mtcars[,1:7], Y=mtcars[,8], type = "PLS", optns=list(scaleC="none"))
+il<- oplsda(X=mtcars[,1:7], Y=mtcars[,8], type = "OPLS", optns=list(scaleC="none"))
+ilpred <-oplsdaPredict(model = il, newdata = mtcars[,1:7])
+
+il<- oplsda(X=iris[,1:3], Y=iris[,4], type = "PLS", optns=list(scaleC="none"))
+ilpred <-oplsdaPredict(model = il, newdata = iris[,1:3])
 
 plotScores(model=lot, optns = list(ellipse = "hotellings", discretePalette = c("covid" = "purple", "control" = "orange")))
 
-plotScores(model=a, optns=list(color = BIOspcglyc$age ,ellipse = "hotellings"))
+plotScores(model=a, optns=list(color = BIOspcglyc$age ,ellipse = "normal"))
 
 plotLoadings(model = a, optns = list())
 ```
