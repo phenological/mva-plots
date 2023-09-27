@@ -59,7 +59,7 @@ plotLoadings <- function(model, optns=list()){
         theme_bw() +
         theme
 
-      print(onePlot)
+      return(onePlot)
     }
 
   #########PCA objects##################
@@ -97,7 +97,7 @@ plotLoadings <- function(model, optns=list()){
       theme_bw() +
       theme
 
-    print(onePlot)
+    return(onePlot)
     }
 
   if(!("PCi" %in% names(optns))){
