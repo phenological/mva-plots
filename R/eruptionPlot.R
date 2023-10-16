@@ -123,10 +123,31 @@ colnames(ed)<-c("cd", "fc", "pval", "loadings", "id", "corr")
 labels<-list("Cliff's Delta", "Log2FC", "|log10pval|", "|loadings|", "id", "|corr|")
 names(labels)<-c("cd", "fc", "pval", "loadings", "id", "corr")
 
-if("color" %in% names(optns)){
-  color <- ed[,optns$color]
-}else{color <- ed$corr
-optns$color <- "corr"}
+if("color" %in% names(optns)) {
+  color <- ed[, optns$color]
+
+} else{
+  color <- ed$corr
+  optns$color <- "corr"
+  # color_breaks <- c(0, 0.5, 1)
+  # values <- NULL
+  # limits <- c(0, 1)
+}
+
+if (optns$color == "pval") {
+  color_breaks <- c(0, 1.3, max(ed[,"pval"]))
+  values <- scales::rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, max(ed[,"pval"])))
+  limits <- c(0, max(ed[,"pval"]))
+}
+else{
+  color_breaks <- c(0, 0.5, 1)
+  values <- NULL
+  limits <- c(0, 1)
+}
+# if("color" %in% names(optns)){
+#   color <- ed[,optns$color]
+# }else{color <- ed$corr
+# optns$color <- "corr"}
 
 if("x" %in% names(optns)){
   x <- ed[,optns$x]
@@ -154,9 +175,19 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
   theme_bw() +
   scale_x_continuous(limits = c(-1, 1)) +
   scale_color_gradientn(
-    colours = optns$continuousPalette,
+    values = values,
+    colours = optns$continuousPalette,  # Use the custom color palette,
+    breaks = color_breaks,  # Specify the breaks
+    labels = scales::number_format(accuracy = 0.01), #2 decimal points on colourbar scale
+    limits = limits,
+    trans = "identity",
     na.value = "grey50",
-    guide = "colourbar") +
+    guide = "colourbar"
+  )
+  # scale_color_gradientn(
+  #   colours = optns$continuousPalette,
+  #   na.value = "grey50",
+  #   guide = "colourbar") +
   ggtitle(plotTitle) +
   theme(panel.grid.minor = element_blank(),
         plot.tag = element_text(face = "bold",
