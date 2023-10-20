@@ -4,6 +4,8 @@ functionList <- list.files(path = functionDir)
 for(i in functionList){
   source(paste0(functionDir,i))
 }
+d<-eruptionPlot(model = a, optns= list(factor = BIOspcglyc$covid_status,  method = "bonferroni", color = "pval", plotTitle = "eruption", plotTitle = "test"))
+d[["plots"]][["eruptionPlot"]]
 ```
 
 ```{r}
@@ -88,7 +90,6 @@ df3 <- df2[-c(49,70,548),]
 
 rm(df, df2)
 ```
-```
 
 #tests pcagrid
 ```{r}
@@ -145,6 +146,9 @@ fff[["plots"]][["pcaGrid"]]
 fff<- plotLoadings(model= a)
 fff[["plots"]][["plotLoadingGrid"]]
 ```
+
+
+
 ```{r}
 data("iris")
 a<-PCA(data=iris[,1:4], annotation = iris[,5])
@@ -287,16 +291,208 @@ ggplot(data=ed, aes(x = cd,
         legend.position = "right",
         legend.direction = "vertical")
 
-d<-eruptionPlot(model=a, factor=BIOspcglyc[,"covid_status"], optns=list(PC=2))
+d<-eruptionPlot(model = a, optns= list(factor = BIOspcglyc$covid_status, color = "pval", method = "bonferroni"))
 d[["plots"]][["eruptionPlot"]]
 
+data <- data.frame(
+  Value = rnorm(100),
+  PValue = abs(log10(runif(100)))
+)
 
-data(mtcars)
- 
-a <- PCA(data = mtcars[,1:7], annotation=mtcars[,8:11], center = TRUE, scale. = TRUE)
-b <- eruptionPlot(model = a, factor=mtcars[,"vs"], optns=list(plotTitle = "mtcars eruption", method = "bonferroni", PC=2))
+# Set the threshold for significance
+significant_threshold <- abs(log10(0.05))
 
-b[["plots"]][["eruptionPlot"]]
+continuousPalette <- c(
+      "#0000CC",
+      "#0000FF",
+      "#0055FF",
+      "#00AAFF",
+      "#00FFFF",
+      "#2BFFD5",
+      "#55FFAA",
+      "#80FF80",
+      "#AAFF55",
+      "#D4FF2B",
+      "#FFFF00",
+      "#FFAA00",
+      "#FF5500",
+      "#FF0000",
+      "#CC0000")
+
+continuousPalette <- c(
+  "#00AAFF",
+  "#00FFFF",
+  "#FFAA00",  # Orange
+  "#FF5500",
+  "#CC0000"# Red
+)
+
+#p-value
+data <- d[["data"]][["eruptionData"]]
+
+
+custom_palette <- c(
+      "#0000CC",
+      "#0000FF",
+      "#0055FF",
+      "#00AAFF",
+      "#00FFFF",
+      "#2BFFD5",
+      "#55FFAA",
+      "#80FF80",
+      "#AAFF55",
+      "#D4FF2B",
+      "#FFFF00",
+      "#FFAA00",
+      "#FF5500",
+      "#FF0000",
+      "#CC0000")
+
+#color_breaks <- c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, max(data$pval))
+
+color_breaks <- c(0, 1.3, max(data$pval))
+#values <- scales::rescale(color_breaks)
+values <- scales::rescale(c(0.1,0.11,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1.3, 1.5, 2, max(data$pval)))
+limits<- c(i, max(data$pval))
+
+# #correlation
+# color_breaks <-c(0,0.5,1)
+# values <- NULL
+# limits<- c(0,1)
+
+custom_transformation <- function(x) {
+  10^(-x)
+}
+custom_inverse <- function(x) {
+  x^10
+}
+ggplot(data, aes(x = cd, y = fc, color = pval)) +
+  geom_point() +
+  scale_color_gradientn(
+    values = values,
+    colours = custom_palette,  # Use the custom color palette,
+    breaks = c(0,1.3,15),  # Specify the breaks
+    #breaks = color_breaks,  # Specify the breaks
+    #labels = scales::cbreaks(range = c(0, 2)),
+    labels=scales::number_format(accuracy = 0.01),
+    limits = limits,
+    na.value = "grey50",
+    guide = "colourbar",
+    trans = "log10"
+  #trans = scales::trans_new("custom", custom_transformation, custom_inverse)
+  ) +
+  labs(color = "P-Value") +
+  theme_minimal()
+
+
+ggforce::power_trans(n=0.1)
+
+d<-eruptionPlot(model = a, optns= list(factor = BIOspcglyc$covid_status, color = "pval", method = "bonferroni"))
+d[["plots"]][["eruptionPlot"]]
+library(raster)
+r <- raster(ncol=5, nrow=4)
+r[] <- 1:max(data$pval)
+#my_breaks = c(0,1,2,3,5,10,20)
+n = 15
+my_col= custom_palette
+
+####not cont looking#####
+plot(r, breaks = color_breaks, col = my_col, legend = FALSE, zlim=c(0,max(data$pval)))
+def_breaks = seq(0,max(data$pval),length.out=(n+1))
+
+library(fields)
+image.plot(r, zlim = c(0,max(data$pval)), 
+           legend.only = TRUE, 
+           col = my_col,
+           axis.args = list(#at = def_breaks[1], 
+             at = def_breaks, 
+                            labels = c(0," "," "," "," "," "," "," "," "," "," "," " ,1.30," "," ", round(max(data$pval),1))))
+
+######
+ma<- round(max(data$pval),1)
+limits<- c(0, ma)
+
+p<- ggplot(data, aes(x = cd, y = fc, color = pval)) +
+  geom_point() +
+  scale_color_gradientn(
+    colours = custom_palette,  # Use the custom color palette,
+    breaks = c(0,12,ma),  # Specify the breaks
+    labels=c("0", "1.3", ma),
+    limits = limits,
+    na.value = "grey50",
+    guide = "colourbar"
+  ) +
+  labs(color = "|log10pval|") +
+  theme_minimal() +
+  theme(legend.title = element_text(margin = margin(t = 100)))
+
+leg<-ggpubr::get_legend(p)
+
+ggpubr::as_ggplot(leg)
+p2<-ggplot(data = data, aes(x= fc, y= pval, color= pval)) +
+  geom_point() +
+  theme(legend.position = "none")
+
+p2 + guides(colorbar = ggpubr::get_legend(p))
+
+plot_grid(plotlist = list(p2, leg), rel_widths = c(10,1.5))
+
+
+
+#####
+
+color_breaks <- c(0, 1.3, max(data$pval))
+#values <- scales::rescale(color_breaks)
+values <- scales::rescale(c(0.1,0.11,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9, 1.3, 1.5, 2, max(data$pval)))
+limits<- c(0, max(data$pval))
+custom_tran <- function(x) {
+  10^(-x)
+}
+
+custom_in<- function(y){
+  log10(y)
+}
+
+# Create a ggplot with the custom color scale
+ggplot(data =data, aes(x = fc, y = cd, color = pval)) +
+  geom_point() +
+  scale_color_gradientn(
+    #values = values,
+    colours = custom_palette,
+    breaks = custom_transformation(color_breaks[c(1,8,14)]),
+    labels = c("0", "1.3", ma),
+    limits = custom_transformation(limits),
+    na.value = "grey50",
+    guide = "colourbar",
+    trans = "reverse"
+    #trans = scales::trans_new("custom", custom_tran, custom_in)
+  ) +
+  labs(color = "P-Value") +
+  theme_minimal()
+
+
+####legend######
+ma<- round(max(data$pval),1)
+color_breaks <- c(0, 1.3, ma)
+  values <- scales::rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, ma))
+  limits <- c(0, ma)
+  
+plot1 <- ggplot(data =data, aes(x = fc, y = cd, color = pval)) +
+  geom_point() +
+  scale_color_gradientn(
+    values = values,
+    colours = custom_palette,  # Use the custom color palette,
+    breaks = color_breaks,  # Specify the breaks
+    labels = scales::number_format(accuracy = 0.01), #2 decimal points on colourbar scale
+    limits = limits,
+    trans = "identity",
+    na.value = "grey50",
+    guide = "colourbar"
+  ) +
+  theme(legend.position = "none")
+
+ggarrange(plotlist = list(plot1), legend.grob = get_legend(p), legend = "right")
+
 ```
 
 

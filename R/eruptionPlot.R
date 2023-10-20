@@ -183,17 +183,47 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
     trans = "identity",
     na.value = "grey50",
     guide = "colourbar"
-  )
-  # scale_color_gradientn(
-  #   colours = optns$continuousPalette,
-  #   na.value = "grey50",
-  #   guide = "colourbar") +
+  )+
   ggtitle(plotTitle) +
   theme(panel.grid.minor = element_blank(),
         plot.tag = element_text(face = "bold",
                                 size = 25),
         legend.position = "right",
         legend.direction = "vertical")
+
+########p-value legend##########
+#makes a seperate plot with evenly spread colourbar
+
+  if("color" %in% names(optns)){
+
+    if(optns$color == "pval"){
+      ma<- round(max(ed$pval),1)
+      color_breaks <- c(0, 1.3, ma)
+      values <- scales::rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, ma))
+      limits <- c(0, ma)
+
+      plot1 <- ggplot(data, aes(x = cd, y = fc, color = pval)) +
+        geom_point() +
+        scale_color_gradientn(
+          colours = custom_palette,  # Use the custom color palette,
+          breaks = c(0,12,ma),  # Specify the breaks
+          labels=c("0", "1.3", ma),
+          limits = limits,
+          na.value = "grey50",
+          guide = "colourbar"
+        ) +
+        labs(color = "|log10pval|") +
+        theme_minimal() +
+        theme(legend.title = element_text(margin = margin(t = 100)))
+
+      eruptionPlot <- ggarrange(plotlist = list(eruptionPlot), legend.grob = get_legend(plot1), legend = "right")
+
+    }
+
+  }
+
+
+################################
 
 #append to data and plots
 if(is(model)[1] == "list"){
