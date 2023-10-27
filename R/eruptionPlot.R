@@ -235,7 +235,7 @@ if(is(model)[1] == "opls"){
   model@suppLs[["eruptionData"]] <-append(x = data.frame(), values = ed)
 }
 
-print(eruptionPlot)
+return(eruptionPlot)
 invisible(model)
 
 }
