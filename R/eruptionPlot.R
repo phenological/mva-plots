@@ -202,10 +202,10 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
       values <- scales::rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, ma))
       limits <- c(0, ma)
 
-      plot1 <- ggplot(data, aes(x = cd, y = fc, color = pval)) +
+      plot1 <- ggplot(data = ed, aes(x = cd, y = fc, color = pval)) +
         geom_point() +
         scale_color_gradientn(
-          colours = custom_palette,  # Use the custom color palette,
+          colours = optns$continuousPalette,  # Use the custom color palette,
           breaks = c(0,12,ma),  # Specify the breaks
           labels=c("0", "1.3", ma),
           limits = limits,
