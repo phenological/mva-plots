@@ -41,16 +41,17 @@ gridEllipseOptions <- function(model = model, pcaGridPlot = pcaGridPlot, thresh 
         if(optns$ellipse == "hotellings"){
 
           ##for the plot
+          #####NB: c() or as.vector around rx and ry as otherwise warnings about depreciated vector arithmetic occur
           temp <-
             temp + gg_circle(
-              rx = sqrt(var(model$data$pcdf[i]) * hotFisN),
-              ry = sqrt(var(model$data$pcdf[j]) * hotFisN),
+              rx = c(sqrt(var(model$data$pcdf[i]) * hotFisN)),
+              ry = c(sqrt(var(model$data$pcdf[j]) * hotFisN)),
               xc = 0,
               yc = 0
             )
           ##for outliers
-          rx <- sqrt(var(model$data$pcdf[i]) * hotFisN)
-          ry <- sqrt(var(model$data$pcdf[j]) * hotFisN)
+          rx <- c(sqrt(var(model$data$pcdf[i]) * hotFisN))
+          ry <- c(sqrt(var(model$data$pcdf[j]) * hotFisN))
 
           insideOut <- list((model$data$pcdf[i]^2)/(rx^2) + (model$data$pcdf[j]^2)/(ry^2))
           idx <- which(insideOut[[1]] > 1)
