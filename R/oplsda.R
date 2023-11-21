@@ -26,6 +26,38 @@ oplsda <- function(X, Y, type, optns=list()){
    orthoI <- 0
  } else if(type == "OPLS"){
    orthoI <- NA
+
+ #handle if the number of levels is not 2
+   levels<- length(table(as.factor(Y)))
+
+   #if there are more than 2 levels
+   if(levels > 2){
+    oldNames<- (names(table(as.factor(Y))))
+
+    #remove any levels with nothing in them
+     Y <- as.factor(Y)
+     Y <- as.character(Y)
+     Y <- as.factor(Y)
+     newlevels<- length(table(Y))
+     newNames<- (names(table(Y)))
+
+     #if there are still more than 2 levels
+     if(newlevels >2){
+       stop("Error: You have more than 2 levels in your Y. OPLS requires exactly 2 levels.")
+     }
+
+     #if there are now only two levels, print what the old levels were and what the new levels are
+     if(newlevels == 2){
+       print(paste0("Your levels in Y have been changed from ", levels, " to 2. Old levels are ", paste(oldNames, collapse = ", "), ". Your new levels are", paste(newNames, collapse = ", ") ))
+     }
+
+   }
+
+   #if there are less than 2 levels
+   if(levels < 2){
+     stop("Error: You have less than 2 levels in your Y. OPLS requires exactly 2 levels.")
+   }
+
  }
 
   if (type == "OPLS" && "orthoI" %in% names(optns)){

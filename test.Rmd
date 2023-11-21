@@ -4,8 +4,15 @@ functionList <- list.files(path = functionDir)
 for(i in functionList){
   source(paste0(functionDir,i))
 }
+load("/Users/lucygrigoroff/Downloads/smod1a.rda")
+a <- oplsda(X=BIOspcglyc[,1:8], Y= as.factor(BIOspcglyc$covid_status), type = "OPLS", optns=list(predI = 3, permI= 100))
+#a <- 
 d<-eruptionPlot(model = a, optns= list(factor = BIOspcglyc$covid_status,  method = "bonferroni", color = "pval", plotTitle = "eruption", plotTitle = "test"))
 d[["plots"]][["eruptionPlot"]]
+
+use_test("myFn1")
+
+
 ```
 
 ```{r}
@@ -114,7 +121,7 @@ loadPackages(myPackages = c("ggplot2",
                             "sp"))
 #1) create PCA object
 a <- PCA(BIOspcglyc[,1:8])
-a1 <- PCA(df3[,1:112], rank = 20)
+a1 <- PCA(df3[,1:112], rank. = 20)
 # #2) create screeCumulativeThresholdObject
 # b <- screeCumulativeThreshold(PCAObject = a, cutoff = 95)
 # 
@@ -139,8 +146,10 @@ a1 <- PCA(df3[,1:112], rank = 20)
 # opt=list(colour= "covid_status")
 
 #2) 
-fff<- plotScores(model=a, optns=list(colour=BIOspcglyc[,"age"], shape=BIOspcglyc[,"sex"], ellipse="normal", outlierLabels=row.names(BIOspcglyc)))
+fff<- plotScores(model=a, optns=list(color=BIOspcglyc[,"age"], shape=BIOspcglyc[,"sex"], ellipse="normal", outlierLabels=row.names(BIOspcglyc)))
 fff[["plots"]][["pcaGrid"]]
+
+fff1<- plotScores(model=a, optns=list(colour=BIOspcglyc[,"age"], shape=BIOspcglyc[,"sex"], PCi =1, PCj=2,ellipse="normal", outlierLabels=row.names(BIOspcglyc)))
 
 #2)
 fff<- plotLoadings(model= a)
@@ -1296,14 +1305,14 @@ gg_circle <- function(rx, ry, xc, yc, color = "black", fill = NA, ...) {
 
  hotFisN <- (n - 1) * 2 * (n^2 - 1) / (n^2 * (n - 2)) * qf(0.95, 2, n - 2)
  
-
-p <- ggplot(data=a$pcdf, aes(x=a$pcdf$PC4, y=a$pcdf$PC5)) +
+a<- PCA(data = BIOspcglyc[,1:8])
+p <- ggplot(data=a$data$pcdf, aes(x=a$data$pcdf$PC4, y=a$data$pcdf$PC5)) +
   geom_point() +
   #stat_ellipse( type = "norm", geom = "polygon", fill = "gray", level = 0.95, alpha = .5, linetype = 2)
   #geom_point(aes(colour= a$pcdf$covid_status)) +
    gg_circle(
-    rx = sqrt(var(a$pcdf$PC4) * hotFisN),
-    ry = sqrt(var(a$pcdf$PC5) * hotFisN),
+    rx = sqrt(var(a$data$pcdf$PC4) * hotFisN),
+    ry = sqrt(var(a$data$pcdf$PC5) * hotFisN),
     xc = 0, yc = 0
   )
 
