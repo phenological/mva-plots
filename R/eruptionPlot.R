@@ -232,18 +232,3 @@ invisible(model)
 
 }
 
-# #logFC	PValue	FDR cliffsDelta PrincipalComponentLoadings
-#univariate plot
-# ggplot(data = results, aes(x = log2FC, y = pvalRescaled)) +
-#   geom_point(size = 3,
-#              shape = 16,
-#              alpha = 0.3) +
-#   theme_minimal() +
-#   geom_hline(yintercept = -log10(0.05), col = "black") +
-#   geom_vline(xintercept = c(-0.6, 0.6), col = "black") +
-#   geom_label_repel(aes(label = id),
-#                    colour = "black",
-#                    min.segment.length = 0.001) +
-#   labs(title = plotTitle,
-#        x = "log2FoldChange",
-#        y = "-log10 adj.p-val")
