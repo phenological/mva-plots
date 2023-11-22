@@ -48,7 +48,7 @@ oplsda <- function(X, Y, type, optns=list()){
 
      #if there are now only two levels, print what the old levels were and what the new levels are
      if(newlevels == 2){
-       print(paste0("Your levels in Y have been changed from ", levels, " to 2. Old levels are ", paste(oldNames, collapse = ", "), ". Your new levels are", paste(newNames, collapse = ", ") ))
+       warning(paste0("Your levels in Y have been changed from ", levels, " to 2. Old levels are ", paste(oldNames, collapse = ", "), ". Your new levels are ", paste(newNames, collapse = ", ") ))
      }
 
    }
