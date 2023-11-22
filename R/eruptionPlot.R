@@ -75,11 +75,6 @@ eruptionPlot <- function(model, optns = list()){
     df <- as.data.frame(model@suppLs[["x"]])
     df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
     pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]))
-    # if(grepl("O", model@typeC) == TRUE){
-    #   pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]))
-    # }else{
-    #   pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]))
-    #   }
   }
 
   #ensure "factor" isn't included in id
@@ -88,10 +83,10 @@ eruptionPlot <- function(model, optns = list()){
     id <- as.data.frame(id[-idx,])
   }
 
-#cliffs delta
+########cliffs delta##########
     cd <- cliffsDelta(model = model, optns = optns)
 
-#correlations between scaled + centered original data and scores
+##########correlations between scaled + centered original data and scores######
     if(is(model)[1]== "list"){
       corr <- abs(t(as.data.frame(cor(model$data$scores[,PC], model$data$dataSC))))
     }
@@ -100,24 +95,25 @@ eruptionPlot <- function(model, optns = list()){
       corr <- abs(t(as.data.frame(cor(model@scoreMN[,PC], model@suppLs[["xModelMN"]]))))
     }
 
-#Fold change
+##########Fold change#########
   fc <- foldChange(model = model, optns = optns)
 
-#adjusted p-value
+########adjusted p-value########
 pval<-list()
 for(i in 1:(ncol(df)-1)){
   pval[[i]]<-kruskal.test(df[,i], df[,"factor"])$p.value
 }
 
 unlist(pval)
+pvalUnadjusted <- t(as.data.frame(pval))
 pvalAdjusted <- p.adjust(pval, method = method)
 pvalRescaled <- abs(log10(pvalAdjusted))
 pvalRescaled <- as.data.frame(pvalRescaled)
 
 #eruption data frame
-ed<-cbind(cd, fc, pvalRescaled, pcLoadings, id, corr)
+ed<-cbind(cd, fc, pvalRescaled, pvalUnadjusted, pcLoadings, id, corr)
 
-colnames(ed)<-c("cd", "fc", "pval", "loadings", "id", "corr")
+colnames(ed)<-c("cd", "fc", "pval", "pvalRaw", "loadings", "id", "corr")
 
 #for graph labs
 labels<-list("Cliff's Delta", "Log2FC", "|log10pval|", "|loadings|", "id", "|corr|")
@@ -129,9 +125,6 @@ if("color" %in% names(optns)) {
 } else{
   color <- ed$corr
   optns$color <- "corr"
-  # color_breaks <- c(0, 0.5, 1)
-  # values <- NULL
-  # limits <- c(0, 1)
 }
 
 if (optns$color == "pval") {
@@ -144,10 +137,6 @@ else{
   values <- NULL
   limits <- c(0, 1)
 }
-# if("color" %in% names(optns)){
-#   color <- ed[,optns$color]
-# }else{color <- ed$corr
-# optns$color <- "corr"}
 
 if("x" %in% names(optns)){
   x <- ed[,optns$x]
@@ -159,7 +148,7 @@ if("y" %in% names(optns)){
 }else{y <- ed$loadings
 optns$y <- "loadings"}
 
-#plot
+############plot#########
 eruptionPlot <- ggplot(data = ed, aes(x = x,
                                       y = y,
                                       color = color)) +
@@ -183,7 +172,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
     trans = "identity",
     na.value = "grey50",
     guide = "colourbar"
-  )+
+  ) +
   ggtitle(plotTitle) +
   theme(panel.grid.minor = element_blank(),
         plot.tag = element_text(face = "bold",
@@ -192,7 +181,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
         legend.direction = "vertical")
 
 ########p-value legend##########
-#makes a seperate plot with evenly spread colourbar
+#makes a separate plot with evenly spread colourbar
 
   if("color" %in% names(optns)){
 
@@ -216,14 +205,17 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
         theme_minimal() +
         theme(legend.title = element_text(margin = margin(t = 100)))
 
+      eruptionPlot<- eruptionPlot +
+                      labs( caption = paste0("p-value adjustment method: ", method) )
+
       eruptionPlot <- ggarrange(plotlist = list(eruptionPlot), legend.grob = get_legend(plot1), legend = "right")
 
     }
 
   }
 
-
-################################
+print(eruptionPlot)
+#########append#############
 
 #append to data and plots
 if(is(model)[1] == "list"){
@@ -232,10 +224,10 @@ if(is(model)[1] == "list"){
 }
 
 if(is(model)[1] == "opls"){
-  model@suppLs[["eruptionData"]] <-append(x = data.frame(), values = ed)
+  model@suppLs[["eruptionData"]] <- append(x = data.frame(), values = ed)
+  model@suppLs[["eruptionPlot"]] <- eruptionPlot
 }
 
-return(eruptionPlot)
 invisible(model)
 
 }

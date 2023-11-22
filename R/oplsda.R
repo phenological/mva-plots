@@ -99,6 +99,12 @@ if("permI" %in% names(optns)){
   permI <- optns$permI
 } else {permI <- 20}
 
+
+#make sure X is a data frame for other functions
+  if(!(is(X)[1] == "data.frame")){
+    X <- as.data.frame(X)
+  }
+
   model <- ropls::opls(x = X,
                         y = Y,
                         predI = predI,
