@@ -2,9 +2,9 @@
 #' Manhattan plot
 #' 
 #' @param data  
-#' @param x      numeric or factor, that goes on x-axsis
+#' @param x      numeric or factor, that goes on x-axis
 #' @param y     numeric, can be p-value, can be concentration depending on data
-#' @param point_shape numeric, geom_point shape in ggplot. default is 1; an emplty circle
+#' @param point_shape numeric, geom_point shape in ggplot. default is 1; an empty circle
 #' @param point_size numeric, geom_point size in ggplot. default is 2
 #' @param point_alpha numeric, geom_point alpha in ggplot. default is 1
 #' @param show_legend boolean, to show legends on the right hand side of the plot. default is FALSE. If interactive is TRUE then it overwrite to show_legend = TRUE
