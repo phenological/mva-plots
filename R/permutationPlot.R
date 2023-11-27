@@ -70,7 +70,7 @@ if(!("size" %in% names(optns)))
    theme_bw()+
    labs(x = expression(Similarity(bold(y), bold(y[perm]))),
         y = "Value",
-        caption = paste0("pR2Y = ",lot@summaryDF[, "pR2Y"],", pQ2 = ",lot@summaryDF[, "pQ2"])) +
+        caption = paste0("pR2Y = ", model@summaryDF[, "pR2Y"],", pQ2 = ", model@summaryDF[, "pQ2"])) +
    scale_color_manual(values = colors) +
    theme(legend.title=element_blank(),
          legend.position = c(0.9, 0.1),

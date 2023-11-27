@@ -32,12 +32,23 @@ plotScores<-function(model, optns=list()){
 
   #outlier annotation
   if("annotation" %in% names(optns)){
-    model$data$pcdf <- cbind(model$data$pcdf, optns$annotation)
+    if(is(model)[1] == "list"){
+      model$data$pcdf <- cbind(model$data$pcdf, optns$annotation)
+    }
+    if(is(model)[1] == "opls"){
+      model@suppLs[["annotation"]] <- optns$annotation
+    }
   }
 
   if("outlierLabels" %in% names(optns)){
     if(!("annotation" %in% names(optns))){
-      model$data$pcdf <- cbind(model$data$pcdf, optns$outlierLabels)
+      if(is(model)[1] == "list"){
+        model$data$pcdf <- cbind(model$data$pcdf, optns$outlierLabels)
+      }
+      if(is(model)[1] == "opls"){
+        model@suppLs[["annotation"]] <- optns$outlierLabels
+      }
+
     }
   }
 
@@ -282,7 +293,11 @@ plotScores<-function(model, optns=list()){
     }
 
     df <- cbind(df, model@suppLs[["yMCN"]])
-    df$rownames <- row.names(df)
+    df$rownames <- rownames(df)
+
+if("outlierLabels" %in% names(optns)){
+  df$outlierID <- optns$outlierLabels
+}
 
     #colors
     if(grepl("DA", model@typeC) == TRUE){
@@ -334,7 +349,7 @@ plotScores<-function(model, optns=list()){
       }
       }
 
-########ALL##############
+########ALL (base plot)##############
   onePlot <- ggplot(data = df,
                     aes(x = df[,PCi], y = df[,PCj])) +
           ggtitle(plotTitle) +
@@ -353,47 +368,68 @@ plotScores<-function(model, optns=list()){
           theme
 
 #########ellipse & outliers########
-if(is(model)[1] == "opls" & "ellipse" %in% names(optns)){
+if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
 
   #make ellipse
   output <- singleEllipseOptions(model = model, df = df, PCi = PCi, PCj = PCj, plot = onePlot, optns = optns)
 
+  #idx <- 1
   idx <- output$outliers
   onePlot <- output$plot
 
+
   #add labels
-  if("outlierLabels" %in% optns){
+  if("outlierLabels" %in% names(optns)){
+
     if(grepl("O", model@typeC) == TRUE){
       onePlot <- onePlot +
         geom_label(data = df[idx,],
                    aes(x = p1,
                        y = o1,
-                       label = rownames),
+                       label = outlierID),
                    size = 2,
                    hjust = 0,
                    vjust = 0,
                    label.size = NA,
-                   fill=NA)
+                   fill = NA)
     }
 
-    if(grepl("O", model@typeC) == FALSE){
-      onePlot <- onePlot + geom_label(data = df[idx,],
-                                      aes(x = p1,
-                                          y = p2,
-                                          label = rownames),
-                                      size = 2,
-                                      hjust = 0,
-                                      vjust = 0,
-                                      label.size = NA,
-                                      fill=NA)
+    if(!(grepl("O", model@typeC) == TRUE)){
+      onePlot <- onePlot +
+        geom_label(data = df[idx,],
+                   aes(x = p1,
+                       y = p2,
+                       label = outlierID),
+                   size = 2,
+                   hjust = 0,
+                   vjust = 0,
+                   label.size = NA,
+                   fill = NA)
+
     }
+
   }
 
-  return(onePlot)
+  print(onePlot)
+
+  model@suppLs[["outlierID"]] <- df[idx, "outlierID"]
+  model@suppLs[["ScoresPlot"]] <- onePlot
+  return(model)
   #invisible(output)
 }
-  if(is(model)[1] == "opls" & !("ellipse" %in% names(optns))){return(onePlot)}
 
+
+  if (is(model)[1] == "opls" & !("ellipse" %in% names(optns)))
+  {
+
+    print(onePlot)
+
+    model@suppLs[["ScoresPlot"]] <- onePlot
+    return(model)
+
+  }
+
+#########single PCA##############
 if(is(model)[1] == "list"){
   if("PCi" %in% names(optns)){
     if("ellipse" %in% names(optns)){
@@ -403,15 +439,16 @@ if(is(model)[1] == "list"){
 
       if("outlierLabels" %in% names(optns)) {
         model$data$pcdf$outlierID <- optns$outlierLabels
-        onePlot <- onePlot + geom_label(data = model$data$pcdf[idx, ],
-                                        aes(x = model$data$pcdf[idx, PCi],
-                                            y = model$data$pcdf[idx, PCj],
-                                            label = outlierID),
-                                        size = 2,
-                                        hjust = 0,
-                                        vjust = 0,
-                                        label.size = NA,
-                                        fill = NA)
+        onePlot <- onePlot +
+                   geom_label(data = model$data$pcdf[idx, ],
+                              aes(x = model$data$pcdf[idx, PCi],
+                                  y = model$data$pcdf[idx, PCj],
+                                  label = outlierID),
+                              size = 2,
+                              hjust = 0,
+                              vjust = 0,
+                              label.size = NA,
+                              fill = NA)
     }
     }
     model$plots <- append(model$plots, list(pcaSingle = onePlot))
@@ -421,7 +458,7 @@ if(is(model)[1] == "list"){
 
 }
 
-###########GRID###########
+###########PCA grid###########
 if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
   #ensure that lack of legend doesn't stop ggpairs from working
   if ((length(optns$color)) == 1 &
@@ -475,9 +512,6 @@ if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
   print(pcaGridPlot)
   invisible(model)}
 
-
-
-###########single PCA ############TBA
 
 
 }
