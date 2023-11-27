@@ -415,7 +415,7 @@ if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
   model@suppLs[["outlierID"]] <- df[idx, "outlierID"]
   model@suppLs[["ScoresPlot"]] <- onePlot
   return(model)
-  #invisible(output)
+
 }
 
 
