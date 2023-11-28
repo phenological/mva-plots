@@ -9,10 +9,13 @@ test_that("PCA produced model is handled appropriately", {
 
   #list object
   a <- PCA(data=data[,1:5])
-  p <- eruptionPlot(model = a, optns = list(factor=data[,"sex"], method = "none", color = "pval"))
+  p <- eruptionPlot(model = a,
+                    optns = list(factor=data[,"sex"],
+                                 method = "none",
+                                 color = "pval"))
 
   #correct class
-  expect_s3_class(object= p[["plots"]][["eruptionPlot"]], class = "gg")
+  expect_s3_class(object= p[["plots"]][["eruptionPlot"]], class = "egg")
   expect_equal(length(p), 2)
   expect_equal(length(p[["plots"]]), 4)
 })

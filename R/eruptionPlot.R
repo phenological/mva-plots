@@ -196,7 +196,10 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
       values <- scales::rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, ma))
       limits <- c(0, ma)
 
-      plot1 <- ggplot(data = ed, aes(x = cd, y = fc, color = pval)) +
+      plot1 <- ggplot(data = ed,
+                      aes(x = cd,
+                          y = fc,
+                          color = pval)) +
         geom_point() +
         scale_color_gradientn(
           colours = optns$continuousPalette,  # Use the custom color palette,
@@ -213,7 +216,9 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
       eruptionPlot<- eruptionPlot +
                       labs( caption = paste0("p-value adjustment method: ", method) )
 
-      eruptionPlot <- ggarrange(plotlist = list(eruptionPlot), legend.grob = ggpubr::get_legend(plot1), legend = "right")
+      eruptionPlot <- ggarrange(plots = list(eruptionPlot),
+                                legend.grob = (ggpubr::get_legend(plot1)),
+                                legend = "right")
 
     }
 
