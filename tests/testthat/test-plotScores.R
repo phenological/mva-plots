@@ -83,7 +83,7 @@ test_that("opls object is handled correctly", {
 
   #make plotscores for oplsda model with ellipse and outliers included
 
-  ps<- plotScores(model = oplsdaModel,
+  ps<- plotScores(model = model,
                   optns = list(
                     color = exampleData[,"status"],
                     ellipse = "hotellings",
