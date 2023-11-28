@@ -2,8 +2,8 @@
 #' Subset Optimization by reference matching (STORM)
 #'
 #'
-#' Step 1) Subset selection
-#' Step 2) STOCSY of subset
+#' Step 1 Subset selection
+#' Step 2 STOCSY of subset
 #'   - Pearson correlation of each subset spectrum with the reference (reference a.k.a driver, chemical shift)
 #'   - calculate corresponding p-value by transforming the correlation into the t-statistics with n-2 degrees of freedoms
 #'   - exclude spectra subsets that have negative correlation with the reference
