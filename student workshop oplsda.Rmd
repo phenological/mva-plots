@@ -1,14 +1,20 @@
 ---
-title: "Student Workshop"
+title: "Student Workshop O-PLS-DA"
 author: "Lucy Grigoroff"
-date: "2023-11-23"
-output: html_document
+date: "November 2023"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Student Workshop O-PLS-DA}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 ```
-
 
 Package installation 
 #change after 1st release 
@@ -51,6 +57,7 @@ Using the mva-plots package **PCA()** function we can calculate our PCA model, i
 ```{r}
 modelPCA <- PCA(data = exampleData[,1:5], 
                 optns = list(cutoff = 95))
+
 ```
 
 This is a combined scree plot and cumulative variance plot. They represent the same thing, how much variance is explained in each component. PC1 and PC2 usually explain the majority of variance, here there is approximately 80% explained in PC1 and 11% in PC2. If you'd like to access the information as a data frame you can do so from the modelPCA R object created.
