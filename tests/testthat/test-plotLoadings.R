@@ -23,7 +23,7 @@ test_that("opls object is handled correctly", {
 
   #make plotloadings for oplsda model with ellipse and outliers included
 
-  pl<- plotLoadings(model = oplsdaModel)
+  pl<- plotLoadings(model = model)
 
   #is the plot appended to the model
   expect_true("LoadingsPlot" %in% names(pl@suppLs), "LoadingsPlot should exist in pl@suppLs")
