@@ -1,7 +1,7 @@
 
 #' Manhattan plot
 #'
-#' @param data
+#' @param data Data to be supplied
 #' @param x numeric or factor, that goes on x-axis
 #' @param y numeric, can be p-value, can be concentration depending on data
 #' @param point_shape numeric, geom_point shape in ggplot. default is 1; an empty circle

@@ -13,8 +13,6 @@
 #' data(iris)
 #' a <- PCA(data = iris[,1:4], annotation=[,5], center = TRUE, scale. = TRUE)
 #' b <- plotLoadings(model = a, optns = list(gridTitle = "Iris Dataset PC Loadings", thresh = 3))
-#'
-#' To access a single plot from the grid: b[["plots]][["plotLoadingsGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 
 plotLoadings <- function(model, optns=list()){
