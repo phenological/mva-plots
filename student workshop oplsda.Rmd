@@ -16,15 +16,34 @@ knitr::opts_chunk$set(
 )
 ```
 
-Package installation 
-#change after 1st release 
 
-```{r}
+```{r load-pack, fig.show='hold', message=FALSE, warning=FALSE, include = FALSE}
+
+#load packages
+library(ggpubr)
+library(GGally)
+library(ggrepel)
+library(stats)
+library(ggplot2)
+library(roxygen2)
+library(testthat)
+library(ggpubr)
+library(sjmisc)
+
+functionDir <- "./R/"
+functionList <- list.files(path = functionDir)
+for(i in functionList){
+  source(paste0(functionDir,i))
+}
+```
+
+## Package installation
+```{r echo = TRUE, results = 'hide'}
 devtools::install_github("phenological/mva-plots")
 library(mva.plots)
 ```
 
-Example Data
+## Example Data
 
 Using mtcars as if it contained analyte information as well as metadata about subjects for the purposes of this tutorial. 
 
@@ -37,6 +56,8 @@ exampleData$status <- ifelse(exampleData$status == 1, "treatment", "control")
 exampleData$sex <- ifelse(exampleData$sex == 1, "male", "female")
 rownames(exampleData) <- paste0("subject", 1:nrow(exampleData))
 
+exampleData <- exampleData [,1:9]
+
 exampleData
 ```
 
@@ -48,13 +69,13 @@ exampleData
 
 A PCA allows us to visually represent high-dimensional data. It does so by transforming a large set of variables into a smaller one that still contains most of the information in the large set. 
 
-A brief look at PCA:
+**A brief look at PCA:**
 
 The data is usually standardised using mean centering and standard deviation scaling prior to principal component calculation (you have the option to not to do one or both in the following function using *center* and *scale* arguments). There are two popular methods of calculation; eigenvalue decomposition of the covariance matrix and singular value decomposition (SVD). In the mva-plots we use the prcomp function from the stats package, which uses SVD.
 
 Using the mva-plots package **PCA()** function we can calculate our PCA model, in this case we chose to use only the first 5 metabolites. Ensure you do not provide metadata information to the *data* argument. You may which to determine how many PCs it take to explain a certain proportion of variation. In which case provide *cutoff*, in this example 95% of the variance should be explained. If no cutoff argument is provided the default is 99%. You can instead manually set the number of components using *rank.*. *modelPCA* is now an R object that contains different slots containing information about the PCA model - this includes the scores and loadings for each of the principal components as well as other summary information.
 
-```{r}
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 modelPCA <- PCA(data = exampleData[,1:5], 
                 optns = list(cutoff = 95))
 
@@ -62,13 +83,13 @@ modelPCA <- PCA(data = exampleData[,1:5],
 
 This is a combined scree plot and cumulative variance plot. They represent the same thing, how much variance is explained in each component. PC1 and PC2 usually explain the majority of variance, here there is approximately 80% explained in PC1 and 11% in PC2. If you'd like to access the information as a data frame you can do so from the modelPCA R object created.
 
-```{r}
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 modelPCA[["data"]][["pcSum"]]
 ```
 
 You should use explained variance to help gauge how many PCs you'd like to observe using their scores and loadings. Often, we use clustering in the scores as an initial discovery analysis about points of interest. In the current example, you may only be interested in the first two components and be interested in the persons treatment status, suspecting these metabolites may be somehow important. You can use the **plotScores()** function with *color* coding according to treatment status, along with *ellipse* based on color, to help visualize possible separation/clustering. Further input parameters include *shape*, *alpha* and *size* assignment as a basic aesthetic or related to a feature, customised continuous or discrete color palettes options (*continuousPalette* and *discretePalette*) and arguments you would supply through *theme()* when using ggplot to define the plot appearance. Check the function documentation for further details and examples.
 
-```{r}
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 plotScores(model = modelPCA, 
            optns = list(PCi = 1, 
                         PCj = 2, 
@@ -76,11 +97,12 @@ plotScores(model = modelPCA,
                         colorTitle = "Status",
                         ellipse = "color"))
 ```
+
 Each point represents a subject (a row of the exampleData of metabolites 1 through 5). The percentages in the axis labels describe the amount of explained variation by the respective PC.
 
 You may want to observe outliers using Hotelling's ellipse and identify them by their subject number. The confidence interval (*ci*) for ellipse calculations is adjustable and the default is 95%. There are other available options for ellipse calculations, check the function documentation for further details and examples.
 
-```{r}
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 plotScores(model = modelPCA, 
            optns = list(PCi = 1, 
                         PCj = 2, 
@@ -92,7 +114,7 @@ plotScores(model = modelPCA,
 
 If you would like to view more PCs, but aren't sure how many, don't supply an argument and the threshold to explain the *cutoff* you provided for initially building the modelPCA will be used to determine the number of PCs displayed. To manually set the number of components you want to view (three in our example), provide the *thresh* argument. 
 
-```{r}
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 plotScores(
   model = modelPCA,
   optns = list(
@@ -104,12 +126,14 @@ plotScores(
 )
 
 ```
+
 Separation of subject status is only evident in the first component, and you can view the loadings graphically using **plotLoadings()**. You may do as you did with **plotScores()** and view them as a grid for multiple components by providing *thresh* and not *PCi* and *PCj*, or not providing any of them, just the model.
 
-```{r}
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 plotLoadings(model = modelPCA,
              optns = list(PCi = 1, PCj = 2))
 ```
+
 Alternatively, this information (and the scores) will be in the modelPCA R object we created and you can access the data frame of this information.
 
 ```{r}
@@ -151,11 +175,11 @@ If there is only one Y variable, PLS and OPLS models fitted to the same data hav
 
 If you choose to use O-PLS-DA, you should keep in mind the properties of your data and your PCA results. For example, if you wish to build a DA model, you will need to have a fairly even number of samples in each group (groups being treatment and control in our example). Also, if there was no separation visible in the PCA, and you build an O-PLS-DA and there is now separation evident, chances are the model has been over fitted. Having a very wide matrix (many more features than you have samples) also increases chance of overfitting. There are other metrics to help identify this in addition to your initial PCA. 
 
-R2Y (R-squared for Y): R2Y is the percent of the variation in the results is explained by the model. It ranges from 0 to 1, where 0 indicates that the model does not explain any variance, and 1 indicates that the model explains all the variance. In the context of OPLS-DA, R2Y is a measure of how well the model captures the variation in the class memberships or groups.
+**R2Y (R-squared for Y):** R2Y is the percent of the variation in the results is explained by the model. It ranges from 0 to 1, where 0 indicates that the model does not explain any variance, and 1 indicates that the model explains all the variance. In the context of OPLS-DA, R2Y is a measure of how well the model captures the variation in the class memberships or groups.
 
-R2X (R-squared for X): This metric represents the proportion of variance in the predictor variables (X) that is explained by the model. It indicates how well the model captures the variation in the predictor variables. Similar to R2Y, it ranges from 0 to 1. 
+**R2X (R-squared for X):** This metric represents the proportion of variance in the predictor variables (X) that is explained by the model. It indicates how well the model captures the variation in the predictor variables. Similar to R2Y, it ranges from 0 to 1. 
 
-cumulative Q2(Q-squared): Used to assess the predictive performance of the model. It is calculated using cross-validation and represents the proportion of the response variable variance that can be predicted by the model (predictive variance of fit). For a continuous Y, A positive Q2 indicates good predictive performance, while a negative Q2 suggests that the model is worse than a random model (Q2 of 1 (perfect prediction) to zero or negative values (inaccurate prediction)). For a DA it ranges from 0 to 1 with 1 being perfect prediction, 0.5 being no predictive capability (it's like flipping a coin) and 0 is exact inverted prediction. 
+**cumulative Q2(Q-squared):** Used to assess the predictive performance of the model. It is calculated using cross-validation and represents the proportion of the response variable variance that can be predicted by the model (predictive variance of fit). For a continuous Y, A positive Q2 indicates good predictive performance, while a negative Q2 suggests that the model is worse than a random model (Q2 of 1 (perfect prediction) to zero or negative values (inaccurate prediction)). For a DA it ranges from 0 to 1 with 1 being perfect prediction, 0.5 being no predictive capability (it's like flipping a coin) and 0 is exact inverted prediction. 
 
 In our example you can access this information from the *oplsdaModel* object, and do so in a way that shows you the breakdown for each component:
 
@@ -171,9 +195,9 @@ oplsdaModel@summaryDF
 ```
 You'll notice some additional information in the summaryDF from the model. 
 
-pre: the number of predictive components.
-ort: the number of orthogonal components.
-RMSEE: the square root of the mean error between the actual and the predicted responses during cross-validation.
+**pre:** the number of predictive components.
+**ort:** the number of orthogonal components.
+**RMSEE:** the square root of the mean error between the actual and the predicted responses during cross-validation.
 
 The following are assessments related to permutation tests on the model. Permutation is a method to see if the models performance is not by chance and it has better performance than a model based on random data. In the case of DA, randomly permuted or shuffled class labels or response variable, while keeping the predictor variables unchanged, are used to create a model. The permuted models have their Q2 and R2Y compared to model built with the real class labels. The p-values are the proportion of Q2perm and R2Yperm that are above the real Q2 and R2Y.
 
@@ -197,7 +221,7 @@ $$
 $$
 
 You can view the permutation assessment graphically using **permutationPlot()**. You can change the aesthetics using *colorQ*, *colorR*, *alpha*, *size* and *shape*. 
-```{r}
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 permutationPlot(model = oplsdaModel, 
                 optns = list(colorQ = "red",
                              colorR = "blue"
@@ -208,7 +232,7 @@ Here we see the 20 permuted Q2 and R2Y (as the translucent 20 blue and 20 red do
 
 You can view the scores and loadings plots the same way you did for a PCA.
 
-```{r}
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 ps <- plotScores(model = oplsdaModel, 
                  optns = list(
                             color = exampleData[,"status"],
@@ -218,13 +242,14 @@ ps <- plotScores(model = oplsdaModel,
                )
 
 ```
-```{r}
+
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 lp <- plotLoadings(model = oplsdaModel)
 
 ```
 
 
-##Prediction 
+## Prediction 
 
 You can use your model to make predictions on on other data (for example a different cohort). Here we generate data as if we have a different group of subject with slightly different results for the metabolites we used to build the model. 
 
@@ -250,7 +275,7 @@ predictModel$predY
 ```
 The scores (for the 1st orthogonal and predictive components for our example) are also available in the predictModel object. You can project this onto the scores for your original model. 
 
-```{r}
+```{r fig.show='hold', fig.width = 7.2, fig.height = 4, message=FALSE, warning=FALSE}
 dfo <- as.data.frame(cbind(oplsdaModel@orthoScoreMN, 
                            oplsdaModel@scoreMN, 
                            oplsdaModel@suppLs[["y"]]))
@@ -281,10 +306,10 @@ ggplot(data = df,
   ggtitle("Score Plot Projection")
 
 ```
+
 The "new cohort" from exampleData2 is unsurprisingly similar to pattern from the "original cohort" from exampleData. 
 
-
-\ExtraResources{
+For more indepth information on PCA and O-PLS-DA calculations refer to the following resources:
 
 https://medium.com/analytics-vidhya/understanding-principle-component-analysis-pca-step-by-step-e7a4bb4031d9
 
@@ -293,8 +318,6 @@ https://learnche.org/pid/latent-variable-modelling/index
 Trygg J. and Wold, S. (2002) Orthogonal projections to latent structures (O-PLS). \emph{Journal of Chemometrics}, 16.3, 119-128.
 
 Geladi, P and Kowalski, B.R. (1986), Partial least squares and regression: a tutorial. \emph{Analytica Chimica Acta}, 185, 1-17.
-}
-\
 
 
 
