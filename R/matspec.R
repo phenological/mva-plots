@@ -7,8 +7,6 @@
 #' @param roi region of interest if not defined default is set as c(0.0 , 9.5)
 #' @param interactive default is True which allow you to zoom in and select which spectra to show
 #' @return Interactive/non-interactive spectra plot
-#' @importFrom tidyverse dplyr
-#' @importFrom RColorBrewer brewer.pal
 #' @importFrom plotly plot_ly add_lines layout
 #' @importFrom reshape2 melt
 #'
@@ -35,12 +33,19 @@ matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
     df <- reshape2::melt(X[, fi])
     x <- list(title = "ppm", autorange = "reversed")
     y <- list(title = "Intensity")
-    cols <- suppressWarnings(colorRampPalette(RColorBrewer::brewer.pal(10,
-                                                                       "Set2"))(nrow(X)))
+    # cols <- suppressWarnings(colorRampPalette(RColorBrewer::brewer.pal(10,
+    #                                                                    "Set2"))(nrow(X)))
+
+    cols <- suppressWarnings(colorRampPalette(colors = c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854", "#FFD92F", "#E5C494", "#B3B3B3"))(nrow(X)))
     df$col <- rep(cols, length(which(fi==TRUE)))
-    p <- suppressWarnings(plotly::plot_ly(data = df, x = ~Var2, y = ~value,
-                                  color = ~I(col), name = ~Var1, hovertemplate = "%{x} ppm<extra></extra>") %>%
-                            plotly::layout(xaxis = x, yaxis = y) %>%plotly::add_lines())
+    p <- suppressWarnings(plotly::plot_ly(data = df,
+                                          x = ~Var2,
+                                          y = ~value,
+                                          color = ~I(col),
+                                          name = ~Var1,
+                                          hovertemplate = "%{x} ppm<extra></extra>") +
+                            plotly::layout(xaxis = x, yaxis = y) +
+                            plotly::add_lines())
     return(p)
   }
   matplot(ppm[fi], t(X[, fi]), type = "l", xlim = rev(range(ppm[fi])),

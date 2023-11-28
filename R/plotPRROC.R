@@ -30,7 +30,7 @@ library(PRROC)
 plotPRROC<-function(model = NULL,x = NULL,y = NULL,PC = c(1,2),col = c("red","black"),caption = FALSE){
   if(!is.null(model)){
     if(class(model)[1]=="opls"){
-      method<-model@typeC
+      method <- model@typeC
       Y = as.numeric(factor(model@suppLs$y))
       x<--model@scoreMN[which(Y==PC[1])]
       y<--model@scoreMN[which(Y==PC[2])]

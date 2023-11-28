@@ -30,29 +30,37 @@ manhattanPlot<-function(data,x,y,point_shape = 1,point_size = 2,point_alpha = 1,
     y<-as.numeric(y)
   }
 
-  Manhattan_plot<-ggplot(data,aes(x,y))+
-    geom_point(aes(color = factor(x)),shape = point_shape, size = point_size,alpha = point_alpha)+
-    theme_minimal()+
-    labs(title = main_title,x = xlab,y = ylab)
+  Manhattan_plot<-ggplot(data,aes(x,y)) +
+    geom_point(aes(color = factor(x)),
+               shape = point_shape,
+               size = point_size,
+               alpha = point_alpha) +
+    theme_minimal() +
+    labs(title = main_title,
+         x = xlab,
+         y = ylab)
 
   # show legend or not
   if(show_legend==FALSE){
-    Manhattan_plot<-Manhattan_plot+theme(legend.position = "n")
+    Manhattan_plot <- Manhattan_plot +
+                      theme(legend.position = "n")
   }
 
   if(!exists("threshold")){
     if(log_scaling==TRUE){
-      threshold<- -log10(as.numeric(threshold))
+      threshold <- -log10(as.numeric(threshold))
     }else{
-      threshold<-as.numeric(threshold)
+      threshold <- as.numeric(threshold)
     }
 
-    Manhattan_plot<-Manhattan_plot+
-      geom_hline(yintercept = threshold, linetype = "dashed", color = "black")
+    Manhattan_plot <- Manhattan_plot +
+                      geom_hline(yintercept = threshold,
+                                 linetype = "dashed",
+                                 color = "black")
   }
 
   if(interactive==TRUE){
-    Manhattan_plot<-plotly::ggplotly(Manhattan_plot)
+    Manhattan_plot <- plotly::ggplotly(Manhattan_plot)
   }
 
   return(Manhattan_plot)

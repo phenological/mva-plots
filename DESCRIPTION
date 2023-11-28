@@ -17,6 +17,7 @@ Imports:
     ggrepel,
     plotly,
     PRROC,
+    reshape2,
     ropls,
     roxygen2,
     scales,
