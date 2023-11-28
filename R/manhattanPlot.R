@@ -11,7 +11,6 @@
 #' @param log_scaling boolean, to apply -log10 to the y value. default is TRUE. If it is TRUE then threshold value is automatically log scaled.
 #' @param threshold numeric, add horizontal dash line to the plot. If log_scaling =TRUE then threshold value is automatically log scaled.
 #' @param interactive boolean, to make the plot interactive. default is FALSE.
-
 #' @return a ggplot2 object.
 #' @importFrom plotly ggplotly
 #' @export

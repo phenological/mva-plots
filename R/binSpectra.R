@@ -2,10 +2,10 @@
 #' Binning spectra
 #'
 #'
-#' @param X :full resolution spectra matrix
+#' @param X full resolution spectra matrix
 #' @param ppm parts per million
-#' @param width : interval in ppm. width must be larger than full resolution ppm interval
-#' @param npoints : total number of data points after binning npoints must be smaller than the length of ppm
+#' @param width interval in ppm. width must be larger than full resolution ppm interval
+#' @param npoints total number of data points after binning npoints must be smaller than the length of ppm
 #' You are required to specify either width or npoints NOT BOTH.
 #'
 #'

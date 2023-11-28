@@ -10,9 +10,9 @@
 #'   - from the remaining spectra subset with the lowest p-values are chosen to be in the subset
 #' Step 3) reference updating
 #'
-#' @param n :expected number of spectra subset with hidden signal (signal of interest)
-#' @param b :expected half signal width data points
-#' @param q : predefined p-value threshold for refernce selection (0<q<=1, q<0.05 is significant).
+#' @param n expected number of spectra subset with hidden signal (signal of interest)
+#' @param b expected half signal width data points
+#' @param q predefined p-value threshold for refernce selection (0<q<=1, q<0.05 is significant).
 #'
 #'
 #' Iteratively learns the true reference by repeating a procedure to find the most highly correlated spectra
