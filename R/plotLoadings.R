@@ -59,7 +59,10 @@ plotLoadings <- function(model, optns=list()){
         theme_bw() +
         theme
 
-      return(onePlot)
+      print(onePlot)
+
+      model@suppLs[["LoadingsPlot"]] <- onePlot
+      return(model)
     }
 
   #########PCA objects##################
