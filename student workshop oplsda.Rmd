@@ -39,7 +39,7 @@ for(i in functionList){
 
 ## Package installation
 ```{r echo = TRUE, results = 'hide'}
-devtools::install_github("phenological/mva-plots")
+devtools::install_github("phenological/mva-plots@0.0.1")
 library(mva.plots)
 ```
 

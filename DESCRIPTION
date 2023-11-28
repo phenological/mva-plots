@@ -17,5 +17,6 @@ Imports:
     plotly,
     PRROC,
     roxygen2,
+    scales,
     stats,
     testthat

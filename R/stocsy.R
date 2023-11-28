@@ -1,5 +1,5 @@
 #' Simple STOCSY implementation
-#' 
+#'
 #' @param x numeric, x scale e.g. ppm
 #' @param Y numeric, spectra matrix, spectra in rows
 #' @param driver numeric, reference to compute correlation. If length(driver) matches the number of spectra, it is interpreted as the vector of observations of the driver variable. Otherwise, driver[1] is interpreted as the chemical shift coordinate of the driver.
@@ -51,26 +51,57 @@ stocsy <- function(x, Y, driver, roi = range(x), plot = TRUE, breaks = 10){
 }
 
 #' Simple STOCSY visualization
-#' 
+#'
 #' @param stocsy, list, STOCSY results as returned by mvaPlots::stocsy()
 #' @param breaks numeric, number of breaks in the x axis
 #' @return a ggplot of the STOCSY, with ppm in the horizontal axis, covariance in the vertical axis, and correlation in the color scale
 #' @import ggplot2
 #' @importFrom colorRamps matlab.like2
 #' @export
-plotStocsy <- function(aDF, breaks=10){
-  driver <- attr(aDF,"driver")
-  p <- ggplot(aDF
-              ,aes(x=ppm
-                     ,y=covar
-                     ,colour=corr)) + geom_line() + scale_x_reverse(n.breaks=breaks)
-  p <- p + scale_colour_gradientn(colors = colorRamps::matlab.like2(10)
-                                  , limits=c(0,1)
-                                  , name="|R|")
+plotStocsy <- function(aDF, breaks = 10){
+
+ continuousPalette<- c(
+                        "#0000CC",
+                        "#0000FF",
+                        "#0055FF",
+                        "#00AAFF",
+                        "#00FFFF",
+                        "#2BFFD5",
+                        "#55FFAA",
+                        "#80FF80",
+                        "#AAFF55",
+                        "#D4FF2B",
+                        "#FFFF00",
+                        "#FFAA00",
+                        "#FF5500",
+                        "#FF0000",
+                        "#CC0000"
+                        )
+
+
+  driver <- attr(aDF, "driver")
+
+  p <- ggplot(data = aDF,
+              aes(x= ppm,
+                  y = covar,
+                  colour = corr)) +
+        geom_line() +
+        scale_x_reverse(n.breaks = breaks)
+
+  p <- p +
+       scale_colour_gradientn(colors = continuousPalette,
+                              limits = c(0,1),
+                              name = "|R|")
   if(!is.null(driver) & length(driver) == 1){
-    p <- p + labs(caption=paste("Driver c. shift:",driver,"ppm"))
+    p <- p +
+         labs(caption = paste("Driver c. shift:",driver,"ppm"))
+
     if (driver >= min(aDF$ppm) & driver <= max(aDF$ppm))
-      p <- p + geom_vline(xintercept = driver,linetype = 2)
+      p <- p +
+           geom_vline(xintercept = driver,
+                      linetype = 2)
+
+
   }
   return(p)
 }
