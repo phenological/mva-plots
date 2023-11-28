@@ -15,6 +15,7 @@ Imports:
     egg,
     GGally,
     ggplot2,
+    ggpubr,
     ggrepel,
     plotly,
     PRROC,
