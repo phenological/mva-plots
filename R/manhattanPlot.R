@@ -1,9 +1,9 @@
 
 #' Manhattan plot
-#' 
-#' @param data  
-#' @param x      numeric or factor, that goes on x-axis
-#' @param y     numeric, can be p-value, can be concentration depending on data
+#'
+#' @param data
+#' @param x numeric or factor, that goes on x-axis
+#' @param y numeric, can be p-value, can be concentration depending on data
 #' @param point_shape numeric, geom_point shape in ggplot. default is 1; an empty circle
 #' @param point_size numeric, geom_point size in ggplot. default is 2
 #' @param point_alpha numeric, geom_point alpha in ggplot. default is 1
@@ -13,8 +13,7 @@
 #' @param interactive boolean, to make the plot interactive. default is FALSE.
 
 #' @return a ggplot2 object.
-#' @import ggplot2
-#' @import plotly
+#' @importFrom plotly ggplotly
 #' @export
 
 manhattanPlot<-function(data,x,y,point_shape = 1,point_size = 2,point_alpha = 1,show_legend=FALSE,log_scaling=TRUE,threshold = NA,xlab = "",ylab = "",main_title = "Manhattan Plot",interactive = FALSE){
@@ -30,28 +29,28 @@ manhattanPlot<-function(data,x,y,point_shape = 1,point_size = 2,point_alpha = 1,
   }else{
     y<-as.numeric(y)
   }
-  
+
   Manhattan_plot<-ggplot(data,aes(x,y))+
     geom_point(aes(color = factor(x)),shape = point_shape, size = point_size,alpha = point_alpha)+
     theme_minimal()+
     labs(title = main_title,x = xlab,y = ylab)
-  
+
   # show legend or not
   if(show_legend==FALSE){
     Manhattan_plot<-Manhattan_plot+theme(legend.position = "n")
   }
-  
+
   if(!exists("threshold")){
     if(log_scaling==TRUE){
       threshold<- -log10(as.numeric(threshold))
     }else{
       threshold<-as.numeric(threshold)
     }
-    
+
     Manhattan_plot<-Manhattan_plot+
       geom_hline(yintercept = threshold, linetype = "dashed", color = "black")
   }
-  
+
   if(interactive==TRUE){
     Manhattan_plot<-plotly::ggplotly(Manhattan_plot)
   }
@@ -69,9 +68,9 @@ manhattanPlot<-function(data,x,y,point_shape = 1,point_size = 2,point_alpha = 1,
 #                          names_to = "para",
 #                          values_to = "y")%>%
 #   mutate(log10_y = -log10(y))
-# 
+#
 # x = sampleID
-# 
+#
 # manhattanPlot(data = data, x = "sampleID", y = "y",point_shape=1,log_scaling = TRUE,threshold = 1,interactive = TRUE)
 
 

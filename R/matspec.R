@@ -1,4 +1,4 @@
-#' matspec 
+#' matspec
 #'
 #' Plot multiple spectra plot that can be interactive (default)
 #'
@@ -7,22 +7,23 @@
 #' @param roi region of interest if not defined default is set as c(0.0 , 9.5)
 #' @param interactive default is True which allow you to zoom in and select which spectra to show
 #' @return Interactive/non-interactive spectra plot
-#' @importFrom dplyr
-#' @importFrom ggplot2
-#' @importFrom plotly
-#' 
-#' @examples 
+#' @importFrom tidyverse dplyr
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom plotly plot_ly add_lines layout
+#' @importFrom reshape2 melt
+#'
+#' @examples
 #' nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
 #' ppm<-as.numeric(nmr@varName)
 #' X<-nmr@.Data
 #' matspec(X[1:3,],ppm,roi = c(3.0,4.5),interactive = T)
 
-matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...) 
+matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
 {
   if (is.null(ppm)) {
     ppm <- as.numeric(colnames(X))
   }else {
-    if (length(ppm)!=ncol(X)) 
+    if (length(ppm)!=ncol(X))
       stop("Non-matching dimensions X matrix and ppm vector or missing values in ppm.")
   }
   if (!missing(roi)){
@@ -34,15 +35,15 @@ matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
     df <- reshape2::melt(X[, fi])
     x <- list(title = "ppm", autorange = "reversed")
     y <- list(title = "Intensity")
-    cols <- suppressWarnings(colorRampPalette(RColorBrewer::brewer.pal(10, 
+    cols <- suppressWarnings(colorRampPalette(RColorBrewer::brewer.pal(10,
                                                                        "Set2"))(nrow(X)))
     df$col <- rep(cols, length(which(fi==TRUE)))
-    p <- suppressWarnings(plotly::plot_ly(data = df, x = ~Var2, y = ~value, 
-                                  color = ~I(col), name = ~Var1, hovertemplate = "%{x} ppm<extra></extra>") %>% 
+    p <- suppressWarnings(plotly::plot_ly(data = df, x = ~Var2, y = ~value,
+                                  color = ~I(col), name = ~Var1, hovertemplate = "%{x} ppm<extra></extra>") %>%
                             plotly::layout(xaxis = x, yaxis = y) %>%plotly::add_lines())
     return(p)
   }
-  matplot(ppm[fi], t(X[, fi]), type = "l", xlim = rev(range(ppm[fi])), 
+  matplot(ppm[fi], t(X[, fi]), type = "l", xlim = rev(range(ppm[fi])),
           xlab = "ppm", ylab = "Intensity",...)
 
 }

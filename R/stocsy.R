@@ -7,9 +7,7 @@
 #' @param plot, boolean, whether to return the plot of the STOCSY (TRUE, default) or the numbers
 #' @param breaks numeric, number of breaks in the x axis or the STOCSY plot
 #' @return if plot=TRUE, a ggplot2 object. Otherwise, a data.frame with the correlations and covariances of Y with the driver and the corresponding ppm scale, restricted to the given roi. The "driver" (either a cshift or a vector of intensities) is stored as an attribute of the data.frame.
-#' @import ggplot2
-#' @importFrom colorRamps matlab.like2
-#' @export
+
 stocsy <- function(x, Y, driver, roi = range(x), plot = TRUE, breaks = 10){
   #Parse the driver, which may be a chem. shift, into a driver vector
   if (is.numeric(driver)){
@@ -55,8 +53,6 @@ stocsy <- function(x, Y, driver, roi = range(x), plot = TRUE, breaks = 10){
 #' @param stocsy, list, STOCSY results as returned by mvaPlots::stocsy()
 #' @param breaks numeric, number of breaks in the x axis
 #' @return a ggplot of the STOCSY, with ppm in the horizontal axis, covariance in the vertical axis, and correlation in the color scale
-#' @import ggplot2
-#' @importFrom colorRamps matlab.like2
 #' @export
 plotStocsy <- function(aDF, breaks = 10){
 

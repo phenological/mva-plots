@@ -18,8 +18,6 @@
 #'        This is needed for PCA with prcomp package, or (O)PLS with type = "Statistical reconstruction".
 #' @return plot of the loadings
 #' @import scales
-#' @import colorRamps
-
 #' @examples
 #' PCA model,the loading will always use type = "Statistical reconstruction".
 #' PCA_pca_model<-PCA(NOESY,annotation = ANN$COVID)  # PCA

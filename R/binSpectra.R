@@ -1,17 +1,18 @@
 
 #' Binning spectra
-#' 
-#' 
+#'
+#'
 #' @param X :full resolution spectra matrix
-#' @param ppm 
+#' @param ppm
 #' @param width : interval in ppm. width must be larger than full resolution ppm interval
 #' @param npoints : total number of data points after binning npoints must be smaller than the length of ppm
 #' You are required to specify either width or npoints NOT BOTH.
 #'
-#' 
-#' @example Xb<-binSpectra(X = X, ppm = ppm, width = 0.001)
+#'
+#' @examples
+#' Xb<-binSpectra(X = X, ppm = ppm, width = 0.001)
 #' ppm_bin<-as.numeric(colnames(Xb))
-#' 
+#'
 
 
 binSpectra<-function (X, ppm, width = NULL, npoints = NULL){
