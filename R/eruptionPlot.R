@@ -213,7 +213,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
       eruptionPlot<- eruptionPlot +
                       labs( caption = paste0("p-value adjustment method: ", method) )
 
-      eruptionPlot <- ggarrange(plotlist = list(eruptionPlot), legend.grob = get_legend(plot1), legend = "right")
+      eruptionPlot <- ggarrange(plotlist = list(eruptionPlot), legend.grob = ggpubr::get_legend(plot1), legend = "right")
 
     }
 
