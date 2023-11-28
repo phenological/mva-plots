@@ -18,6 +18,7 @@
 #' @import scales
 #' @import ggrepel
 #' @import GGally
+#' @import egg
 #' @examples
 #' data(mtcars)
 #'

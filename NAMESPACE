@@ -2,7 +2,10 @@
 
 export(manhattanPlot)
 export(plotStocsy)
+import(GGally)
 import(PRROC)
+import(ggplot2)
+import(ggrepel)
 import(scales)
 importFrom(plotly,add_lines)
 importFrom(plotly,ggplotly)
