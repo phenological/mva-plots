@@ -6,7 +6,7 @@
 \alias{mva.plots-package}
 \title{mva.plots: What the Package Does (One Line, Title Case)}
 \description{
-What the package does (one paragraph).
+What the package does (one paragraph). Multivariate plots.
 }
 \author{
 \strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})

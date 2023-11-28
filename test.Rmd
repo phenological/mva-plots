@@ -1,7 +1,7 @@
 ```{r}
 
 #Add packages to the description
-usethis::use_package("colorRamps")
+usethis::use_package("ggpubr")
 #remove packages from the description
 desc::desc_del_dep(package = "colorRamps")
 
