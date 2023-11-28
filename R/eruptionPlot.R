@@ -14,6 +14,10 @@
 #' @param y A parameter for the \code{optns} list. Choose your y-axis using the same options stated for color. The default is loadings.
 #' @return The eruption plot is printed and the model is appended with the eruption data (cliffs Delta, p-value, correlation, loadings). For ropls object, eruptionData is found in suppLs.
 #'
+#' @import ggplot2
+#' @import scales
+#' @import ggrepel
+#' @import GGally
 #' @examples
 #' data(mtcars)
 #'
