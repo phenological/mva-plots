@@ -1,9 +1,9 @@
 Package: mva.plots
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Add visualisation capabilities to multivariate analysis
+Version: 0.0.3
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person("Lucy", "Grigoroff", , "Lucy.Grigoroff@murdoch.edu.au", role = c("aut"),
+           comment = c(ORCID = ""))
 Description: What the package does (one paragraph). Multivariate plots.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -20,8 +20,9 @@ Imports:
     plotly,
     PRROC,
     reshape2,
-    ropls,
     roxygen2,
     scales,
     stats,
     testthat
+biocViews:
+    ropls
