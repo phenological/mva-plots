@@ -37,6 +37,6 @@ Function that uses ropls::opls to perform O-PLS-DA modelling. Please see the rop
 }
 \examples{
 data(mtcars)
-a <- oplsda(X = mtcars[,1:7], Y = [,8], type = "PLS", optns = list(permI = 50))
-a <- oplsda(X = mtcars[,1:7], Y = [,8], type = "OPLS", optns = list(permI = 50))
+a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
+a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
 }
