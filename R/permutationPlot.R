@@ -12,8 +12,8 @@
 #' @param alpha A parameter for the \code{optns} list. A numeric of the alpha desired for the permuted results. Default size is 0.4, actual values are always opaque.
 #' @return Permutation plot of Q2 and R2Y. The caption denoted pQ2 and pR2Y which indicates how significantly different the real results are from the permuted. Example, pQ2=(1+n(permutedQ2>realQ2))/n(permutations)
 #' @examples
-#' data(iris)
-#' a <- oplsda(X = mtcars[,1:7], Y = [,8], type = "OPLS", optns = list(permI = 50))
+#' data(mtcars)
+#' a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
 #' permutationPlot(model = a, optns=list(shape="square", colorQ = "#FF5500", colorR = "pink", size = 5))
 #'
 permutationPlot <- function(model, optns = list()){

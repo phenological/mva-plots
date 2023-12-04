@@ -39,11 +39,9 @@ Step 3) reference updating
 }
 }
 \examples{
-storm(X = Xb, ppm = ppm_bin,roi = c(7.52,7.58),calibrate = TRUE)  # hippurate
-storm(X = Xb, ppm = ppm_bin,  b=5, q=0.01, idx_ref=NULL,roi = c(4.02,4.04),calibrate = FALSE)
-storm(X = Xb, ppm = ppm_bin,roi = c(1.13,1.16),calibrate = FALSE)
-
-
+#storm(X = Xb, ppm = ppm_bin,roi = c(7.52,7.58),calibrate = TRUE)  # hippurate
+#storm(X = Xb, ppm = ppm_bin,  b=5, q=0.01, idx_ref=NULL,roi = c(4.02,4.04),calibrate = FALSE)
+#storm(X = Xb, ppm = ppm_bin,roi = c(1.13,1.16),calibrate = FALSE)
 }
 \references{
 Posma et.al (2012) dx.doi.org/10.1021/ac302360v| Anal.Chem. 2012, 84, 10694−10701

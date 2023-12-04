@@ -24,5 +24,5 @@ Function that uses ropls::opls model to make predictions on a new data set. Only
 \examples{
 data(mtcars)
 a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
-b <- oplsdaPredict(model = a, newdata = , optns = list(real = as.factor()))
+#b <- oplsdaPredict(model = a, newdata = mtcars[,1:7], optns = list(real = as.factor()))
 }

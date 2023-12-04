@@ -25,8 +25,8 @@
 #' @examples
 #' data(iris)
 #' a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
-#' b <- plotscores(model = a, optns=list(color = iris[,"Species"], discretePalette = c("setosa" = "purple", "versicolor = "orange", "virginica" = "steelblue"), colorTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alpha = 0.7))
-#' To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
+#' #b <- plotscores(model = a, optns=list(color = iris[,"Species"], discretePalette = c("setosa" = "purple", "versicolor = "orange", "virginica" = "steelblue"), colorTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alpha = 0.7))
+#' #To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
 
 plotScores<-function(model, optns=list()){
 

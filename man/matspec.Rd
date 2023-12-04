@@ -22,8 +22,8 @@ Interactive/non-interactive spectra plot
 Plot multiple spectra plot that can be interactive (default)
 }
 \examples{
-nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
-ppm<-as.numeric(nmr@varName)
-X<-nmr@.Data
-matspec(X[1:3,],ppm,roi = c(3.0,4.5),interactive = T)
+# this cannot be we don't publish path to our data !nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
+#ppm<-as.numeric(nmr@varName)
+#X<-nmr@.Data
+#matspec(X[1:3,],ppm,roi = c(3.0,4.5),interactive = T)
 }
