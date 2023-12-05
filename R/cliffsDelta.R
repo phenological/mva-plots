@@ -54,21 +54,6 @@ cliffsDelta <- function(model, optns = optns) {
   unlist(cd)
   cd<-t(as.data.frame(cd))
 
-
-  ##cliffs delta using stats via calculating U statistic (W wilcoxon statistic)
-
-  # U <- list()
-  # for(i in 1:(ncol(df)-1)){
-  #   formula <- as.formula(paste(colnames(df)[i]," ~ factor", sep=""))
-  #   model <- wilcox.test(formula, data = df)
-  #   U[[i]] <- model[["statistic"]]
-  # }
-  #
-  #
-  #    U <- (unlist(U))
-  #
-  #    cd <- (U/(n*m)-0.5)*2
-
   return(cd)
 }
 
