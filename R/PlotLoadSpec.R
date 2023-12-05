@@ -144,7 +144,7 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
 
   if(method=="PCA"){
     p1<-ggplot(df,aes(x = x, y = y,color = col))+geom_line() +
-      scale_x_reverse(breaks = scales::breaks_pretty(n = 15)) +
+      scale_x_reverse(breaks = breaks_pretty(n = 15)) +
       scale_colour_gradientn(colors = continuousPalette,
                              limits = raCol,
                              name = expression("|p"["sc"] * "|")) +
@@ -160,7 +160,7 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
                    y = y,
                    color = col)) +
       geom_line() +
-      scale_x_reverse(breaks = scales::breaks_pretty(n = 15)) +
+      scale_x_reverse(breaks = breaks_pretty(n = 15)) +
       scale_colour_gradientn(colors = continuousPalette,
                              na.value = "grey50",
                              limits = raCol,

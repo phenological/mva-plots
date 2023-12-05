@@ -9,6 +9,7 @@
 #' @param thresh A parameter for the optns list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.
 #'
 #' @return The model list appended with the grid of loadings under plots.
+#' @import GGally
 #' @examples
 #' #data(iris)
 #' #a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
@@ -103,7 +104,7 @@ plotLoadings <- function(model, optns=list()){
     }
 
   if(!("PCi" %in% names(optns))){
-    plotLoadingGrid <- GGally::ggpairs(data = df[,1:thresh],
+    plotLoadingGrid <- ggpairs(data = df[,1:thresh],
                                        columnLabels = c(title),
                                        title = plotTitle,
                                        diag="blank",

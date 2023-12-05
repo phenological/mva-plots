@@ -19,6 +19,7 @@
 #' @import ggrepel
 #' @import GGally
 #' @import egg
+#' @importFrom ggpubr get_legend
 #' @examples
 #' #data(mtcars)
 #'
@@ -135,7 +136,7 @@ if("color" %in% names(optns)) {
 
 if (optns$color == "pval") {
   color_breaks <- c(0, 1.3, max(ed[,"pval"]))
-  values <- scales::rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, max(ed[,"pval"])))
+  values <- rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, max(ed[,"pval"])))
   limits <- c(0, max(ed[,"pval"]))
 }
 else{
@@ -173,7 +174,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
     values = values,
     colours = optns$continuousPalette,  # Use the custom color palette,
     breaks = color_breaks,  # Specify the breaks
-    labels = scales::number_format(accuracy = 0.01), #2 decimal points on colourbar scale
+    labels = number_format(accuracy = 0.01), #2 decimal points on colourbar scale
     limits = limits,
     trans = "identity",
     na.value = "grey50",
@@ -194,7 +195,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
     if(optns$color == "pval"){
       ma<- round(max(ed$pval),1)
       color_breaks <- c(0, 1.3, ma)
-      values <- scales::rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, ma))
+      values <- rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, ma))
       limits <- c(0, ma)
 
       plot1 <- ggplot(data = ed,
@@ -218,7 +219,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
                       labs( caption = paste0("p-value adjustment method: ", method) )
 
       eruptionPlot <- ggarrange(plots = list(eruptionPlot),
-                                legend.grob = (ggpubr::get_legend(plot1)),
+                                legend.grob = (get_legend(plot1)),
                                 legend = "right")
 
     }

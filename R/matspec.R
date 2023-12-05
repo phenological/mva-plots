@@ -39,7 +39,7 @@ matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
 ####interactive plot####
 #for an interactive plot, use plot_ly
   if(interactive){
-    df <- reshape2::melt(X[, fi])
+    df <- melt(X[, fi])
     x <- list(title = "ppm", autorange = "reversed")
     y <- list(title = "Intensity")
      # cols <- suppressWarnings(colorRampPalette(RColorBrewer::brewer.pal(10,
@@ -76,7 +76,7 @@ matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
     p <- suppressWarnings(layout(p = p ,
                                  xaxis = x,
                                  yaxis = y))
-    p <- suppressWarnings(plotly::add_lines(p = p))
+    p <- suppressWarnings(add_lines(p = p))
 
     return(p)
   }

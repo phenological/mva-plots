@@ -13,11 +13,12 @@
 #' @param interactive boolean, to make the plot interactive. default is FALSE.
 #' @return a ggplot2 object.
 #' @importFrom plotly ggplotly
+#' @importFrom crayon red
 #' @export
 
 manhattanPlot<-function(data,x,y,point_shape = 1,point_size = 2,point_alpha = 1,show_legend=FALSE,log_scaling=TRUE,threshold = NA,xlab = "",ylab = "",main_title = "Manhattan Plot",interactive = FALSE){
   if(!exists("x")|!exists("y")){
-    cat(crayon::red("mvaPlots::Manhattanplot >>"
+    cat(red("mvaPlots::Manhattanplot >>"
                     ,"Please specify x and y for the plot\n"))
     stop()
   }
@@ -59,7 +60,7 @@ manhattanPlot<-function(data,x,y,point_shape = 1,point_size = 2,point_alpha = 1,
   }
 
   if(interactive==TRUE){
-    Manhattan_plot <- plotly::ggplotly(Manhattan_plot)
+    Manhattan_plot <- ggplotly(Manhattan_plot)
   }
 
   return(Manhattan_plot)

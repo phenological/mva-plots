@@ -7,6 +7,7 @@
 #' @param optns An empty list for confusion matrix addition.
 #' @param real A parameter for the \code{optns} list. The "real" clasifications for the newdata as a factor. If supplied, a confusion matrix will be calculated.
 #' @returns The prediction model including the predictive scores and orthogonal scores.
+#' @importFrom caret confusionMatrix
 #' @examples
 #' #data(mtcars)
 #' #a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
@@ -103,7 +104,7 @@ oplsdaPredict <- function (model, newdata, optns=list()){
   }
 
     if("real" %in% names(optns)){
-      conf <- caret::confusionMatrix(data = predMCNFcVcn, reference = optns$real)
+      conf <- confusionMatrix(data = predMCNFcVcn, reference = optns$real)
     } else (conf <-list())
 
 prediction <- list(orthoScoreMN = xtoMN,
