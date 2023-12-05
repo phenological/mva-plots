@@ -19,6 +19,8 @@
 #' @examples
 #' #data(iris)
 #' #a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
+#' @import stats
+#' @import ggplot2
 #' @export
 
 #calculate Principal Components using prcomp
