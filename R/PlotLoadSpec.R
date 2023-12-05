@@ -32,6 +32,7 @@
 #' #ropls_oplsda_model<-ropls::opls(NOESY,y = Y1,predI = 1, orthoI = NA)
 #'
 #' #PlotLoadSpec(model = prcomp_pca_model)
+#' @export
 
 PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NULL,option = list()){
 

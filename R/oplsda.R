@@ -18,6 +18,7 @@
 #' #data(mtcars)
 #' #a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
 #' #a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
+#' @export
 
 oplsda <- function(X, Y, type, optns=list()){
 

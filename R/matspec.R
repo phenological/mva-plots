@@ -15,6 +15,7 @@
 #' #ppm<-as.numeric(nmr@varName)
 #' #X<-nmr@.Data
 #' #matspec(X[1:3,],ppm,roi = c(3.0,4.5),interactive = T)
+#' @export
 
 matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
 {

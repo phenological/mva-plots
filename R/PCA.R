@@ -19,6 +19,7 @@
 #' @examples
 #' #data(iris)
 #' #a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
+#' @export
 
 #calculate Principal Components using prcomp
 

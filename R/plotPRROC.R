@@ -23,6 +23,7 @@
 #'#plot(t[[1]])
 #'
 #'#plot(t$plot)
+#'@export
 
 
 library(PRROC)

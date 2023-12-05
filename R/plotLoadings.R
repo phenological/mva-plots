@@ -13,6 +13,7 @@
 #' #data(iris)
 #' #a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
 #' #b <- plotLoadings(model = a, optns = list(gridTitle = "Iris Dataset PC Loadings", thresh = 3))
+#' @export
 
 
 plotLoadings <- function(model, optns=list()){
