@@ -16,8 +16,8 @@
 #' @return The ropls object. Please refer to the ropls::opls help for details.
 #' @examples
 #' data(mtcars)
-#' a <- oplsda(X = mtcars[,1:7], Y = [,8], type = "PLS", optns = list(permI = 50))
-#' a <- oplsda(X = mtcars[,1:7], Y = [,8], type = "OPLS", optns = list(permI = 50))
+#' a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
+#' a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
 
 oplsda <- function(X, Y, type, optns=list()){
 
