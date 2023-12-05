@@ -19,7 +19,9 @@
 #' @import ggrepel
 #' @import GGally
 #' @import egg
+#' @import methods
 #' @importFrom ggpubr get_legend
+#' @importFrom ggrepel geom_label_repel
 #' @examples
 #' #data(mtcars)
 #'

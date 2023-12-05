@@ -10,6 +10,8 @@
 #'
 #' @return The model list appended with the grid of loadings under plots.
 #' @import GGally
+#' @import methods
+#' @importFrom ggrepel geom_text_repel
 #' @examples
 #' #data(iris)
 #' #a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)

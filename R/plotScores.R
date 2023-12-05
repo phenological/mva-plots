@@ -27,7 +27,12 @@
 #' #a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
 #' #b <- plotscores(model = a, optns=list(color = iris[,"Species"], discretePalette = c("setosa" = "purple", "versicolor = "orange", "virginica" = "steelblue"), colorTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alpha = 0.7))
 #' #To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
+#' @import methods
+#' @import ggplot2
+#' @import GGally
 #' @export
+
+
 
 plotScores<-function(model, optns=list()){
 
@@ -468,11 +473,11 @@ if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
       (length(optns$alpha)) == 1) {
     testLegend <- NULL
   } else{
-    testLegend <- GGally::grab_legend(onePlot)
+    testLegend <- grab_legend(onePlot)
   }
 
   #grid of PCAs
-  pcaGridPlot<-GGally::ggpairs(data = model$data$pcdf[,1:thresh],
+  pcaGridPlot<-ggpairs(data = model$data$pcdf[,1:thresh],
                                columnLabels = c(title),
                                title = plotTitle,
                                diag="blank",
