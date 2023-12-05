@@ -33,5 +33,4 @@ Permutation plot for oplsda (ropls) models.
 #data(mtcars)
 #a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
 #permutationPlot(model = a, optns=list(shape="square", colorQ = "#FF5500", colorR = "pink", size = 5))
-
 }
