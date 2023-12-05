@@ -24,6 +24,7 @@
 #'
 #' #a <- PCA(data = mtcars[,1:7], center = TRUE, scale. = TRUE)
 #' #b <- eruptionPlot(model = a,  optns=list(factor=mtcars[,"vs"], color = "corr", plotTitle = "mtcars eruption", method = "bonferroni"))
+#' @export
 
 eruptionPlot <- function(model, optns = list()){
 

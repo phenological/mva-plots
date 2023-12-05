@@ -12,7 +12,7 @@
 #' @examples
 #' #Xb<-binSpectra(X = X, ppm = ppm, width = 0.001)
 #' #ppm_bin<-as.numeric(colnames(Xb))
-#'
+#'@export
 
 
 binSpectra<-function (X, ppm, width = NULL, npoints = NULL){
