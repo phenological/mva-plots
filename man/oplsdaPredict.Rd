@@ -22,7 +22,7 @@ The prediction model including the predictive scores and orthogonal scores.
 Function that uses ropls::opls model to make predictions on a new data set. Only the first opls predicitve and orthogonal component used currently.
 }
 \examples{
-data(mtcars)
-a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
+#data(mtcars)
+#a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
 #b <- oplsdaPredict(model = a, newdata = mtcars[,1:7], optns = list(real = as.factor()))
 }
