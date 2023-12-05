@@ -20,7 +20,7 @@ You are required to specify either width or npoints NOT BOTH.}
 Binning spectra
 }
 \examples{
-Xb<-binSpectra(X = X, ppm = ppm, width = 0.001)
-ppm_bin<-as.numeric(colnames(Xb))
+#Xb<-binSpectra(X = X, ppm = ppm, width = 0.001)
+#ppm_bin<-as.numeric(colnames(Xb))
 
 }

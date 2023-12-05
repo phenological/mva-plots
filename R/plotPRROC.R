@@ -11,18 +11,18 @@
 #'
 #' @import PRROC
 #' @examples
-#' Y<-as.numeric(gsub("preCOVID",1,gsub("COVID-pos",2,Y))) for (pls-da)
-#' Y1<-as.factor(ANN$COVID)  # for OPLS-DA
-#' ropls_pls_model<-ropls::opls(NOESY,y = Y)
-#' ropls_plsda_model<-ropls::opls(NOESY,y = ANN$COVID)
-#' ropls_opls_model<-ropls::opls(NOESY,y = Y,predI = 1, orthoI = NA)
-#' ropls_oplsda_model<-ropls::opls(NOESY,y = Y1,predI = 1, orthoI = NA)
+#' #Y<-as.numeric(gsub("preCOVID",1,gsub("COVID-pos",2,Y))) for (pls-da)
+#' #Y1<-as.factor(ANN$COVID)  # for OPLS-DA
+#' #ropls_pls_model<-ropls::opls(NOESY,y = Y)
+#' #ropls_plsda_model<-ropls::opls(NOESY,y = ANN$COVID)
+#' #ropls_opls_model<-ropls::opls(NOESY,y = Y,predI = 1, orthoI = NA)
+#' #ropls_oplsda_model<-ropls::opls(NOESY,y = Y1,predI = 1, orthoI = NA)
 #'
-#' t<-plotPRROC(ropls_oplsda_model,caption = TRUE)
+#' #t<-plotPRROC(ropls_oplsda_model,caption = TRUE)
 #'
-#'plot(t[[1]])
+#'#plot(t[[1]])
 #'
-#'plot(t$plot)
+#'#plot(t$plot)
 
 
 library(PRROC)
