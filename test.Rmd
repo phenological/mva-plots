@@ -6,7 +6,7 @@ usethis::use_package("ggpubr")
 desc::desc_del_dep(package = "colorRamps")
 
 #create tests
-use_test("oplsda")
+use_test("matspec")
 
 #build check
 
@@ -21,7 +21,7 @@ for(i in functionList){
 }
 
 
-devtools::session_info()
+
 
 ```
 

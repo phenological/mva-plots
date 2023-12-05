@@ -118,7 +118,6 @@ If you would like to view more PCs, but aren't sure how many, don't supply an ar
 plotScores(
   model = modelPCA,
   optns = list(
-    thresh = 3,
     color = as.factor(exampleData$status),
     colorTitle = "Status",
     ellipse = "color"
