@@ -8,8 +8,8 @@
 #' @param real A parameter for the \code{optns} list. The "real" clasifications for the newdata as a factor. If supplied, a confusion matrix will be calculated.
 #' @returns The prediction model including the predictive scores and orthogonal scores.
 #' @examples
-#' data(mtcars)
-#' a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
+#' #data(mtcars)
+#' #a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
 #' #b <- oplsdaPredict(model = a, newdata = mtcars[,1:7], optns = list(real = as.factor()))
 
 oplsdaPredict <- function (model, newdata, optns=list()){

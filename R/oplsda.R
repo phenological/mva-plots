@@ -15,9 +15,9 @@
 #' @param subset Default is NULL. You can change this in the \code{optns} list. Set as vector of observation indices to be used for training set or "odd" for equal train and test subsets. Equal subsetting will take into account the classes proportions as training sets should be representative.
 #' @return The ropls object. Please refer to the ropls::opls help for details.
 #' @examples
-#' data(mtcars)
-#' a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
-#' a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
+#' #data(mtcars)
+#' #a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
+#' #a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
 
 oplsda <- function(X, Y, type, optns=list()){
 

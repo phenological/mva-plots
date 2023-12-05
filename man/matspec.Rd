@@ -7,7 +7,7 @@
 matspec(X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
 }
 \arguments{
-\item{X}{is a spectra matrix (colnames(X)<-ppm, and rownames(X)<-Annotation$sampleID is recommended to do so before plotting)}
+\item{X}{is a spectra matrix (colnames(X) <- ppm, and rownames(X)<-Annotation$sampleID is recommended to do so before plotting)}
 
 \item{ppm}{must be numeric and same length as the number of column in X}
 
