@@ -3,6 +3,8 @@
 export()
 export(PCA)
 export(PlotLoadSpec)
+export(binSpectra)
+export(eruptionPlot)
 export(manhattanPlot)
 export(matspec)
 export(oplsda)
