@@ -57,60 +57,60 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
 
   if(class(model)[1]=="prcomp"){
     df <- data.frame(-model$rotation)
-    res<-summary(model)
-    res<-round(c(res$importance['Proportion of Variance',1:ncol(df)])*100,1)
-    x<-as.numeric(rownames(df))
-    idx<-which(x>roi[1] & x<roi[2])
+    res <- summary(model)
+    res <- round(c(res$importance['Proportion of Variance',1:ncol(df)])*100,1)
+    x <- as.numeric(rownames(df))
+    idx <- which(x>roi[1] & x<roi[2])
     if(ncol(df)< PC){
       stop("PC selected is larger than the dimension of the model")
     }
-    df<-df[idx,PC]
-    x<-x[idx]
+    df <- df[idx,PC]
+    x <- x[idx]
     method = "PCA"
     if(is.null(X)){
       stop("please defined X which is a spectra data matrix used for the PCA model using prcomp")
     }
     cc <- abs(cor(X[,idx],model$x[,PC]))
-    cv<-cov(X[,idx],model$x[,PC])
+    cv <- cov(X[,idx],model$x[,PC])
     raCol <- c(0, max(cc))
-    df<-data.frame(x = x,y = cv,col = cc)
+    df <- data.frame(x = x,y = cv,col = cc)
 
   }
-  if(is(model)[1]=="list" & length(model)==2){  # need to change this, for now, PCA() using library(prcomp) return list of 2
-    res<-model$data$pcSum$`Proportion of Variance`
-    df<-as.data.frame(-model$data$loadings)
-    x<-as.numeric(rownames(df))
-    idx<-which(x>roi[1] & x<roi[2])
+  if(is(model)[1] == "list" & length(model) == 2){  # need to change this, for now, PCA() using library(prcomp) return list of 2
+    res <- model$data$pcSum$`Proportion of Variance`
+    df <- as.data.frame(-model$data$loadings)
+    x <- as.numeric(rownames(df))
+    idx <- which(x>roi[1] & x<roi[2])
     # cen<-data.frame(model$data$center[idx])
     if(ncol(df)< PC){
       stop("PC selected is larger than the dimension of the model")
     }
-    df<-df[idx,PC]
-    x<-x[idx]
+    df <- df[idx,PC]
+    x <- x[idx]
     method = "PCA"
     cc <- abs(cor(model$data$rawData[,idx],model$data$scores[,PC]))
-    cv<-cov(model$data$rawData[,idx],model$data$scores[,PC])
+    cv <- cov(model$data$rawData[,idx],model$data$scores[,PC])
     raCol <- c(0, max(cc))
-    df<-data.frame(x = x,y = cv,col = cc)
+    df <- data.frame(x = x, y = cv, col = cc)
   }
-  if(is(model)[1]=="opls"){
-    method<-model@typeC
-    res<-model@summaryDF
-    if(type=="Backscaled"){
-      df<-data.frame(-model@loadingMN)
-      x<-as.numeric(rownames(df))
-      idx<-which(x>roi[1] & x<roi[2])
+  if(is(model)[1] == "opls"){
+    method <- model@typeC
+    res <- model@summaryDF
+    if(type == "Backscaled"){
+      df <- data.frame(-model@loadingMN)
+      x <- as.numeric(rownames(df))
+      idx <- which(x>roi[1] & x<roi[2])
       if(ncol(df)< PC){
         stop("PC selected is larger than the dimension of the model")
       }
       cen<--data.frame(model@xSdVn[idx])
-      df<-df[idx,PC]
-      x<-x[idx]
-      m<-abs(df)
-      y<-df*cen
+      df <- df[idx,PC]
+      x <-x [idx]
+      m <- abs(df)
+      y <- df*cen
       names(y)[1]<-"y"
-      col<-(m - min(m))/(max(m) - min(m))
-      df<-data.frame(x = x,y = y,col = col)
+      col <- (m - min(m))/(max(m) - min(m))
+      df <- data.frame(x = x,y = y,col = col)
       raCol = NULL
     }
     if(type=="Statistical reconstruction"){
@@ -119,21 +119,21 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
       }
 
       if(grepl("O",method)){ # for opls use scores
-        df<-data.frame(model@orthoScoreMN)
+        df <- data.frame(model@orthoScoreMN)
       }else{ # for pls use orthogonal
-        df<-data.frame(model@scoreMN)
+        df <- data.frame(model@scoreMN)
       }
-      x<-as.numeric(rownames(-model@loadingMN))
-      idx<-which(x>roi[1] & x<roi[2])
+      x <- as.numeric(rownames(-model@loadingMN))
+      idx <- which(x>roi[1] & x<roi[2])
       if(ncol(df)< PC){
         stop("PC selected is larger than the dimension of the model")
       }
-      df<-df[,PC]
-      x<-x[idx]
+      df <- df[,PC]
+      x <- x[idx]
       cc <- abs(cor(X[,idx],df))
-      cv<-cov(X[,idx],df)
+      cv <- cov(X[,idx],df)
       raCol <- c(0, max(cc))
-      df<-data.frame(x = x,y = cv,col = cc)
+      df <- data.frame(x = x,y = cv,col = cc)
     }
     if(type != "Backscaled" & type !="Statistical reconstruction"){
       stop("Name for the visualization type must be 'Backscaled' or 'Statistical reconstruction'. ")
@@ -144,7 +144,11 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
   }
 
   if(method=="PCA"){
-    p1<-ggplot(df,aes(x = x, y = y,color = col))+geom_line() +
+    p1<-ggplot(df,
+               aes(x = x,
+                   y = y,
+                   color = col)) +
+      geom_line() +
       scale_x_reverse(breaks = breaks_pretty(n = 15)) +
       scale_colour_gradientn(colors = continuousPalette,
                              limits = raCol,
