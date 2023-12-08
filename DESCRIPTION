@@ -29,5 +29,9 @@ Imports:
     testthat
 biocViews:
     ropls
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
 VignetteBuilder: 
     knitr
