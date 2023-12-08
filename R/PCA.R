@@ -17,8 +17,8 @@
 #' @param scale The scaling used.
 #' @param threshold The number of principal components needed to explain the amount of cumulative variance specified (or the default of 99%).
 #' @examples
-#' #data(iris)
-#' #a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
+#' data(iris)
+#' a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
 #' @import stats
 #' @import ggplot2
 #' @export
