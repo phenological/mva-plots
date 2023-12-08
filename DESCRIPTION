@@ -29,3 +29,5 @@ Imports:
     testthat
 biocViews:
     ropls
+VignetteBuilder: 
+    knitr
