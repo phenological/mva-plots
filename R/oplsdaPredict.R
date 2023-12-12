@@ -5,13 +5,13 @@
 #' @param model oplsda model (or ropls built model).
 #' @param newdata Matrix or data frame of the same X variables as the model (O-PLS-DA).
 #' @param optns An empty list for confusion matrix addition.
-#' @param real A parameter for the \code{optns} list. The "real" clasifications for the newdata as a factor. If supplied, a confusion matrix will be calculated.
+#' @param real A parameter for the \code{optns} list. The "real" classifications for the newdata as a factor. If supplied, a confusion matrix will be calculated. Only available for DA.
 #' @returns The prediction model including the predictive scores and orthogonal scores.
 #' @importFrom caret confusionMatrix
 #' @examples
-#' #data(mtcars)
-#' #a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
-#' #b <- oplsdaPredict(model = a, newdata = mtcars[,1:7], optns = list(real = as.factor()))
+#' data(mtcars)
+#' a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
+#' b <- oplsdaPredict(model = a, newdata = mtcars[,1:7], optns = list(real = as.factor()))
 #' @export
 
 oplsdaPredict <- function (model, newdata, optns=list()){
@@ -47,6 +47,20 @@ oplsdaPredict <- function (model, newdata, optns=list()){
 }
 
   }
+
+#if there's no orthogonal component
+  if(!(model@summaryDF[, "ort"] > 0)){
+
+    t_pred <- matrix(NA, nrow = nrow(xteMN), ncol = model@summaryDF[, "pre"])
+
+    #calculate the predictive scores
+    for(noN in 1:model@summaryDF[, "pre"]){
+      t_pred[, noN] <- xteMN %*% model@weightMN[, noN]
+      xtoMN <- NULL
+    }
+  }
+
+
 #use the changed newdata X that only had predictive comp to calculate Y prediction
   if(model@suppLs[["naxL"]]) {
     yTesScaMN <- matrix(0,
@@ -69,6 +83,9 @@ oplsdaPredict <- function (model, newdata, optns=list()){
                     FALSE)
     attr(yTesMN, "scaled:center") <- NULL
     attr(yTesMN, "scaled:scale") <- NULL
+
+
+#if Y is a factor, convert predicted for new data to the same format
 
   if(is.factor(model@suppLs[["y"]])) {
 
@@ -103,9 +120,14 @@ oplsdaPredict <- function (model, newdata, optns=list()){
 
   }
 
+#confusion matrix for DA or multi-class models, A Confusion matrix is an N x N matrix used for evaluating the performance of a classification model, where N is the total number of target classes.
     if("real" %in% names(optns)){
-      conf <- confusionMatrix(data = predMCNFcVcn, reference = optns$real)
-    } else (conf <-list())
+
+      if(is(optns$real)[1] == "factor"| is(optns$real)[1] == "character"){
+        conf <- confusionMatrix(data = as.factor(predMCNFcVcn), reference = as.factor(optns$real))
+      } else{conf <- list()
+             warning("Your Y is not a factor or factorizable character, therefore no confusion matrix is supplied")}
+    } else (conf <- list())
 
 prediction <- list(orthoScoreMN = xtoMN,
                    predScoreMN = t_pred,
@@ -116,7 +138,7 @@ invisible(prediction)
 }
 
 ##confusion matrix
-# caret::confusionMatrix(iris$Species, sample(iris$Species))
+#caret::confusionMatrix(iris$Species, sample(iris$Species))
 # model@suppLs[["yMCN"]]
 # model@suppLs[["yPreMN"]]
 
@@ -131,86 +153,3 @@ invisible(prediction)
 
 
 
-
-
-
-
-
-
-
-# function (opls_model, newdata, idx_scale = NULL)
-# {
-#   if (!"OPLS_metabom8" %in% is(opls_model)) {
-#     stop("Model input does not belong to class OPLS_Torben!")
-#     return(NULL)
-#   }
-#   if (length(unique(opls_model@Y$ori)) != 2) {
-#     stop("Predictions implemented only for regression or 2-class outcomes.")
-#     return(NULL)
-#   }
-#   if (is.null(ncol(newdata))) {
-#     X <- rbind(newdata)
-#   }
-#   else {
-#     X <- newdata
-#   }
-#   if (length(opls_model@X_mean) != ncol(newdata)) {
-#     stop("Newdata argument does not match training data.")
-#   }
-#   if (!is.null(idx_scale)) {
-#     map_scale <- c(none = 0L, UV = 1L)
-#     map_scale[match(opls_model@Parameters$scale, names(map_scale))]
-#     sc_res <- .scaleMatRcpp(X,
-#                             idx_scale - 1,
-#                             center = opls_model@Parameters$center,
-#                             scale_type = map_scale[match(opls_model@Parameters$scale,
-#                                                          names(map_scale))])
-#     X <- sc_res$X_prep
-#   }
-#   else {
-#     if (all(!is.null(opls_model@X_mean) & !is.na(opls_model@X_mean)) &&
-#         all(!is.null(opls_model@X_sd) & !is.na(opls_model@X_sd))) {
-#       Xmc <- sweep(X, 2, opls_model@X_mean, FUN = "-")
-#       X <- sweep(Xmc, 2, opls_model@X_sd, FUN = "/")
-#     }
-#   }
-#   e_new_orth <- X
-#   n_pcOorth = opls_model@nPC - 1
-#   t_orth <- matrix(NA, nrow = nrow(X), ncol = n_pcOorth)
-#   for (i in seq_len(n_pcOorth)) {
-#     t_orth[, i] <- e_new_orth %*% t(t(opls_model@w_orth[i,]))/drop(crossprod(t(t(opls_model@w_orth[i, ]))))
-#     e_new_orth <- e_new_orth - (cbind(t_orth[, i]) %*% t(opls_model@p_orth[i, ]))
-#   }
-#
-#   if ((n_pcOorth) > 1) {
-#     pc.orth <- pca(t_orth, pc = 1, scale = "UV")
-#     t_orth_pca <- pc.orth@t[, 1]
-#   }
-#   else {
-#     t_orth_pca <- NULL
-#   }
-#
-#   t_pred <- e_new_orth %*% (opls_model@w_pred)
-#   betas <- opls_model@betas_pred
-#   q_h <- opls_model@Qpc
-#   res <- matrix(NA, nrow = nrow(X), ncol = ncol(opls_model@t_pred))
-#   for (i in seq_len(ncol(opls_model@t_pred))) {
-#     opts <- t(cbind(betas[i]) %*% t_pred[, i]) %*% rbind(q_h[,
-#                                                              i])
-#     res[, i] <- apply(opts, 1, sum)
-#   }
-#   totalPrediction <- apply(res, 1, sum)
-#   Y_predicted <- (totalPrediction * opls_model@Y_sd) + opls_model@Y_mean
-#   if (opls_model@type == "DA") {
-#     cs <- table(opls_model@Y$ori, opls_model@Y$dummy)
-#     levs <- data.frame(Original = rownames(cs), Numeric = as.numeric(colnames(cs)),
-#                        stringsAsFactors = FALSE, row.names = NULL)
-#     Y_predicted <- levs$Original[apply(vapply(levs$Numeric,
-#                                               function(x, y = Y_predicted) {
-#                                                 abs(x - y)
-#                                               }, Y_predicted), 1, which.min)]
-#   }
-#   out <- list(Y_predicted = Y_predicted, t_pred = t_pred,
-#               t_orth = t_orth, t_orth_pca = t_orth_pca)
-#   return(out)
-# }
