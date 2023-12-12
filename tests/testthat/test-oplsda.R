@@ -22,7 +22,7 @@ test_that("When performing OPLS, if number of levels is not 2, the correct actio
   #if there are less than 2 levels in your Y, it stops
   mtcars$paint <- factor("red")
   expect_error(oplsda(X = mtcars[,1:5], Y = mtcars$paint, type = "OPLS"),
-               "Error: You have less than 2 levels in your Y. OPLS requires exactly 2 levels.")
+               "Error: You have less than 2 levels in your Y. O-PLS requires exactly 2 levels.")
 
   #if there are more than 2 levels in your Y, it stops
   mtcars$paint <- factor(rep(c("red", "green", "blue"), length.out = nrow(mtcars)))
