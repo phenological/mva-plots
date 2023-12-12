@@ -23,6 +23,9 @@ Function that uses ropls::opls model to make predictions on a new data set. Only
 }
 \examples{
 data(mtcars)
-a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
-b <- oplsdaPredict(model = a, newdata = mtcars[,1:7], optns = list(real = as.factor()))
+a <- oplsda(X = mtcars[,1:5], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
+columns_to_jitter <- c("mpg", "cyl", "disp", "hp", "drat")
+exampleData <- mtcars
+exampleData[, columns_to_jitter] <- lapply(exampleData[, columns_to_jitter], function(x) jitter(x, factor = 0.1))
+b <- oplsdaPredict(model = a, newdata = exampleData[,1:5])
 }
