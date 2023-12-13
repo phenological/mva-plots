@@ -9,10 +9,6 @@ rownames(exampleData) <- paste0("subject", 1:nrow(exampleData))
 
 exampleData <- exampleData [,1:9]
 
-oplsdaModel <- oplsda(Y = (exampleData[, "status"]),
-                      X = exampleData[,1:5],
-                      type = "OPLS")
-
 #create a second dataset
 ## Select the first 5 columns
 columns_to_jitter <- c("metab1", "metab2", "metab3", "metab4", "metab5")
