@@ -1,4 +1,4 @@
-source("test_data.R")
+source("~/tests/testthat/test_data.R")
 
 test_that("O-PLS-DA model works with predictions", {
   ###Set up data####
