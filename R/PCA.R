@@ -124,5 +124,5 @@ if (plot == TRUE) {
              threshold = t)
 
   invisible(list(data = data,
-              plots = plots))
+                 plots = plots))
 }
