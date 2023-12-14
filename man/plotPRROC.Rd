@@ -42,9 +42,17 @@ x and y.
 \examples{
 data("mtcars")
 Y<-as.factor(mtcars$vs)  # for DA
-ropls_pls_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "PLS")
-ropls_plsda_model<-ropls::opls(x = mtcars[,1:5], y = Y1, predI = NA, orthoI = 0)
-ropls_pls_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "PLS")
-ropls_oplsda_model<-ropls::opls(x = mtcars[,1:5], y = Y1, predI = 1, orthoI = NA)
-t<-plotPRROC(ropls_oplsda_model, caption = FALSE)
+
+#PLS-DA
+plsda_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "PLS")
+ropls_plsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = NA, orthoI = 0)
+
+#O-PLS-DA
+oplsda_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "OPLS")
+ropls_oplsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = 1, orthoI = NA)
+
+t<-plotPRROC(oplsda_model, caption = FALSE)
+
+#x and y
+plotPRROC(x = oplsda_model@scoreMN[which(Y == 1)], y = oplsda_model@scoreMN[which(Y == 2)])
 }
