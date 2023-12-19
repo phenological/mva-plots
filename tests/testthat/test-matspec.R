@@ -1,3 +1,37 @@
+# #spectra simulation
+#
+# # Function to simulate a Gaussian peak
+# simulate_peak <- function(x, center, sigma, intensity) {
+#   exp(-(x - center)^2 / (2 * sigma^2)) * intensity
+# }
+#
+# # Function to generate example NMR spectrum data
+# generate_example_spectrum <- function() {
+#   # Create a range of chemical shifts (x-axis values)
+#   chemical_shifts <- seq(0, 10, by = 0.1)
+#
+#   # Simulate two peaks
+#   peak1 <- simulate_peak(chemical_shifts, center = 3, sigma = 0.5, intensity = 5)
+#   peak2 <- simulate_peak(chemical_shifts, center = 7, sigma = 0.7, intensity = 8)
+#
+#   # Combine peaks to create the spectrum
+#   spectrum <- peak1 + peak2
+#
+#   # Create a data frame with chemical shifts and intensities
+#   spectrum_data <- data.frame(Chemical_Shift = chemical_shifts, Intensity = spectrum)
+#
+#   return(spectrum_data)
+# }
+#
+# # Generate example spectrum data
+# example_spectrum_data <- generate_example_spectrum()
+#
+# # Plot the example NMR spectrum
+# ggplot(example_spectrum_data, aes(x = Chemical_Shift, y = Intensity)) +
+#   geom_line(color = "blue") +
+#   labs(title = "Example NMR Spectrum", x = "Chemical Shift", y = "Intensity")
+#
+# matspec(X = (example_spectrum_data$Chemical_Shift), ppm = t(example_spectrum_data$Chemical_Shift))
 
 # library(metabom8)
 #
