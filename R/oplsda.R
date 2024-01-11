@@ -65,7 +65,7 @@ oplsda <- function(X, Y, type, optns=list()){
       if(type == "OPLS"){
         #if there are still more than 2 levels
         if(newlevels >2){
-          stop("Error: You have more than 2 levels in your Y. OPLS requires exactly 2 levels.")
+          stop("Error: You have more than 2 levels in your Y. OPLS-DA requires exactly 2 levels.")
         }
 
         #if there are now only two levels, print what the old levels were and what the new levels are
@@ -86,7 +86,7 @@ oplsda <- function(X, Y, type, optns=list()){
 
     #if there are less than 2 levels
     if(levels < 2){
-      stop("Error: You have less than 2 levels in your Y. O-PLS requires exactly 2 levels.")
+      stop("Error: You have less than 2 levels in your Y. PLS-DA requires at least 2 levels.")
     }
   }
 
