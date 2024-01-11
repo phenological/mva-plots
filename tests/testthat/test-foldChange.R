@@ -66,13 +66,13 @@ test_that("can use with dataframe with more than 2 groups",{
 
   # Generate some sample data
   set.seed(123)
-  data <- as.data.frame(matrix(rnorm(200), ncol = 5))
-  data[data < 0] <- abs(data[data < 0])
+  data1 <- as.data.frame(matrix(rnorm(200), ncol = 5))
+  data1[data1 < 0] <- abs(data1[data1 < 0])
 
-  data$fact <- sample(c("control", "treatment", "misc1", "misc2"), 4, replace = FALSE)
+  data1$fact <- sample(c("control", "treatment", "misc1", "misc2"), 4, replace = FALSE)
 
-  model <- data[,1:5]
-  optns<-list(control = "control", factor = data$fact)
+  model <- data1[,1:5]
+  optns<-list(control = "control", factor = data1$fact)
 
   if(is(model)[1] == "data.frame"){
     df <- model
@@ -122,10 +122,10 @@ test_that("can use with dataframe with more than 2 groups",{
 
 
 
-  #log2fcdf<- foldChange(model = data[,1:5], optns = list(factor = data$fact, control = "control"))
+  log2fcdf<- foldChange(model = data1[,1:5], optns=list(control = "control", factor = data1$fact))
 
   #should have 4 columns in result
-  #expect_equal(object = length(log2fcdf), expected = 4)
+  expect_equal(object = length(log2fc_df), expected = 4)
 
 
 })
