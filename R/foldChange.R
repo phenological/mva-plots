@@ -19,8 +19,7 @@ foldChange <- function(model = model, optns = optns){
 
   if(is(model)[1] == "data.frame"){
     df <- model
-    data$fact <- as.factor(data$fact)
-    df$factor <- as.numeric(relevel(data$fact, ref = optns$control))
+    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
     # Initialize an empty data frame to store log2fc values
     log2fc_df <- data.frame(matrix(NA, nrow = ncol(model), ncol = 1))
   }
