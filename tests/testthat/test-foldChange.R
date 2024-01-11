@@ -11,10 +11,6 @@ test_that("foldChange calculates log2 fold change correctly for PCA", {
   result <- PCA(data[,1:5], optns = list(factor = data$fact))
   log2fclist <- foldChange(model = result, optns = list(factor = data$fact))
 
-  # Do oplsda for opls option
-  result2<- oplsda(X = mtcars[,1:5], Y = mtcars$vs, type = "OPLS")
-  log2fcopls <-foldChange(model = result2, optns = list(factor = mtcars$vs))
-
   #manual calc
   result$data$rawData$factor <- as.numeric(as.factor(data$fact))
   df <- result$data$rawData
