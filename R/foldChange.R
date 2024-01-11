@@ -50,13 +50,19 @@ foldChange <- function(model = model, optns = optns){
 
   #track the variable to the assigned factor, use optns$factor and df$factor to make the list
 
-  # Create a mapping between numbers and words
+  # Create a mapping between numbers and words, rename log2fc dataframe columns
   mapping <- setNames(unique(optns$factor), unique(df$factor))
 
-  test<- as.data.frame(mapping)
+  testnames<- as.data.frame(mapping)
+  testnames$rowName <- rownames(testnames)
 
-  colnames(log2fc_df)<- test[[1]]
+  for (i in seq_len(nrow(testnames))) {
+    col_number <- as.numeric(testnames[i, 2])
+    new_col_name <- as.character(testnames[i, 1])
+    names(log2fc_df)[col_number] <- new_col_name
+  }
 
+#if only 2 factors, just need the second column, since first is all NA (control to control)
   if(length(unique_factors) == 2){
     log2fc_df <- as.data.frame(log2fc_df[,2])
   }

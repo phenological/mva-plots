@@ -70,6 +70,17 @@ test_that("can use with dataframe with more than 2 groups",{
   data1[data1 < 0] <- abs(data1[data1 < 0])
 
   data1$fact <- sample(c("control", "treatment", "misc1", "misc2"), 4, replace = FALSE)
+  original<- foldChange(model = data1[,1:5], optns=list(control = "control", factor = data1$fact))
+
+  data2 <- rbind(data1[which(data1$fact == "control"),], data1[which(data1$fact == "treatment"),])
+  test<- foldChange(model = data2[,1:5], optns=list(control = "control", factor = data2$fact))
+
+  #is the first column control
+  expect_equal(object = colnames(original)[1], expected = "control")
+
+
+  #is the foldchange for treatment the same when there is all 4 factors and when there is just controla nd treatment
+  expect_equal(object = as.numeric(original[,"treatment"]), expected = as.numeric(unlist(test)))
 
   log2fcdf<- foldChange(model = data1[,1:5], optns=list(control = "control", factor = data1$fact))
 
