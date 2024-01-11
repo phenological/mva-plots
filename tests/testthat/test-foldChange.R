@@ -75,7 +75,7 @@ test_that("can use with dataframe with more than 2 groups",{
 
   data$fact <- sample(c("control", "treatment", "misc1", "misc2"), 4, replace = FALSE)
 
-  log2fcdf<- foldChange(model = result2, optns = list(factor = data$fact, control = "control"))
+  log2fcdf<- foldChange(model = data[,1:5], optns = list(factor = data$fact, control = "control"))
 
   #should have 4 columns in result
   expect_equal(object = length(log2fcdf), expected = 4)
@@ -153,3 +153,4 @@ test_that("can use with dataframe with more than 2 groups",{
   # foldChange(model = result2, optns = list(factor = data$fact, control = "control"))
 
 })
+
