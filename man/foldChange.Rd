@@ -4,7 +4,7 @@
 \alias{foldChange}
 \title{Fold Change}
 \usage{
-foldChange(model, optns = optns)
+foldChange(model = model, optns = optns)
 }
 \description{
 Fold Change
