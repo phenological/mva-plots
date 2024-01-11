@@ -24,7 +24,7 @@ foldChange <- function(model = model, optns = optns){
   }
 
   # logmean for control
-  idx<- which(df[,"factor"] == 1)
+  idx<- which(df$factor == 1)
   control <- df[idx,]
   c <- log2(apply(X = control, MARGIN = 2, FUN = mean))
 
