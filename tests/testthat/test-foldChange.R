@@ -78,8 +78,7 @@ test_that("can use with dataframe with more than 2 groups",{
   #is the first column control
   expect_equal(object = colnames(original)[1], expected = "control")
 
-
-  #is the foldchange for treatment the same when there is all 4 factors and when there is just controla nd treatment
+  #is the foldchange for treatment the same when there is all 4 factors and when there is just control and treatment
   expect_equal(object = as.numeric(original[,"treatment"]), expected = as.numeric(unlist(test)))
 
   log2fcdf<- foldChange(model = data1[,1:5], optns=list(control = "control", factor = data1$fact))
