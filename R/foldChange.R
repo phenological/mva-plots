@@ -1,5 +1,4 @@
 #' Fold Change
-#'
 
 foldChange <- function(model = model, optns = optns){
 
