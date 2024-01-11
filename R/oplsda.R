@@ -86,7 +86,7 @@ oplsda <- function(X, Y, type, optns=list()){
 
     #if there are less than 2 levels
     if(levels < 2){
-      stop("Error: You have less than 2 levels in your Y. PLS-DA requires at least 2 levels.")
+      stop("Error: You have less than 2 levels in your Y. DA requires at least 2 levels.")
     }
   }
 
