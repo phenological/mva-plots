@@ -58,8 +58,10 @@ cliffsDelta <- function(model, optns = optns) {
     }
 
     #if rescale is required
-    n <- table(df[,"factor"])[1]
-    m <- table(df[,"factor"])[j]
+    n <- length(which(df[,"factor"]==1))
+    m <- length(which(df[,"factor"]==j))
+    # n <- table(df[,"factor"])[1]
+    # m <- table(df[,"factor"])[j]
     rescale.factor = (n*m-1)/(n*m)
 
 
