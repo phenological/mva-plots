@@ -122,3 +122,5 @@ cliffDf<- cliffsDelta(model = data1[,1:5], optns=list(control = "control", facto
 expect_equal(object = length(cliffDf), expected = 4)
 
 })
+
+
