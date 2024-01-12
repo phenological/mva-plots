@@ -38,7 +38,16 @@ test_that("cliffDelta calculates correctly for opls", {
 
   # Do oplsda for opls option
   result2<- oplsda(X = mtcars[,1:5], Y = mtcars$vs, type = "OPLS")
-  cdopls <-cliffsDelta(model = result2, optns = list(factor = mtcars$vs))
+  cdopls <-cliffsDelta(model = result2, optns = list(factor = mtcars$vs, control = 0))
+
+  model = result2
+  optns = list(factor = mtcars$vs, control = 0)
+  if(is(model)[1] == "opls"){
+    df <- as.data.frame(model@suppLs[["x"]])
+    df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+    cd_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
+  }
+
 
   #manual calc
   model <- result2
