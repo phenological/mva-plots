@@ -62,17 +62,29 @@ cliffsDelta <- function(model, optns = optns) {
     m <- table(df[,"factor"])[j]
     rescale.factor = (n*m-1)/(n*m)
 
-    for(i in 1:(ncol(df)-1)){
-      ifelse(test = abs(cd[[i]]) == 1,
-             yes = cd[[i]]*rescale.factor,
-             no = cd)
+
+    for (i in 1:(ncol(df) - 1)) {
+      cd[[i]] <- ifelse(abs(cd[[i]]) == 1,
+                        cd[[i]] * rescale.factor,
+                        cd[[i]])
     }
-    unlist(cd)
-    cd<-as.vector(t(as.data.frame(cd)))
 
     # Assign the log2fc as a column in the data frame
     col_name <- paste0("cd", j)
-    cd_df[, col_name] <- cd
+    cd_df[, col_name] <- unlist(cd)
+
+    #
+    # for(i in 1:(ncol(df)-1)){
+    #   ifelse(test = (abs(cd[[i]]) == 1),
+    #          yes = cd[[i]]*rescale.factor,
+    #          no = cd)
+    # }
+    # unlist(cd)
+    # cd<-as.vector(t(as.data.frame(cd)))
+
+    # # Assign the log2fc as a column in the data frame
+    # col_name <- paste0("cd", j)
+    # cd_df[, col_name] <- cd
 
   }
 
