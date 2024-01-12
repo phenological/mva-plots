@@ -10,13 +10,13 @@ cliffsDelta <- function(model, optns = optns) {
 
   if(is(model)[1] == "opls"){
     df <- as.data.frame(model@suppLs[["x"]])
-    df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+    df[,"factor"] <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
     cd_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
   }
 
   if(is(model)[1] == "data.frame"){
     df <- model
-    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
+    df[,"factor"] <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
     # Initialize an empty data frame to store cd values
     cd_df <- data.frame(matrix(NA, nrow = ncol(model), ncol = 1))
   }
@@ -33,7 +33,7 @@ cliffsDelta <- function(model, optns = optns) {
 
 
   # Dynamically assigning factors for one to one calculations
-  unique_factors <- unique(df$factor)
+  unique_factors <- unique(df[,"factor"])
 
   for(j in 2:length(unique_factors)){
 
@@ -58,8 +58,8 @@ cliffsDelta <- function(model, optns = optns) {
     }
 
     #if rescale is required
-    n <- table(df$factor)[1]
-    m <- table(df$factor)[j]
+    n <- table(df[,"factor"])[1]
+    m <- table(df[,"factor"])[j]
     rescale.factor = (n*m-1)/(n*m)
 
     for(i in 1:(ncol(df)-1)){
@@ -77,7 +77,7 @@ cliffsDelta <- function(model, optns = optns) {
   }
 
   # Create a mapping between numbers and words, rename cd dataframe columns
-  mapping <- setNames(unique(optns$factor), unique(df$factor))
+  mapping <- setNames(unique(optns$factor), unique(df[,"factor"]))
 
   testnames<- as.data.frame(mapping)
   testnames$rowName <- rownames(testnames)
