@@ -94,7 +94,7 @@ test_that("cliffDelta calculates correctly for opls", {
   expected_cd<-as.vector(t(as.data.frame(cd)))
 
   # Check if the calculated cd matches the expected values
-  expect_identical(cdopls[,1], expected_cd)
+  expect_identical(as.numeric(cdopls[,1]), expected_cd)
 
 })
 
@@ -116,9 +116,9 @@ expect_equal(object = colnames(original)[1], expected = "control")
 #is the cliff's delta for treatment the same when there is all 4 factors and when there is just control and treatment
 expect_equal(object = as.numeric(original[,"treatment"]), expected = as.numeric(unlist(test)))
 
-cd_df<- cliffsDelta(model = data1[,1:5], optns=list(control = "control", factor = data1$fact))
+cliffDf<- cliffsDelta(model = data1[,1:5], optns=list(control = "control", factor = data1$fact))
 
 #should have 4 columns in result
-expect_equal(object = length(cd_df), expected = 4)
+expect_equal(object = length(cliffDf), expected = 4)
 
 })
