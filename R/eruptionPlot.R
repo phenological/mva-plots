@@ -31,6 +31,12 @@
 
 eruptionPlot <- function(model, optns = list()){
 
+  if (!"control" %in% names(optns)) {
+    optns$control <- 1
+    #print warning
+    warning(paste0("No control specified in optns for factor. The first entry was set as the control"))
+  }
+
   if("plotTitle" %in% names(optns)){
     plotTitle = optns$plotTitle
   }else{
@@ -71,19 +77,32 @@ eruptionPlot <- function(model, optns = list()){
     PC <- 1
   }
 
-  if(is(model)[1]== "list"){
+  if(is(model)[1] == "list"){
     id <- as.data.frame(colnames(model$data$rawData))
-    model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
     df <- model$data$rawData
+    df[,"factor"] <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
+    #stop if more than 2 levels in df[,"factor"]
+
+    # model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
+    # df <- model$data$rawData
     pcLoadings<-as.data.frame(abs(model$data$loadings[,PC]))
 
   }
 
-  if(is(model)[1]=="opls"){
+  if(is(model)[1] == "opls"){
     id <- as.data.frame(colnames(as.data.frame(model@suppLs[["x"]])))
     df <- as.data.frame(model@suppLs[["x"]])
-    df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+    df[,"factor"] <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
+
+    #stop if more than 2 levels in df[,"factor"]
+
+    # df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
     pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]))
+  }
+
+  #stop if there are more than 2 groups in factor
+  if(length(unique(df[,"factor"])) > 2){
+    stop("Error: You have more than 2 levels in your factor")
   }
 
   #ensure "factor" isn't included in id

@@ -9,13 +9,28 @@ test_that("PCA produced model is handled appropriately", {
 
   #list object
   a <- PCA(data=data[,1:5])
-  p <- eruptionPlot(model = a,
-                    optns = list(factor=data[,"sex"],
-                                 method = "none",
-                                 color = "pval"))
+
+  #expect stop and error if more than 2 groups
+  expect_error(object = suppressWarnings(eruptionPlot(model = a,
+                                                      optns = list(factor=data[,"age"],
+                                                                   method = "none",
+                                                                   color = "pval"))),
+               regexp = "Error: You have more than 2 levels in your factor")
+
+  #expect warning when control not specified
+  expect_warning(object = eruptionPlot(model = a,
+                                      optns = list(factor=data[,"sex"],
+                                       method = "none",
+                                       color = "pval")),
+                 "No control specified in optns for factor. The first entry was set as the control")
+
+  p <-suppressWarnings(eruptionPlot(model = a,
+                                    optns = list(factor=data[,"sex"],
+                                                 method = "fdr",
+                                                 color = "loadings")))
 
   #correct class
-  expect_s3_class(object= p[["plots"]][["eruptionPlot"]], class = "egg")
+  expect_s3_class(object= p[["plots"]][["eruptionPlot"]], class = "gg")
   expect_equal(length(p), 2)
   expect_equal(length(p[["plots"]]), 4)
 })
@@ -26,7 +41,7 @@ test_that("oplsda produced model is handled appropriately", {
   a <- oplsda(X=mtcars[,1:5], Y = mtcars$vs, type = "OPLS")
 
   #eruption
-  p <- eruptionPlot(model = a, optns = list(factor=mtcars[,"vs"]))
+  p <- suppressWarnings(eruptionPlot(model = a, optns = list(factor=mtcars[,"vs"])))
 
   #is eruptionData appended
   expect_true("eruptionData" %in% names(p@suppLs),
