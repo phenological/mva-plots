@@ -1,6 +1,6 @@
 Package: mva.plots
 Title: Add visualisation capabilities to multivariate analysis
-Version: 0.0.5
+Version: 0.0.6
 Authors@R: 
     person("Lucy", "Grigoroff", , "Lucy.Grigoroff@murdoch.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "o"))
@@ -35,3 +35,6 @@ Suggests:
     testthat
 VignetteBuilder: 
     knitr
+Depends: 
+    R (>= 2.10)
+LazyData: true
