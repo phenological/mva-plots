@@ -1,4 +1,9 @@
 #' Fold Change
+#'
+#' @param model A PCA or oplsda object from mva.plots or a data frame passed to
+#' this function.
+#' @param optns A list passed to foldChange with additional arguments.
+
 
 foldChange <- function(model = model, optns = optns){
 

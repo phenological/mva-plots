@@ -6,6 +6,9 @@
 \usage{
 symmetric_limits(x)
 }
+\arguments{
+\item{x}{x coordinates.}
+}
 \description{
 replaces the need for ggpmisc package
 }

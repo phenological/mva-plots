@@ -7,33 +7,57 @@
 PCA(data, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns = list())
 }
 \arguments{
-\item{data}{A data frame or matrix of the numeric values for the principal component calculation.}
+\item{data}{A data frame or matrix of the numeric values for the principal
+component calculation.}
 
 \item{center}{The centering used.}
 
-\item{plot}{To stop the generation of summary plots, set to FALSE. Default is TRUE.}
+\item{scale.}{A logical value indicating whether the variables should be
+scaled to have unit variance before the analysis takes place. The default is
+TRUE. Alternatively, a vector of length equal the number of columns of
+\code{data} can be supplied.}
 
-\item{cutoff}{A parameter for the \code{optns} list. The maximum percentage of cumulative variance you wish to explain. The default is 99\%. for example, optns=list(cutoff= 90) to set a 90\% cutoff. Set rank. = NULL if using this.}
+\item{rank}{The number of components calculated. Default is 5.}
 
-\item{results}{A list with class prcomp, for details of this list see the prcomp documentation.}
+\item{plot}{To stop the generation of summary plots, set to FALSE. Default
+is TRUE.}
 
-\item{pcSum}{A data frame of the summary information (Standard deviation, Proportion of Variance and Cumulative Proportion) for the principal component calculation.}
+\item{optns}{An empty list for additional modelling options.}
 
-\item{scores}{The scores. The value of the rotated data (which has been centered and scaled) data multiplied by the loadings matrix. The cov(scores) is the diagonal matrix diag(sdev^2). For the formula method, napredict() is applied to handle the treatment of values omitted by the na.action.}
+\item{cutoff}{A parameter for the \code{optns} list. The maximum percentage
+of cumulative variance you wish to explain. The default is 99\%. for example,
+optns=list(cutoff= 90) to set a 90\% cutoff. Set rank. = NULL if using this.}
 
-\item{loadings}{Variable loadings (i.e., a matrix whose columns contain the eigenvectors).}
+\item{results}{A list with class prcomp, for details of this list see the
+prcomp documentation.}
 
-\item{sdev}{The standard deviations of the principal components (i.e., the square roots of the eigenvalues of the covariance/correlation matrix, though the calculation is actually done with the singular values of the data matrix).}
+\item{pcSum}{A data frame of the summary information (Standard deviation,
+Proportion of Variance and Cumulative Proportion) for the principal component
+calculation.}
+
+\item{scores}{The scores. The value of the rotated data (which has been
+centered and scaled) data multiplied by the loadings matrix. The cov(scores)
+is the diagonal matrix diag(sdev^2). For the formula method, napredict() is
+applied to handle the treatment of values omitted by the na.action.}
+
+\item{loadings}{Variable loadings (i.e., a matrix whose columns contain the
+eigenvectors).}
+
+\item{sdev}{The standard deviations of the principal components (i.e., the
+square roots of the eigenvalues of the covariance/correlation matrix, though
+the calculation is actually done with the singular values of the data matrix).}
 
 \item{scale}{The scaling used.}
 
-\item{threshold}{The number of principal components needed to explain the amount of cumulative variance specified (or the default of 99\%).}
+\item{threshold}{The number of principal components needed to explain the
+amount of cumulative variance specified (or the default of 99\%).}
 }
 \value{
 A list of objects used in further calculations.
 }
 \description{
-The prcomp function is applied and uses the singular value decomposition (SVD) method. The maximum number of principal components calculated is 8.
+The prcomp function is applied and uses the singular value decomposition
+(SVD) method. The maximum number of principal components calculated is 8.
 }
 \examples{
 data(iris)

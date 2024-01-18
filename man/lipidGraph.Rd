@@ -7,13 +7,15 @@
 lipidGraph(model, stat = "fc", optns = list())
 }
 \arguments{
-\item{model}{A model from PCA or oplsda function, or a dataframe of lipids.}
+\item{model}{A model from PCA or oplsda function, or a data frame of lipids.}
 
 \item{stat}{The statistic you would like to use. Either log2 fold change "fc",
 Cliff's Delta "cd", correlation "corr" or "external". "fc" and "cd" are
 calculated automatically. "external" is an externally supplied statistic that
 can be, for example, a p-value from lmm and needs to be provided in the
 \code{optns}.}
+
+\item{optns}{An empty list for additional options.}
 
 \item{external}{If stat is set to external, set this parameter in the
 \code{optns} list. Must be the same as the number of lipids.}
@@ -65,5 +67,4 @@ optns = list(factor = (lipidMetadata$Class),
 # View the graph
 print(graph)
 }
-
 }

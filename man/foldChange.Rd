@@ -6,6 +6,12 @@
 \usage{
 foldChange(model = model, optns = optns)
 }
+\arguments{
+\item{model}{A PCA or oplsda object from mva.plots or a data frame passed to
+this function.}
+
+\item{optns}{A list passed to foldChange with additional arguments.}
+}
 \description{
 Fold Change
 }

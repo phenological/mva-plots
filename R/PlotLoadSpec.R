@@ -18,6 +18,7 @@
 #' @param X spectral data matrix used for the model.
 #'        This is needed for PCA with prcomp package, or
 #'        (O)PLS with type = "Statistical reconstruction".
+#' @param optns An empty list for additional options.
 #' @return plot of the loadings
 #' @import scales
 #' @import methods
@@ -37,7 +38,7 @@
 #' #PlotLoadSpec(model = prcomp_pca_model)
 #' @export
 
-PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NULL,option = list()){
+PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X = NULL, optns = list()){
 
   continuousPalette<- c(
                         "#0000CC",

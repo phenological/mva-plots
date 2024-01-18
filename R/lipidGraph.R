@@ -9,7 +9,8 @@
 #' \code{optns}.
 #' @param external If stat is set to external, set this parameter in the
 #' \code{optns} list. Must be the same as the number of lipids.
-#' @param model A model from PCA or oplsda function, or a dataframe of lipids.
+#' @param model A model from PCA or oplsda function, or a data frame of lipids.
+#' @param optns An empty list for additional options.
 #' @param color A parameter for the \code{optns} list. Color palette for discrete
 #' values, you can assign colors to specific factors, example:
 #' discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply
@@ -33,8 +34,6 @@
 #' @param control A parameter for the \code{optns} list to set which group with
 #' the supplied factor you wish to set as the control for comparison to all
 #' other groups.
-#' @import stats
-#' @import ggplot2
 #' @examples
 #' \dontrun{
 #' # Load lipid data and metadata
@@ -49,9 +48,9 @@
 #' # View the graph
 #' print(graph)
 #' }
-#'
-
-
+#' @import stats
+#' @import ggplot2
+#' @export
 
 lipidGraph <- function(model, stat = "fc", optns = list()){
 

@@ -6,6 +6,7 @@
 #' @param ppm must be numeric and same length as the number of column in X
 #' @param roi region of interest if not defined default is set as c(0.0 , 9.5)
 #' @param interactive default is True which allow you to zoom in and select which spectra to show
+#' @param ... extra arguments.
 #' @return Interactive/non-interactive spectra plot
 #' @importFrom plotly plot_ly add_lines layout
 #' @importFrom reshape2 melt

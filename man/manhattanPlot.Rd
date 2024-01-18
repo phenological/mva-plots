@@ -45,7 +45,15 @@ If it is TRUE then threshold value is automatically log scaled.}
 \item{threshold}{numeric, add horizontal dash line to the plot. If
 log_scaling = TRUE then threshold value is automatically log scaled.}
 
+\item{xlab}{The x-axis title.}
+
+\item{ylab}{The y-axis title.}
+
+\item{main_title}{A character argument for the title of the plot.}
+
 \item{interactive}{Boolean, to make the plot interactive. default is FALSE.}
+
+\item{optns}{An empty list for additional options.}
 }
 \value{
 a ggplot2 object.

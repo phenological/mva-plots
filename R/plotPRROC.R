@@ -17,6 +17,7 @@
 #' @param caption Boolean for AU ROC and AUC PR. If TRUE, they appear in the
 #' center of the graph, if FALSE they appear as a caption at the botom of the
 #' graph.
+#' @param PC A concatenation of the principal components to use, default is c(1, 2)
 #' @return PRROC_plot
 #' @import PRROC
 #' @examples

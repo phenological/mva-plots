@@ -1,4 +1,8 @@
 #' Cliff's Delta
+#'
+#' @param model A PCA or oplsda object from mva.plots or a data frame passed to
+#' this function.
+#' @param optns A list passed to cliffsDelta with additional arguments.
 
 cliffsDelta <- function(model, optns = optns) {
 

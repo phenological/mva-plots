@@ -14,6 +14,8 @@ matspec(X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
 \item{roi}{region of interest if not defined default is set as c(0.0 , 9.5)}
 
 \item{interactive}{default is True which allow you to zoom in and select which spectra to show}
+
+\item{...}{extra arguments.}
 }
 \value{
 Interactive/non-interactive spectra plot

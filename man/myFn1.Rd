@@ -6,6 +6,13 @@
 \usage{
 myFn1(data, mapping, method = "stat_ellipse")
 }
+\arguments{
+\item{data}{The data used to plot.}
+
+\item{mapping}{mapping for ggplot.}
+
+\item{method}{the stat_ellipse method for plotting.}
+}
 \description{
 Shell function for scatter plot of plotscores with ellipses for the pcaGrid function. Any aesthetic parameters are included in the pcaGrid function.
 }

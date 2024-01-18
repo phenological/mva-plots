@@ -10,7 +10,7 @@ PlotLoadSpec(
   roi = c(0.5, 9.5),
   type = "Backscaled",
   X = NULL,
-  option = list()
+  optns = list()
 )
 }
 \arguments{
@@ -34,6 +34,8 @@ but for PLS and OPLS "Backscaling" method is recommended.}
 \item{X}{spectral data matrix used for the model.
 This is needed for PCA with prcomp package, or
 (O)PLS with type = "Statistical reconstruction".}
+
+\item{optns}{An empty list for additional options.}
 }
 \value{
 plot of the loadings
