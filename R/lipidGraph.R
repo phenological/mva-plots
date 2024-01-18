@@ -10,7 +10,23 @@
 #' @param external If stat is set to external, set this parameter in the
 #' \code{optns} list. Must be the same as the number of lipids.
 #' @param model A model from PCA or oplsda function, or a dataframe of lipids.
-#' @param color
+#' @param color A parameter for the \code{optns} list. Color palette for discrete
+#' values, you can assign colors to specific factors, example:
+#' discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply
+#' a concatenated list, example (and the default): discretePalette =
+#' c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE",
+#'  "#4393C3", "#2166AC"). Hexadecimal or color names accepted.
+#' @param shape A parameter for the \code{optns} list. A character of the shape
+#' desired. Default shape is "circle".
+#' @param alpha A parameter for the \code{optns} list. A numeric of the alpha
+#' desired. Default size is 0.3.
+#' @param theme A parameter for the \code{optns} list. Personalize the plot
+#' theme you would like applied as you would using theme() in ggplot. Example:
+#' theme = theme(legend.position = "left", text=element_text(size=5)).
+#' @param guides A parameter for the \code{optns} list. Personalize the plot
+#' legend/guide how you would like applied as you would using guides() in
+#' ggplot. Example: guides = guides(color = guide_legend(title = "Color Legend"),
+#' size = "none")
 #' @param factor A parameter for the \code{optns} list. An object the same
 #' length as the data in the model supplied that must have at least 2 unique
 #' groups such as treatment and control. More than 2 is allowable.
@@ -19,6 +35,23 @@
 #' other groups.
 #' @import stats
 #' @import ggplot2
+#' @examples
+#' \dontrun{
+#' # Load lipid data and metadata
+#' lipid_data <- readRDS(system.file("extdata", "lipidData.rds", package = "mva.plots"))
+#' lipid_metadata <- readRDS(system.file("extdata", "lipidMetadata.rds", package = "mva.plots"))
+#'
+#' # Generate a lipid graph
+#' lg<- lipidGraph(model = lipidData,
+#' stat = "cd",
+#' optns = list(factor = (lipidMetadata$Class),
+#'             control = "MISC"))
+#' # View the graph
+#' print(graph)
+#' }
+#'
+
+
 
 lipidGraph <- function(model, stat = "fc", optns = list()){
 
@@ -97,7 +130,27 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
                                "#FFD92F",
                                "#E5C494",
                                "#B3B3B3")
+
   }
+
+  #shape
+  if(!("shape" %in% names(optns))){
+    optns$shape = "circle"}
+
+  #alpha
+  if(!("alpha" %in% names(optns))){
+    optns$alpha = 0.3}
+
+  #theme
+  if(!("theme" %in% names(optns))){
+    theme <- theme()
+  } else{theme <- optns$theme}
+
+  #guides
+  if(!("guides" %in% names(optns))){
+    guides <- guides(color = guide_legend(title = "Group"),
+                     size = guide_legend(title = stat))
+  } else{guides <- optns$guides}
 
 ########cliffs delta##########
 
@@ -191,8 +244,6 @@ if(stat == "fc"){
 #########lipid data frame############
 
 #make class and sc info
-  # id<- colnames(expV[,182:ncol(expV)])
-  # id <- colnames(model)
   lipids <- id
   lmc <- strsplit(lipids, "\\(")
   lmc <- rapply(lmc, function(x) c(x[1], gsub("\\)", "", x[2])), how = "replace")
@@ -252,6 +303,10 @@ if("columns_to_plot" %in% names(optns)){
   columns_to_plot <- optns$columns_to_plot
 } else{columns_to_plot <- colnames(ld)[2:(which(colnames(ld) == "id") - 1)]}
 
+if(length(columns_to_plot) > length(optns$discretePalette)) {
+  warning("You have more groups to plot than colors supplied, the default is 8 colors. Please supply the same or more number of colors as number of groups to plot.")
+}
+
   # Filter the data frame to include only the relevant columns
   plot_data <- ld[, c("class", "sc1", "id",columns_to_plot)]
 
@@ -273,14 +328,18 @@ if("columns_to_plot" %in% names(optns)){
                 geom_jitter(aes(size = abs(Value)),
                             position = position_jitter(height = 0.1,
                                                        width = 0.3),
-                            alpha = 0.3) +
+                            alpha = optns$alpha,
+                            shape = optns$shape) +
                 xlab("Lipid Class") +
                 ylab("Side-Chain Length") +
                 theme_bw() +
                 theme(panel.grid.major = element_line(color = "gray95"),
-                      panel.grid.minor = element_blank(),
-                      legend.position = "none") +
-                scale_color_manual(values = rainbow(length(columns_to_plot)))
+                      panel.grid.minor = element_blank()
+                      ) +
+                scale_color_manual(values  = optns$discretePalette,
+                                   na.value = "grey50" ) +
+    theme +
+    guides
 
 
 return(lipidGraph)
