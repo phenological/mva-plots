@@ -4,33 +4,35 @@
 #'
 #' @param model A PCA or oplsda object.
 #' @param optns An empty list for additional options.
-#' @param factor A parameter for the \code{optns} list used when supplying a PCA
-#' object. An object the same length as the data used to build the PCA model
-#' that must be a two factor variable such as treatment and control.
-#' @param plotTitle A parameter for the \code{optns} list. A character for the
-#' title of the plot. Default is "Eruption Plot".
-#' @param method A parameter for the \code{optns} list. Determines the method to
-#' adjust p-values by. The options the same as listed in stats::p.adjust
-#' ("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none").
-#' The default is "bonferroni".
-#' @param PC A parameter for the \code{optns} list when supplying a PCA object.
-#' A numeric for which principal component to use for the loadings (for the plot
-#' y-axis) and scores (if correlation is chosen for \code{colourCoding}).
-#' @param color A parameter for the \code{optns} list. Color coding for the
-#' eruption plot, choose from the adjusted and re-scaled p-value "pval",
-#' correlation "corr", log2 fold change "fc" or cliff's delta "cd". The default
-#' is the correlation.
-#' @param continuousPalette A parameter for the \code{optns} list. Color palette
-#' for continuous values, use hexadecimal values (example and default:
-#' continuousPalette =c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF",
-#' "#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00",
-#' "#FF5500","#FF0000","#CC0000")),
-#' grDevices names (example: continousPalette = rainbow(4)) or
-#' color names (example : continuousPalette =c("purple", "orange")).
-#' @param x A parameter for the \code{optns} list. Choose your x-axis using the
-#' same options stated for color. The default is cliff's delta.
-#' @param y A parameter for the \code{optns} list. Choose your y-axis using the
-#' same options stated for color. The default is loadings.
+#' @param optns A list for additional options:
+#'   \itemize{
+  #'     \item{factor}{used when supplying a PCA object. An object the same
+  #'     length as the data used to build the PCA model that must be a two
+  #'     factor variable such as treatment and control.}
+  #'     \item{color}{Color coding for the eruption plot, choose from the
+  #'     adjusted and re-scaled p-value "pval", correlation "corr", log2 fold
+  #'     change "fc" or cliff's delta "cd". The default is the correlation.}
+  #'     \item{plotTitle}{A string specifying the plot title.Default is
+  #'     "Eruption Plot".}
+  #'     \item{method}{A string specifying the method parameter. Determines the
+  #'     method to adjust p-values by. The options the same as listed in
+  #'     stats::p.adjust ("holm", "hochberg", "hommel", "bonferroni", "BH",
+  #'     "BY","fdr", "none"). The default is "bonferroni".}
+  #'     \item{PC}{for a PCA object. A numeric for which principal component to
+  #'     use for the loadings (for the plot y-axis) and scores (if correlation
+  #'     is chosen for \code{colourCoding}).}
+  #'     \item{continuousPalette}{Color palette
+  #'     for continuous values, use hexadecimal values (example and default:
+  #'      continuousPalette = c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF",
+  #'      "#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00",
+  #'      "#FF5500","#FF0000","#CC0000")),
+  #'      grDevices names (example: continousPalette = rainbow(4)) or
+  #'      color names (example : continuousPalette =c("purple", "orange")).}
+  #'      \item{x}{Choose your x-axis using the same options stated for color.
+  #'      The default is cliff's delta.}
+  #'      \item{y}{Choose your y-axis using the same options stated for color.
+  #'      The default is loadings.}
+  #'   }
 #' @return The eruption plot is printed and the model is appended with the
 #' eruption data (cliffs Delta, p-value, correlation, loadings). For ropls
 #' object, eruptionData is found in suppLs.

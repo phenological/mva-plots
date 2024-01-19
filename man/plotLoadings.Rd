@@ -9,13 +9,15 @@ plotLoadings(model, optns = list())
 \arguments{
 \item{model}{A PCA, oplsda or ropls object.}
 
-\item{optns}{An empty list for aesthetic options.}
-
-\item{plotTitle}{A parameter for the optns list. A character for the title of the grid.}
-
-\item{theme}{A parameter for the \code{optns} list. Personalize the plot theme you would like applied as you would using theme() in ggplot. Example set theme = theme(legend.position = "left", text=element_text(size=5)) in optns.}
-
-\item{thresh}{A parameter for the optns list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.}
+\item{optns}{An empty list for addtional options:
+\itemize{
+\item{plotTitle}{A character for the title of the grid.}
+\item{theme}{Personalize the plot theme you would like applied as you
+would using theme() in ggplot. Example set
+theme = theme(legend.position = "left", text=element_text(size=5)) in optns.}
+\item{thresh}{A numeric for the number of PCAs to display in the grid.
+The default is calculated in the PCA function.}
+}}
 }
 \value{
 The model list appended with the grid of loadings under plots.

@@ -3,21 +3,19 @@
 #' Permutation plot for oplsda (ropls) models.
 #'
 #' @param model An oplsda (ropls) model.
-#' @param optns An empty list for aesthetic options.
-#' @param plotTitle A parameter for the \code{optns} list. A character for the
-#' title of the plot.
-#' @param colorQ A parameter for the \code{optns} list. A character of the color
-#' for Q2 (example "pink" or "#FF5500"). Default color is "red".
-#' @param colorR A parameter for the \code{optns} list. A character of the color
-#' for R2Y (example "blue" or "#FF5500"). Default color is "blue".
-#' @param shape A parameter for the \code{optns} list. A character (example
-#' "circle") or the number (example 21) of the shape desired . Default shape is
-#' "circle".
-#' @param size A parameter for the \code{optns} list. A numeric of the size
-#' desired. Default size is 3.
-#' @param alpha A parameter for the \code{optns} list. A numeric of the alpha
-#' desired for the permuted results. Default size is 0.4, actual values are
-#' always opaque.
+#' @param optns An empty list for additional options.
+#'    \itemize{
+#'      \item{plotTitle}{A character for the title of the plot.}
+#'      \item{colorQ}{A character of the color for Q2 (example "pink" or "#FF5500").
+#'      Default color is "red".}
+#'      \item{colorR}{A character of the color for R2Y (example "blue" or "#FF5500").
+#'      Default color is "blue".}
+#'      \item{shape}{A character (example "circle") or the number (example 21)
+#'      of the shape desired . Default shape is "circle".}
+#'      \item{size}{A numeric of the size desired. Default size is 3.}
+#'      \item{alpha}{A numeric of the alpha desired for the permuted results.
+#'      Default size is 0.4, actual values are always opaque.}
+#' }
 #' @return Permutation plot of Q2 and R2Y. The caption denoted pQ2 and pR2Y
 #' which indicates how significantly different the real results are from the
 #' permuted. Example, pQ2=(1+n(permutedQ2>realQ2))/n(permutations)

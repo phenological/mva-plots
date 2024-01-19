@@ -13,8 +13,8 @@ stocsy(x, Y, driver, roi = range(x), plot = TRUE, breaks = 10)
 
 \item{driver}{numeric, reference to compute correlation. If length(driver)
 matches the number of spectra, it is interpreted as the vector of
-observations of the driver variable. Otherwise, driver\link{1} is interpreted as
-the chemical shift coordinate of the driver.}
+observations of the driver variable. Otherwise, the first element of driver
+(\code{driver[1]}) is interpreted as the chemical shift coordinate of the driver.}
 
 \item{roi}{numeric, upper and lower limit of the Region Of Interest to be
 correlated. The whole spectra range by default.}

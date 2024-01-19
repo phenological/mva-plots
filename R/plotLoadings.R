@@ -3,10 +3,15 @@
 #' Grid of the loadings plots using GGally::ggpairs up to a threshold number.
 #'
 #' @param model A PCA, oplsda or ropls object.
-#' @param optns An empty list for aesthetic options.
-#' @param plotTitle A parameter for the optns list. A character for the title of the grid.
-#' @param theme A parameter for the \code{optns} list. Personalize the plot theme you would like applied as you would using theme() in ggplot. Example set theme = theme(legend.position = "left", text=element_text(size=5)) in optns.
-#' @param thresh A parameter for the optns list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.
+#' @param optns An empty list for addtional options:
+#'    \itemize{
+#'     \item{plotTitle}{A character for the title of the grid.}
+#'     \item{theme}{Personalize the plot theme you would like applied as you
+#'     would using theme() in ggplot. Example set
+#'     theme = theme(legend.position = "left", text=element_text(size=5)) in optns.}
+#'     \item{thresh}{A numeric for the number of PCAs to display in the grid.
+#'     The default is calculated in the PCA function.}
+#' }
 #'
 #' @return The model list appended with the grid of loadings under plots.
 #' @import GGally

@@ -7,9 +7,11 @@
 #' @param newdata Matrix or data frame of the same X variables as the model
 #' (O-PLS-DA).
 #' @param optns An empty list for confusion matrix addition.
-#' @param real A parameter for the \code{optns} list. The "real" classifications
-#' for the newdata as a factor. If supplied, a confusion matrix will be
-#' calculated. Only available for DA.
+#'    \itemize{
+#'     \item{real}{The "real" classifications for the newdata as a factor. If
+#'      supplied, a confusion matrix will be calculated. Only available for DA.}
+#'      }
+#'
 #' @returns The prediction model including the predictive scores and orthogonal
 #' scores.
 #' @importFrom caret confusionMatrix

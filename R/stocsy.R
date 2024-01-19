@@ -4,8 +4,8 @@
 #' @param Y numeric, spectra matrix, spectra in rows
 #' @param driver numeric, reference to compute correlation. If length(driver)
 #' matches the number of spectra, it is interpreted as the vector of
-#' observations of the driver variable. Otherwise, driver[1] is interpreted as
-#' the chemical shift coordinate of the driver.
+#' observations of the driver variable. Otherwise, the first element of driver
+#' (`driver[1]`) is interpreted as the chemical shift coordinate of the driver.
 #' @param roi numeric, upper and lower limit of the Region Of Interest to be
 #' correlated. The whole spectra range by default.
 #' @param plot, boolean, whether to return the plot of the STOCSY (TRUE,

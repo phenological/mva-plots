@@ -15,40 +15,30 @@ calculated automatically. "external" is an externally supplied statistic that
 can be, for example, a p-value from lmm and needs to be provided in the
 \code{optns}.}
 
-\item{optns}{An empty list for additional options.}
-
-\item{external}{If stat is set to external, set this parameter in the
-\code{optns} list. Must be the same as the number of lipids.}
-
-\item{color}{A parameter for the \code{optns} list. Color palette for discrete
-values, you can assign colors to specific factors, example:
+\item{optns}{A list for additional options:
+\itemize{
+\item{external}{If stat is set to external supply the chosen column from
+data frame here. Must be the same as the number of lipids.}
+\item{color}{Color palette for discrete values, you can assign colors to
+specific factors, example:
 discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply
-a concatenated list, example (and the default): discretePalette =
-c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE",
-"#4393C3", "#2166AC"). Hexadecimal or color names accepted.}
-
-\item{shape}{A parameter for the \code{optns} list. A character of the shape
-desired. Default shape is "circle".}
-
-\item{alpha}{A parameter for the \code{optns} list. A numeric of the alpha
-desired. Default size is 0.3.}
-
-\item{theme}{A parameter for the \code{optns} list. Personalize the plot
-theme you would like applied as you would using theme() in ggplot. Example:
+a concatenated list, example (and the default):
+discretePalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0",
+"#92C5DE", "#4393C3", "#2166AC"). Hexadecimal or color names accepted.}
+\item{shape}{A character of the shape, Default shape is "circle".}
+\item{alpha}{A numeric of the alpha desired. Default size is 0.3.}
+\item{theme}{Personalize the plot theme you would like applied as you would
+using theme() in ggplot. Example:
 theme = theme(legend.position = "left", text=element_text(size=5)).}
-
-\item{guides}{A parameter for the \code{optns} list. Personalize the plot
-legend/guide how you would like applied as you would using guides() in
-ggplot. Example: guides = guides(color = guide_legend(title = "Color Legend"),
-size = "none")}
-
-\item{factor}{A parameter for the \code{optns} list. An object the same
-length as the data in the model supplied that must have at least 2 unique
-groups such as treatment and control. More than 2 is allowable.}
-
-\item{control}{A parameter for the \code{optns} list to set which group with
-the supplied factor you wish to set as the control for comparison to all
-other groups.}
+\item{guides}{Personalize the plot legend/guide how you would like applied as
+you would using guides() in ggplot. Example:
+guides = guides(color = guide_legend(title = "Color Legend"), size = "none")}
+\item{factor}{An object the same length as the data in the model supplied
+that must have at least 2 unique groups such as treatment and control. More
+than 2 is allowable.}
+\item{control}{Character to set which group with the supplied factor you wish
+to set as the control for comparison to all other groups.}
+}}
 }
 \description{
 Lipid plot of class vs side chain.

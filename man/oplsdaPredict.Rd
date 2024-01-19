@@ -12,11 +12,11 @@ oplsdaPredict(model, newdata, optns = list())
 \item{newdata}{Matrix or data frame of the same X variables as the model
 (O-PLS-DA).}
 
-\item{optns}{An empty list for confusion matrix addition.}
-
-\item{real}{A parameter for the \code{optns} list. The "real" classifications
-for the newdata as a factor. If supplied, a confusion matrix will be
-calculated. Only available for DA.}
+\item{optns}{An empty list for confusion matrix addition.
+\itemize{
+\item{real}{The "real" classifications for the newdata as a factor. If
+supplied, a confusion matrix will be calculated. Only available for DA.}
+}}
 }
 \value{
 The prediction model including the predictive scores and orthogonal

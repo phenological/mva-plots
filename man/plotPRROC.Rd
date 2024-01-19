@@ -47,11 +47,11 @@ Y<-as.factor(mtcars$vs)  # for DA
 
 #PLS-DA
 plsda_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "PLS")
-ropls_plsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = NA, orthoI = 0)
+#ropls_plsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = NA, orthoI = 0)
 
 #O-PLS-DA
 oplsda_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "OPLS")
-ropls_oplsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = 1, orthoI = NA)
+#ropls_oplsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = 1, orthoI = NA)
 
 t<-plotPRROC(oplsda_model, caption = FALSE)
 

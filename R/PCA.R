@@ -16,29 +16,40 @@
 #' TRUE. Alternatively, a vector of length equal the number of columns of
 #' \code{data} can be supplied.
 #' @param rank The number of components calculated. Default is 5.
-#' @param optns An empty list for additional modelling options.
-#' @param cutoff A parameter for the \code{optns} list. The maximum percentage
-#' of cumulative variance you wish to explain. The default is 99%. for example,
-#' optns=list(cutoff= 90) to set a 90% cutoff. Set rank. = NULL if using this.
-#' @return A list of objects used in further calculations.
-#' @param results A list with class prcomp, for details of this list see the
-#' prcomp documentation.
-#' @param pcSum A data frame of the summary information (Standard deviation,
-#' Proportion of Variance and Cumulative Proportion) for the principal component
-#' calculation.
-#' @param scores The scores. The value of the rotated data (which has been
-#' centered and scaled) data multiplied by the loadings matrix. The cov(scores)
-#' is the diagonal matrix diag(sdev^2). For the formula method, napredict() is
-#' applied to handle the treatment of values omitted by the na.action.
-#' @param loadings Variable loadings (i.e., a matrix whose columns contain the
-#' eigenvectors).
-#' @param sdev The standard deviations of the principal components (i.e., the
-#' square roots of the eigenvalues of the covariance/correlation matrix, though
-#' the calculation is actually done with the singular values of the data matrix).
-#' @param center The centering used.
-#' @param scale The scaling used.
-#' @param threshold The number of principal components needed to explain the
-#' amount of cumulative variance specified (or the default of 99%).
+#' @param optns A list for additional options:
+#'   \itemize{
+#'    \item{cutoff}{The maximum percentage of cumulative variance you wish to
+#'    explain. The default is 99 percent. for example, optns = list(cutoff = 90) to
+#'    set a 90 percent cutoff. Set rank. = NULL if using this.}
+#'   }
+#'
+#' @return A list containing:\tabular{ll}{
+#'    \code{results} \tab A list with class prcomp, for details of this list see the
+#'                        prcomp documentation. \cr
+#'    \tab \cr
+#'    \code{pcSum} \tab A data frame of the summary information (Standard deviation,
+#'    Proportion of Variance and Cumulative Proportion) for the principal component
+#'    calculation. \cr
+#'    \tab \cr
+#'    \code{scores} \tab The scores. The value of the rotated data (which has been
+#'    centered and scaled) data multiplied by the loadings matrix. The cov(scores)
+#'    is the diagonal matrix diag(sdev^2). For the formula method, napredict() is
+#'    applied to handle the treatment of values omitted by the na.action. \cr
+#'    \tab \cr
+#'    \code{loadings} \tab Variable loadings (i.e., a matrix whose columns contain the
+#'    eigenvectors). \cr
+#'    \tab \cr
+#'    \code{sdev} \tab The standard deviations of the principal components (i.e., the
+#'    square roots of the eigenvalues of the covariance/correlation matrix, though
+#'    the calculation is actually done with the singular values of the data matrix). \cr
+#'    \tab \cr
+#'    \code{center} The centering used. \cr
+#'    \tab \cr
+#'    \code{scale} The scaling used. \cr
+#'    \tab \cr
+#'    \code{threshold} The number of principal components needed to explain the
+#'    amount of cumulative variance specified (or the default of 99(in %)). \cr
+#' }
 #' @examples
 #' data(iris)
 #' a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
@@ -50,7 +61,7 @@
 
 PCA <- function(data, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns=list()) {
 
-  library(ggplot2)
+  requireNamespace("ggplot2", quietly = TRUE)
   results <- prcomp(data,
                     rank = rank,
                     center = center,
@@ -60,7 +71,7 @@ PCA <- function(data, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns
 
   pcSum <- (as.data.frame(t(summary(results)[["importance"]])))
   pcSum <- pcSum[1:rank,]*100
-  pcSum[,"Principal Component"] <- rownames(pcSum)
+  pcSum[, "Principal Component"] <- rownames(pcSum)
   pcSum[, "Principal Component"] <- factor(pcSum$`Principal Component`, levels = pcSum$`Principal Component`)
 
   scores <- results[["x"]]

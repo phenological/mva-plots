@@ -12,7 +12,6 @@ RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 Imports:
     caret,
-    colorRamps,
     crayon,
     egg,
     GGally,
@@ -23,15 +22,15 @@ Imports:
     plotly,
     PRROC,
     reshape2,
-    roxygen2,
     scales,
-    stats,
-    testthat
+    BiocManager (>= 1.30.16),
+    stats
 biocViews:
     ropls
 Suggests: 
     knitr,
     rmarkdown,
+    roxygen2,
     testthat
 VignetteBuilder: 
     knitr
