@@ -2,17 +2,21 @@
 #'
 #' Plot multiple spectra plot that can be interactive (default)
 #'
-#' @param X is a spectra matrix (colnames(X) <- ppm, and rownames(X)<-Annotation$sampleID is recommended to do so before plotting)
+#' @param X is a spectra matrix (colnames(X) <- ppm, and
+#' rownames(X) <- Annotation$sampleID is recommended to do so before plotting)
 #' @param ppm must be numeric and same length as the number of column in X
 #' @param roi region of interest if not defined default is set as c(0.0 , 9.5)
-#' @param interactive default is True which allow you to zoom in and select which spectra to show
+#' @param interactive default is True which allow you to zoom in and select
+#' which spectra to show
 #' @param ... extra arguments.
 #' @return Interactive/non-interactive spectra plot
 #' @importFrom plotly plot_ly add_lines layout
 #' @importFrom reshape2 melt
 #'
 #' @examples
-#' # this cannot be we don't publish path to our data !nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
+#' # this cannot be we don't publish path to our data
+#' # !nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/
+#' # DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
 #' #ppm<-as.numeric(nmr@varName)
 #' #X<-nmr@.Data
 #' #matspec(X[1:3,],ppm,roi = c(3.0,4.5),interactive = T)

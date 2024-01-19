@@ -7,12 +7,13 @@
 plotStocsy(aDF, breaks = 10)
 }
 \arguments{
-\item{breaks}{numeric, number of breaks in the x axis}
+\item{aDF, }{list, STOCSY results as returned by mvaPlots::stocsy()}
 
-\item{stocsy, }{list, STOCSY results as returned by mvaPlots::stocsy()}
+\item{breaks}{numeric, number of breaks in the x axis}
 }
 \value{
-a ggplot of the STOCSY, with ppm in the horizontal axis, covariance in the vertical axis, and correlation in the color scale
+a ggplot of the STOCSY, with ppm in the horizontal axis, covariance
+in the vertical axis, and correlation in the color scale
 }
 \description{
 Simple STOCSY visualization
