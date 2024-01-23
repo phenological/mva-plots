@@ -108,7 +108,8 @@ cliffsDelta <- function(model, optns = optns) {
 
   #if only 2 factors, just need the second column, since first is all NA (control to control)
   if(length(unique_factors) == 2){
-    cd_df <- as.data.frame(cd_df[,2])
+    #cd_df <- as.data.frame(cd_df[,2])
+    cd_df <- cd_df[, 2, drop = FALSE]
   }
   return(cd_df)
 }

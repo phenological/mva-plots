@@ -69,7 +69,8 @@ foldChange <- function(model = model, optns = optns){
 
 #if only 2 factors, just need the second column, since first is all NA (control to control)
   if(length(unique_factors) == 2){
-    log2fc_df <- as.data.frame(log2fc_df[,2])
+    #log2fc_df <- as.data.frame(log2fc_df[,2])
+    log2fc_df <- log2fc_df[, 2, drop = FALSE]
   }
 
   return(log2fc_df)

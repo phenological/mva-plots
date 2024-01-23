@@ -116,8 +116,15 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
     #pcLoadings <- data.frame(matrix(0, nrow = ncol(model), ncol = 1))
   }
 
-  unique_factors <- unique(df[,"factor"])
+  #if the labels us . instead of - and :
+  if (any(grepl("\\.", id))) {
+    # Apply substitution
+    id <- sub("\\(P\\.", "(P-", id)
+    id <- sub("\\(O\\.", "(O-", id)
+    id <- gsub("\\.", ":", id)
+  }
 
+  unique_factors <- unique(df[,"factor"])
 
   if(!("discretePalette" %in% names(optns))){
     optns$discretePalette <- c("#66C2A5",
@@ -147,13 +154,16 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
   #guides
   if(!("guides" %in% names(optns))){
     guides <- guides(color = guide_legend(title = "Group"),
-                     size = guide_legend(title = stat))
+                     size = guide_legend(title = paste0("|",stat,"|")))
   } else{guides <- optns$guides}
 
 ########cliffs delta##########
 
   if(stat == "cd"){
     cd <- cliffsDelta(model = model, optns = optns)
+    if(length(cd) == 1){
+      cd <- cbind(NA, cd)
+    }
     statistic <- cd
   }
 
@@ -179,6 +189,9 @@ if(stat == "corr"){
 
 if(stat == "fc"){
   fc <- foldChange(model = model, optns = optns)
+  if(length(fc) == 1){
+    fc <- cbind(NA, fc)
+  }
   statistic <- fc
 }
 
@@ -186,6 +199,9 @@ if(stat == "fc"){
   if(stat == "external"){
     #add check that there is the correct length of this stat
     if(nrow(optns$external) == length(id)){
+    if(length(optns$external) == 1){
+      external <- cbind(NA, optns$external)
+    }
       statistic <- optns$external
     }else {stop("length of externally provided stat does not match the number of lipids") }
   }
