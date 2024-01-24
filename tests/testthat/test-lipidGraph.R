@@ -226,6 +226,52 @@ test_that("external stat can be supplied, including with more than one group to 
 
 })
 
+test_that("the settings for color work", {
+
+  #if choose ony one group can you set color to direction
+  lg<- lipidGraph(model = lipidData,
+                  stat = "cd",
+                  optns = list(factor = lipidMetadata$Class,
+                               control = "Control",
+                               columns_to_plot = "MISC",
+                               color = "Direction"))
+  g <- ggplot_build(plot = lg)
+
+  gd <- data.frame(colours = unique(g$data[[1]]["colour"]),
+                   label = g$plot$scales$scales[[1]]$get_labels())
+
+  expect_contains(gd[,2], expected = c("negative", "positive"))
+
+  #can't have more than one group and set direction as color
+  lg<- lipidGraph(model = lipidData,
+                  stat = "cd",
+                  optns = list(factor = lipidMetadata$Class,
+                               control = "Control",
+                               color = "Direction"))
+
+
+  g <- ggplot_build(plot = lg)
+
+  gd <- data.frame(colours = unique(g$data[[1]]["colour"]),
+                   label = g$plot$scales$scales[[1]]$get_labels())
+
+expect_contains(gd[,2], expected = c("COVID", "MISC"))
+
+#can override Guide title for more than one Group
+lg<- lipidGraph(model = lipidData,
+                stat = "cd",
+                optns = list(factor = lipidMetadata$Class,
+                             control = "Control",
+                             color = "Direction",
+                             guides = guides(color = guide_legend(title = "Polarity"),
+                                             size = guide_legend(paste0("|cd|"))
+                                             )
+                             )
+                )
+
+expect_equal(object = lg[["guides"]][["colour"]][["title"]], expected = "Polarity")
+})
+
    #use PCA model
 
   test_that("You can use PCA object", {
@@ -255,11 +301,6 @@ test_that("You can use oplsda object", {
                   optns = list(factor = (lipidMetadata$Class),
                                control = "Control"))
 
-  # expect_gt(length(lg[["data"]][["class"]]), 0)
-  # expect_type(object = lg[["data"]][["class"]], type = "character")
-  # expect_type(object = lg[["data"]][["sc1"]], type = "character")
-  # expect_type(object = lg[["data"]][["Value"]], type = "double")
-  #
   #did the class, side chain and id turn out in the correct format? Use the first lipid to test
   expect_equal(object = lg[["data"]][["class"]][1], expected = "CE")
   expect_equal(object = lg[["data"]][["sc1"]][1], expected = "14:0")
@@ -268,7 +309,7 @@ test_that("You can use oplsda object", {
 })
 
 
-# ################
+# # ################
 # #old annotation.dae
 # ANNO<-local(get(load("~/OneDrive - Murdoch University/datasets/covid19/mauritius/DataElements/covid19_mauritius_ANNO.daE")))
 # ANNO<-ANNO@obsDescr[[1]]
@@ -521,4 +562,4 @@ test_that("You can use oplsda object", {
 # lp<- lipidGraph(model = lip[,146:ncol(lip)],
 #            stat= "cd",
 #            optns= list(factor = lip$`Profile No`,
-#                        control = "NDM"))
+#                        control = "NDM", color = "Direction"))

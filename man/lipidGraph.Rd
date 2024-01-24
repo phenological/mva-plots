@@ -19,7 +19,10 @@ can be, for example, a p-value from lmm and needs to be provided in the
 \itemize{
 \item{external}{If stat is set to external supply the chosen column from
 data frame here. Must be the same as the number of lipids.}
-\item{color}{Color palette for discrete values, you can assign colors to
+\item{color}{If there is one Group to be plotted, this can be changed to
+"Direction" which will use colors according to if the stat is positive or
+negative.}
+\item{discretePalette}{Color palette for discrete values, you can assign colors to
 specific factors, example:
 discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply
 a concatenated list, example (and the default):
@@ -51,10 +54,19 @@ lipid_metadata <- readRDS(system.file("extdata", "lipidMetadata.rds", package = 
 
 # Generate a lipid graph
 lg<- lipidGraph(model = lipidData,
-stat = "cd",
-optns = list(factor = (lipidMetadata$Class),
-            control = "MISC"))
+                stat = "cd",
+                optns = list(factor = (lipidMetadata$Class),
+                             control = "MISC"))
 # View the graph
 print(graph)
+
+#To plot only one Group
+lg<- lipidGraph(model = lipidData,
+                stat = "cd",
+                optns = list(factor = (lipidMetadata$Class),
+                             control = "Control",
+                             columns_to_plot = "COVID",
+                             color = "Direction"
+                             discretePalette = c("positive" = "purple", "negative" = "orange")))
 }
 }

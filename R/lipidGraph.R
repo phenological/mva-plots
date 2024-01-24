@@ -12,7 +12,10 @@
 #'   \itemize{
 #'    \item{external}{If stat is set to external supply the chosen column from
 #'    data frame here. Must be the same as the number of lipids.}
-#'    \item{color}{Color palette for discrete values, you can assign colors to
+#'    \item{color}{If there is one Group to be plotted, this can be changed to
+#'    "Direction" which will use colors according to if the stat is positive or
+#'    negative.}
+#'    \item{discretePalette}{Color palette for discrete values, you can assign colors to
 #'    specific factors, example:
 #'    discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply
 #'    a concatenated list, example (and the default):
@@ -41,11 +44,20 @@
 #'
 #' # Generate a lipid graph
 #' lg<- lipidGraph(model = lipidData,
-#' stat = "cd",
-#' optns = list(factor = (lipidMetadata$Class),
-#'             control = "MISC"))
+#'                 stat = "cd",
+#'                 optns = list(factor = (lipidMetadata$Class),
+#'                              control = "MISC"))
 #' # View the graph
 #' print(graph)
+#'
+#' #To plot only one Group
+#' lg<- lipidGraph(model = lipidData,
+#'                 stat = "cd",
+#'                 optns = list(factor = (lipidMetadata$Class),
+#'                              control = "Control",
+#'                              columns_to_plot = "COVID",
+#'                              color = "Direction"
+#'                              discretePalette = c("positive" = "purple", "negative" = "orange")))
 #' }
 #' @import stats
 #' @import ggplot2
@@ -335,12 +347,30 @@ if(length(columns_to_plot) > length(optns$discretePalette)) {
 
   colnames(plot_data_long) <- c("class", "sc1", "id", "Group", "Value")
 
+
+#only allow color to be set as pos and neg when there is one group and change guide title
+  if(length(unique(plot_data_long$Group)) == 1){
+
+    if("color" %in% names(optns)){
+      if(optns$color == "Direction"){
+        optns$color <- ifelse(plot_data_long$Value >= 0, "positive", "negative")
+        if("guides" %in% names(optns)){
+          guides <- optns$guides
+        }else{guides <- guides(color = guide_legend(title = "Sign"),
+                               size = guide_legend(paste0("|",stat,"|")))}
+      }
+    }else{optns$color <- plot_data_long$Group}
+
+  }else{optns$color <- plot_data_long$Group}
+
+
+
 ########### Create the ggplot###########
   lipidGraph <- ggplot(plot_data_long, aes(x = class,
                                            y = sc1,
-                                           color = Group)) +
+                                           color = optns$color)) +
                 geom_jitter(aes(size = abs(Value)),
-                            position = position_jitter(height = 0.1,
+                            position = position_jitter(height = 0,
                                                        width = 0.3),
                             alpha = optns$alpha,
                             shape = optns$shape) +
@@ -352,8 +382,13 @@ if(length(columns_to_plot) > length(optns$discretePalette)) {
                       ) +
                 scale_color_manual(values  = optns$discretePalette,
                                    na.value = "grey50" ) +
+                # geom_jitter(aes(size = abs(Value)),
+                #             position = position_nudge(x = ifelse(plot_data_long$Value == "positive", 0.5, -0.5)),
+                #             alpha = optns$alpha,
+                #             shape = optns$shape) +
     theme +
     guides
+
 
 
 return(lipidGraph)
