@@ -55,7 +55,7 @@ lipid_metadata <- readRDS(system.file("extdata", "lipidMetadata.rds", package = 
 # Generate a lipid graph
 lg<- lipidGraph(model = lipidData,
                 stat = "cd",
-                optns = list(factor = (lipidMetadata$Class),
+                optns = list(factor = (lipidMetadata$Timepoint),
                              control = "MISC"))
 # View the graph
 print(graph)
@@ -63,7 +63,7 @@ print(graph)
 #To plot only one Group
 lg<- lipidGraph(model = lipidData,
                 stat = "cd",
-                optns = list(factor = (lipidMetadata$Class),
+                optns = list(factor = (lipidMetadata$Timepoint),
                              control = "Control",
                              columns_to_plot = "COVID",
                              color = "Direction"

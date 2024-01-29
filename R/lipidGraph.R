@@ -45,7 +45,7 @@
 #' # Generate a lipid graph
 #' lg<- lipidGraph(model = lipidData,
 #'                 stat = "cd",
-#'                 optns = list(factor = (lipidMetadata$Class),
+#'                 optns = list(factor = (lipidMetadata$Timepoint),
 #'                              control = "MISC"))
 #' # View the graph
 #' print(graph)
@@ -53,7 +53,7 @@
 #' #To plot only one Group
 #' lg<- lipidGraph(model = lipidData,
 #'                 stat = "cd",
-#'                 optns = list(factor = (lipidMetadata$Class),
+#'                 optns = list(factor = (lipidMetadata$Timepoint),
 #'                              control = "Control",
 #'                              columns_to_plot = "COVID",
 #'                              color = "Direction"
@@ -83,7 +83,7 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
   }
 
   #if factor is a data table, it needs to be changed to work with cd and fc
-  if(is(optns$factor)[1] == "data.table"){
+  if(is(optns$factor)[1] == "data.table" | is(optns$factor)[1] == "tbl_df"){
     optns$factor <- unlist(optns$factor)
   }
 
@@ -119,7 +119,7 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
   }
 
   #df
-  if(is(model)[1]== "data.frame"){
+  if(is(model)[1] == "data.frame"){
     id <- colnames(model)
     df <- model
 

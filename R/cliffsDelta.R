@@ -24,6 +24,14 @@ cliffsDelta <- function(model, optns = optns) {
     # Initialize an empty data frame to store cd values
     cd_df <- data.frame(matrix(NA, nrow = ncol(model), ncol = 1))
   }
+  #if factor is a data table, it needs to be changed to work with cd and fc
+  if(is(optns$factor)[1] == "data.table" | is(optns$factor)[1] == "tbl_df"){
+    optns$factor <- unlist(optns$factor)
+  }
+
+  if(is(df)[1] == "data.table" | is(df)[1] == "tbl_df"){
+    df <- as.data.frame(df)
+  }
 
   # ##cliffs delta manually
 

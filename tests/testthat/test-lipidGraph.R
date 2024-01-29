@@ -116,15 +116,15 @@
 test_that("You can use a data frame", {
 
   #don't specify control, expect warning
-  expect_warning(object = lipidGraph(model = lipidData,
+  expect_warning(object = lipidGraph(model = as.data.frame(new_lipidData),
                                      stat = "fc",
-                                     optns = list(factor = (lipidMetadata$Class))),
+                                     optns = list(factor = (new_lipidMetadata$Timepoint))),
                  regexp = "No control specified in optns for factor. The first entry was set as the control")
 
   #do specify control
-  lg<- lipidGraph(model = lipidData,
+  lg<- lipidGraph(model = as.data.frame(new_lipidData),
                   stat = "fc",
-                  optns = list(factor = (lipidMetadata$Class),
+                  optns = list(factor = (new_lipidMetadata$Timepoint),
                                control = "Control"))
 
   expect_equal(object = unique(lg[["data"]][["Group"]])[1], expected = "COVID")
@@ -132,9 +132,9 @@ test_that("You can use a data frame", {
 
 
   #specify which group want graphed
-  lg<- lipidGraph(model = lipidData,
+  lg<- lipidGraph(model = as.data.frame(new_lipidData),
                   stat = "fc",
-                  optns = list(factor = lipidMetadata$Class,
+                  optns = list(factor = new_lipidMetadata$Timepoint,
                                control = "Control",
                                columns_to_plot = "MISC"))
   expect_equal(object = unique(lg[["data"]][["Group"]])[1], expected = "MISC")
@@ -142,9 +142,9 @@ test_that("You can use a data frame", {
 
   #if change control, do the correct groups show up? use cd instead of fc
 
-  lg<- lipidGraph(model = lipidData,
+  lg<- lipidGraph(model = as.data.frame(new_lipidData),
                   stat = "cd",
-                  optns = list(factor = (lipidMetadata$Class),
+                  optns = list(factor = (new_lipidMetadata$Timepoint),
                                control = "MISC"))
   expect_length(object = unique(lg[["data"]][["Group"]]), n = 2)
   expect_contains(object = lg[["data"]][["Group"]], expected = "Control")
@@ -153,13 +153,13 @@ test_that("You can use a data frame", {
 })
 
 test_that("NA in factor will throw error",{
-  #change one lipidMetadata Class entry to NA
-  lipidMetadata2 <- lipidMetadata
-  lipidMetadata2[1,"Class"] <- NA
+  #change one new_lipidMetadata Class entry to NA
+  new_lipidMetadata2 <- new_lipidMetadata
+  new_lipidMetadata2[1,"Timepoint"] <- NA
 
-  expect_error(object = lipidGraph(model = lipidData,
+  expect_error(object = lipidGraph(model = as.data.frame(new_lipidData),
                                    stat = "cd",
-                                   optns = list(factor = (lipidMetadata2$Class),
+                                   optns = list(factor = (new_lipidMetadata2$Timepoint),
                                                 control = "Control")),
                regexp = "One of your factors is NA, please change this before running lipidGraph")
 
@@ -170,9 +170,9 @@ test_that("external stat can be supplied, including with more than one group to 
   #supply external stat
 
    ########adjusted p-value########
-   model <- lipidData
+   model <- as.data.frame(new_lipidData)
 
-   optns <- list(factor = as.vector(lipidMetadata$Class), control = "Control", method = "fdr")
+   optns <- list(factor = as.vector(new_lipidMetadata$Timepoint), control = "Control", method = "fdr")
 
    id <- colnames(model)
    df <- model
@@ -214,9 +214,9 @@ test_that("external stat can be supplied, including with more than one group to 
        names(pvalRescaled)[col_number] <- new_col_name
      }
 
-   lg<- lipidGraph(model = lipidData,
+   lg<- lipidGraph(model = as.data.frame(new_lipidData),
                    stat = "external",
-                   optns = list(factor = lipidMetadata$Class,
+                   optns = list(factor = new_lipidMetadata$Timepoint,
                                 control = "Control",
                                 external = pvalRescaled))
 
@@ -229,9 +229,9 @@ test_that("external stat can be supplied, including with more than one group to 
 test_that("the settings for color work", {
 
   #if choose ony one group can you set color to direction
-  lg<- lipidGraph(model = lipidData,
+  lg<- lipidGraph(model = as.data.frame(new_lipidData),
                   stat = "cd",
-                  optns = list(factor = lipidMetadata$Class,
+                  optns = list(factor = new_lipidMetadata$Timepoint,
                                control = "Control",
                                columns_to_plot = "MISC",
                                color = "Direction"))
@@ -243,9 +243,9 @@ test_that("the settings for color work", {
   expect_contains(gd[,2], expected = c("negative", "positive"))
 
   #can't have more than one group and set direction as color
-  lg<- lipidGraph(model = lipidData,
+  lg<- lipidGraph(model = as.data.frame(new_lipidData),
                   stat = "cd",
-                  optns = list(factor = lipidMetadata$Class,
+                  optns = list(factor = new_lipidMetadata$Timepoint,
                                control = "Control",
                                color = "Direction"))
 
@@ -258,9 +258,9 @@ test_that("the settings for color work", {
 expect_contains(gd[,2], expected = c("COVID", "MISC"))
 
 #can override Guide title for more than one Group
-lg<- lipidGraph(model = lipidData,
+lg<- lipidGraph(model = as.data.frame(new_lipidData),
                 stat = "cd",
-                optns = list(factor = lipidMetadata$Class,
+                optns = list(factor = new_lipidMetadata$Timepoint,
                              control = "Control",
                              color = "Direction",
                              guides = guides(color = guide_legend(title = "Polarity"),
@@ -275,12 +275,12 @@ expect_equal(object = lg[["guides"]][["colour"]][["title"]], expected = "Polarit
 #if no second side chain is listed
 test_that("If no 2nd side chain, still handled", {
 
-  idx <- grep("TAG", names(lipidData))
-  TAG <- lipidData[,idx]
+  idx <- grep("TAG", names(new_lipidData))
+  TAG <- new_lipidData[,idx]
 
-  lg <- lipidGraph(model = TAG,
+  lg <- lipidGraph(model = as.data.frame(TAG),
                    stat = "cd",
-                   optns=list(factor = lipidMetadata$Class,
+                   optns=list(factor = new_lipidMetadata$Timepoint,
                               control = "Control"))
 
   g <- ggplot_build(plot = lg)
@@ -291,13 +291,13 @@ test_that("If no 2nd side chain, still handled", {
   expect_contains(gd[,2], expected = c("COVID", "MISC"))
 
 
-  idy <- which(lipidMetadata$Class == "MISC")
-  Class <- lipidMetadata[-idy,"Class"]
+  idy <- which(new_lipidMetadata$Timepoint == "MISC")
+  Class <- new_lipidMetadata[-idy,"Timepoint"]
   TAG2 <- TAG[-idy,]
 
-  lg <- lipidGraph(model = TAG2,
+  lg <- lipidGraph(model = as.data.frame(TAG2),
                    stat = "cd",
-                   optns = list(factor = Class,
+                   optns = list(factor = (Class),
                               control = "Control",
                               color = "Direction"))
 
@@ -317,15 +317,14 @@ test_that("If no 2nd side chain, still handled", {
    #use PCA model
 
   test_that("You can use PCA object", {
-    lipidData <- readRDS(system.file("extdata", "lipidData.rds", package = "mva.plots"))
-    lipidMetadata <- readRDS(system.file("extdata", "lipidMetadata.rds", package = "mva.plots"))
 
-    pca<- PCA(data = lipidData, plot = FALSE, rank =3)
+    pca<- PCA(data = new_lipidData, plot = FALSE, rank =3)
 
     lg<- lipidGraph(model = pca,
                     stat = "cd",
-                    optns = list(factor = (lipidMetadata$Class),
+                    optns = list(factor = (new_lipidMetadata$Timepoint),
                                  control = "Control"))
+
 
     #did the class, side chain and id turn out in the correct format? Use the first lipid to test
     expect_equal(object = lg[["data"]][["class"]][1], expected = "CE")
@@ -335,12 +334,10 @@ test_that("If no 2nd side chain, still handled", {
 
    #use oplsda model
 test_that("You can use oplsda object", {
-  lipidData <- readRDS(system.file("extdata", "lipidData.rds", package = "mva.plots"))
-  lipidMetadata <- readRDS(system.file("extdata", "lipidMetadata.rds", package = "mva.plots"))
-  op<- oplsda(X = lipidData, Y = lipidMetadata$Class, type = "PLS")
+  op<- oplsda(X = new_lipidData, Y = new_lipidMetadata$Timepoint, type = "PLS")
   lg<- lipidGraph(model = op,
                   stat = "cd",
-                  optns = list(factor = (lipidMetadata$Class),
+                  optns = list(factor = (new_lipidMetadata$Timepoint),
                                control = "Control"))
 
   #did the class, side chain and id turn out in the correct format? Use the first lipid to test

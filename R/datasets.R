@@ -2,9 +2,9 @@
 #'
 #' This dataset contains lipid data.
 #'
-#' @name lipidData
+#' @name new_lipidData
 #' @format A data frame.
-#' @usage data(lipidData)
+#' @usage data(new_lipidData)
 #' @seealso \code{\link{readRDS}}
 NULL
 
@@ -12,8 +12,8 @@ NULL
 #'
 #' This dataset contains metadata for lipid data.
 #'
-#' @name lipidMetadata
+#' @name new_lipidMetadata
 #' @format A data frame.
-#' @usage data(lipidMetadata)
+#' @usage data(new_lipidMetadata)
 #' @seealso \code{\link{readRDS}}
 NULL
