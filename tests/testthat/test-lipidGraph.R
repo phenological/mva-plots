@@ -272,6 +272,48 @@ lg<- lipidGraph(model = lipidData,
 expect_equal(object = lg[["guides"]][["colour"]][["title"]], expected = "Polarity")
 })
 
+#if no second side chain is listed
+test_that("If no 2nd side chain, still handled", {
+
+  idx <- grep("TAG", names(lipidData))
+  TAG <- lipidData[,idx]
+
+  lg <- lipidGraph(model = TAG,
+                   stat = "cd",
+                   optns=list(factor = lipidMetadata$Class,
+                              control = "Control"))
+
+  g <- ggplot_build(plot = lg)
+
+  gd <- data.frame(colours = unique(g$data[[1]]["colour"]),
+                   label = g$plot$scales$scales[[1]]$get_labels())
+
+  expect_contains(gd[,2], expected = c("COVID", "MISC"))
+
+
+  idy <- which(lipidMetadata$Class == "MISC")
+  Class <- lipidMetadata[-idy,"Class"]
+  TAG2 <- TAG[-idy,]
+
+  lg <- lipidGraph(model = TAG2,
+                   stat = "cd",
+                   optns = list(factor = Class,
+                              control = "Control",
+                              color = "Direction"))
+
+  g <- ggplot_build(plot = lg)
+
+  gd <- data.frame(colours = unique(g$data[[1]]["colour"]),
+                   label = g$plot$scales$scales[[1]]$get_labels())
+
+  expect_contains(gd[,2], expected = c("negative", "positive"))
+
+  expect_equal(object =  unique(lg[["data"]][["Group"]]), expected = "COVID")
+
+
+})
+
+
    #use PCA model
 
   test_that("You can use PCA object", {

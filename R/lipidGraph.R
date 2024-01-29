@@ -82,6 +82,11 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
     method <- "bonferroni"
   }
 
+  #if factor is a data table, it needs to be changed to work with cd and fc
+  if(is(optns$factor)[1] == "data.table"){
+    optns$factor <- unlist(optns$factor)
+  }
+
   #PCA
   if(is(model)[1] == "list"){
     #id <- as.data.frame(colnames(model$data$rawData))
@@ -272,54 +277,45 @@ if(stat == "fc"){
 #make class and sc info
   lipids <- id
   lmc <- strsplit(lipids, "\\(")
-  lmc <- rapply(lmc, function(x) c(x[1], gsub("\\)", "", x[2])), how = "replace")
-
+  lmc <- rapply(lmc, function(x) c(x[1], gsub("\\)", "", x[2])),
+                how = "replace")
   r <- list()
   for (i in 1:length(lmc)) {
     struc <- strsplit(lmc[[i]][2], "_")[[1]]
     if (length(struc) == 1 | lmc[[i]][1] == "TAG") {
-      totalCarbon <- gsub("[a-zA-Z\\-]+",
-                          "",
-                          strsplit(struc, ":")[[1]][1])
+      totalCarbon <- gsub("[a-zA-Z\\-]+", "", strsplit(struc,
+                                                       ":")[[1]][1])
       if (lmc[[i]][1] == "TAG") {
-        sideChain <- gsub("[a-zA-Z\\-]+",
-                          "",
-                          strsplit(lmc[[i]][2], "_")[[1]][2])
-      } else {
-        unsat <- gsub("[a-zA-Z\\-]+",
-                      "",
-                      strsplit(struc, ":")[[1]][2])
+        sideChain <- gsub("[a-zA-Z\\-]+", "", strsplit(lmc[[i]][2],
+                                                       "_")[[1]][2])
+        unsat <- 1
+      }
+      else {
+        unsat <- gsub("[a-zA-Z\\-]+", "", strsplit(struc,
+                                                   ":")[[1]][2])
         sideChain <- paste0(totalCarbon, ":", unsat)
       }
-    } else {
+    }
+    else {
       t <- strsplit(struc, ":")
-      sc <- unlist(lapply(t, function(x)
-        as.numeric(
-          gsub("[a-zA-Z\\-]+",
-               "",
-               x[1])
-        )))
-      unsatSc <- unlist(lapply(t, function(x)
-        as.numeric(
-          gsub("[a-zA-Z\\-]+",
-               "",
-               x[2])
-        )))
+      sc <- unlist(lapply(t, function(x) as.numeric(gsub("[a-zA-Z\\-]+",
+                                                         "", x[1]))))
+      unsatSc <- unlist(lapply(t, function(x) as.numeric(gsub("[a-zA-Z\\-]+",
+                                                              "", x[2]))))
       totalCarbon <- sum(sc)
       sideChain <- paste0(sc, ":", unsatSc)
       unsat <- sum(unsatSc)
     }
     r[[i]] <- c(lmc[[i]][1], totalCarbon, unsat, sideChain)
   }
-
-  #find the max number of segments r has been split into for any single entry in the list
   l <- max(unlist(lapply(r, function(x) length(x))))
-
-  #make all elements of r the length you determined as l with NA's in the empty slots
-  r <- lapply(r, function(x) c(x, rep(NA, l-length(x))))
-
-  #make r into data frame with a col for class, totalCarbon, unsat and sidechain
+  r <- lapply(r, function(x) c(x, rep(NA, l - length(x))))
   lipidClass <- data.frame(do.call("rbind", r))
+
+  if(length(lipidClass)<5){
+    lipidClass$X5<- NA
+  }
+
   colnames(lipidClass) <- c("class", "nC", "r", "sc1", "sc2")
 
 ld<-cbind(statistic, id, lipidClass)
