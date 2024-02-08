@@ -14,15 +14,15 @@
 #' @importFrom scales breaks_pretty
 #' @examples
 #' # this cannot be we don't publish path to our data !nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
-#' #ppm<-as.numeric(nmr@varName)
-#' #X<-nmr@.Data
-#' an<-nmr@obsDescr[[1]]
-#' Y<-factor(c(rep("A",28),rep("B",28)))
-#' #specOverlay(X,ppm,roi = c(3.0,4.5),alp = 0.3,optns = list(Y, factor(an$sampleType)))
+#' # ppm<-as.numeric(nmr@varName)
+#' # X<-nmr@.Data
+#' # an<-nmr@obsDescr[[1]]
+#' # Y<-factor(c(rep("A",28),rep("B",28)))
+#' # specOverlay(X,ppm,roi = c(3.0,4.5),alp = 0.3,optns = list(Y, factor(an$sampleType)))
 #' @export
 #' 
 
-specOverlay <- function(X, ppm = NULL, roi = c(-0.01, 0.01), alp = 0.7, size = 0.5, title = "", ...) {
+specOverlay <- function(X, ppm = NULL, roi = c(-0.01, 0.01), alp = 0.7, size = 0.5, title = "", optns=list(),...) {
   
   if (is.null(ppm)) {
     ppm <- as.numeric(colnames(X))
@@ -82,3 +82,4 @@ specOverlay <- function(X, ppm = NULL, roi = c(-0.01, 0.01), alp = 0.7, size = 0
   })
   return(g)
 }
+
