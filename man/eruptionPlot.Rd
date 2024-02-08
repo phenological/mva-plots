@@ -34,8 +34,8 @@ The eruption plot is printed and the model is appended with the eruption data (c
 Eruption plot.
 }
 \examples{
-#data(mtcars)
+data(mtcars)
 
-#a <- PCA(data = mtcars[,1:7], center = TRUE, scale. = TRUE)
-#b <- eruptionPlot(model = a,  optns=list(factor=mtcars[,"vs"], color = "corr", plotTitle = "mtcars eruption", method = "bonferroni"))
+a <- PCA(data = mtcars[,1:7], center = TRUE, scale. = TRUE)
+b <- eruptionPlot(model = a,  optns = list(factor = mtcars[,"vs"], color = "corr", plotTitle = "mtcars eruption", method = "bonferroni"))
 }

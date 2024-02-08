@@ -4,41 +4,67 @@
 #' @param data Data to be supplied
 #' @param x numeric or factor, that goes on x-axis
 #' @param y numeric, can be p-value, can be concentration depending on data
-#' @param point_shape numeric, geom_point shape in ggplot. default is 1; an empty circle
+#' @param point_shape numeric, geom_point shape in ggplot. default is 1; an
+#' empty circle
 #' @param point_size numeric, geom_point size in ggplot. default is 2
 #' @param point_alpha numeric, geom_point alpha in ggplot. default is 1
-#' @param show_legend boolean, to show legends on the right hand side of the plot. default is FALSE. If interactive is TRUE then it overwrite to show_legend = TRUE
-#' @param log_scaling boolean, to apply -log10 to the y value. default is TRUE. If it is TRUE then threshold value is automatically log scaled.
-#' @param threshold numeric, add horizontal dash line to the plot. If log_scaling =TRUE then threshold value is automatically log scaled.
-#' @param interactive boolean, to make the plot interactive. default is FALSE.
+#' @param show_legend Boolean, to show legends on the right hand side of the
+#' plot. default is FALSE. If interactive is TRUE then it overwrite to
+#' show_legend = TRUE
+#' @param log_scaling Boolean, to apply -log10 to the y value. default is TRUE.
+#' If it is TRUE then threshold value is automatically log scaled.
+#' @param threshold numeric, add horizontal dash line to the plot. If
+#' log_scaling = TRUE then threshold value is automatically log scaled.
+#' @param interactive Boolean, to make the plot interactive. default is FALSE.
 #' @return a ggplot2 object.
 #' @importFrom plotly ggplotly
 #' @importFrom crayon red
 #' @export
 
-manhattanPlot<-function(data,x,y,point_shape = 1,point_size = 2,point_alpha = 1,show_legend=FALSE,log_scaling=TRUE,threshold = NA,xlab = "",ylab = "",main_title = "Manhattan Plot",interactive = FALSE){
+manhattanPlot<-function(data,
+                        x,
+                        y,
+                        point_shape = 1,
+                        point_size = 2,
+                        point_alpha = 1,
+                        show_legend=FALSE,
+                        log_scaling=TRUE,
+                        threshold = NA,
+                        xlab = "",
+                        ylab = "",
+                        main_title = "Manhattan Plot",
+                        interactive = FALSE,
+                        optns = list()){
+
+  #theme
+  if(!("theme" %in% names(optns))){
+    theme <- theme()
+  } else{theme <- optns$theme}
+
+
   if(!exists("x")|!exists("y")){
-    cat(red("mvaPlots::Manhattanplot >>"
-                    ,"Please specify x and y for the plot\n"))
+    cat(red("mvaPlots::Manhattanplot >>","Please specify x and y for the plot\n"))
     stop()
   }
   x = data[[x]]
   y = data[[y]]
-  if(log_scaling==TRUE){
+  if(log_scaling == TRUE){
     y<- -log10(as.numeric(y))
   }else{
-    y<-as.numeric(y)
+    y <- as.numeric(y)
   }
 
-  Manhattan_plot<-ggplot(data,aes(x,y)) +
-    geom_point(aes(color = factor(x)),
-               shape = point_shape,
-               size = point_size,
-               alpha = point_alpha) +
-    theme_minimal() +
-    labs(title = main_title,
-         x = xlab,
-         y = ylab)
+  Manhattan_plot <- ggplot(data,
+                           aes(x,y)) +
+                    geom_point(aes(color = factor(x)),
+                                   shape = point_shape,
+                                   size = point_size,
+                                   alpha = point_alpha) +
+                    theme_minimal() +
+                    theme +
+                    labs(title = main_title,
+                         x = xlab,
+                         y = ylab)
 
   # show legend or not
   if(show_legend==FALSE){
@@ -46,8 +72,9 @@ manhattanPlot<-function(data,x,y,point_shape = 1,point_size = 2,point_alpha = 1,
                       theme(legend.position = "n")
   }
 
+  #y-axis threshold
   if(!exists("threshold")){
-    if(log_scaling==TRUE){
+    if(log_scaling == TRUE){
       threshold <- -log10(as.numeric(threshold))
     }else{
       threshold <- as.numeric(threshold)
@@ -59,7 +86,8 @@ manhattanPlot<-function(data,x,y,point_shape = 1,point_size = 2,point_alpha = 1,
                                  color = "black")
   }
 
-  if(interactive==TRUE){
+  #interactive or not
+  if(interactive == TRUE){
     Manhattan_plot <- ggplotly(Manhattan_plot)
   }
 

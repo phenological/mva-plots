@@ -13,7 +13,7 @@ oplsdaPredict(model, newdata, optns = list())
 
 \item{optns}{An empty list for confusion matrix addition.}
 
-\item{real}{A parameter for the \code{optns} list. The "real" clasifications for the newdata as a factor. If supplied, a confusion matrix will be calculated.}
+\item{real}{A parameter for the \code{optns} list. The "real" classifications for the newdata as a factor. If supplied, a confusion matrix will be calculated. Only available for DA.}
 }
 \value{
 The prediction model including the predictive scores and orthogonal scores.
@@ -22,7 +22,10 @@ The prediction model including the predictive scores and orthogonal scores.
 Function that uses ropls::opls model to make predictions on a new data set. Only the first opls predicitve and orthogonal component used currently.
 }
 \examples{
-#data(mtcars)
-#a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "PLS", optns = list(permI = 50))
-#b <- oplsdaPredict(model = a, newdata = mtcars[,1:7], optns = list(real = as.factor()))
+data(mtcars)
+a <- oplsda(X = mtcars[,1:5], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
+columns_to_jitter <- c("mpg", "cyl", "disp", "hp", "drat")
+exampleData <- mtcars
+exampleData[, columns_to_jitter] <- lapply(exampleData[, columns_to_jitter], function(x) jitter(x, factor = 0.1))
+b <- oplsdaPredict(model = a, newdata = exampleData[,1:5])
 }

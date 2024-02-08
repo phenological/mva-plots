@@ -14,10 +14,7 @@ PlotLoadSpec(
 )
 }
 \arguments{
-\item{model}{are the output from :
-PCA()
-prcomp()
-ropls::opls()}
+\item{model}{are the output from : PCA(), prcomp(), oplsda() or ropls::opls()}
 
 \item{PC}{is the number of components that you want to plot the loadings of
 Default is 1 and only require to change when plotting PCA or PLS model}
@@ -25,13 +22,18 @@ Default is 1 and only require to change when plotting PCA or PLS model}
 \item{roi}{is the region of interest (default is from 0.5 to 9.5 ppm)}
 
 \item{type}{is the loading visualization types
-"Statistical reconstruction" calculate the covariance for the trace (y) and Pearson's correlation of the predictive (O)PLS scores with each ppm for the color.//
-"Backscaling" calculate the trace with predicted loadings multiplied by the standard deviation of X feature, color is weighted by the OPLS model.//
+"Statistical reconstruction" calculate the covariance for the trace
+(y) and Pearson's correlation of the predictive (O)PLS scores with
+each ppm for the color.//
+"Backscaling" calculate the trace with predicted loadings multiplied
+by the standard deviation of X feature, color is weighted by the
+OPLS model.//
 for PCA it is always "Statistical reconstruction".
-but for PLS and OPLS "Backscaling" method is recommended}
+but for PLS and OPLS "Backscaling" method is recommended.}
 
 \item{X}{spectral data matrix used for the model.
-This is needed for PCA with prcomp package, or (O)PLS with type = "Statistical reconstruction".}
+This is needed for PCA with prcomp package, or
+(O)PLS with type = "Statistical reconstruction".}
 }
 \value{
 plot of the loadings

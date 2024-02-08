@@ -17,7 +17,8 @@ manhattanPlot(
   xlab = "",
   ylab = "",
   main_title = "Manhattan Plot",
-  interactive = FALSE
+  interactive = FALSE,
+  optns = list()
 )
 }
 \arguments{
@@ -27,19 +28,24 @@ manhattanPlot(
 
 \item{y}{numeric, can be p-value, can be concentration depending on data}
 
-\item{point_shape}{numeric, geom_point shape in ggplot. default is 1; an empty circle}
+\item{point_shape}{numeric, geom_point shape in ggplot. default is 1; an
+empty circle}
 
 \item{point_size}{numeric, geom_point size in ggplot. default is 2}
 
 \item{point_alpha}{numeric, geom_point alpha in ggplot. default is 1}
 
-\item{show_legend}{boolean, to show legends on the right hand side of the plot. default is FALSE. If interactive is TRUE then it overwrite to show_legend = TRUE}
+\item{show_legend}{Boolean, to show legends on the right hand side of the
+plot. default is FALSE. If interactive is TRUE then it overwrite to
+show_legend = TRUE}
 
-\item{log_scaling}{boolean, to apply -log10 to the y value. default is TRUE. If it is TRUE then threshold value is automatically log scaled.}
+\item{log_scaling}{Boolean, to apply -log10 to the y value. default is TRUE.
+If it is TRUE then threshold value is automatically log scaled.}
 
-\item{threshold}{numeric, add horizontal dash line to the plot. If log_scaling =TRUE then threshold value is automatically log scaled.}
+\item{threshold}{numeric, add horizontal dash line to the plot. If
+log_scaling = TRUE then threshold value is automatically log scaled.}
 
-\item{interactive}{boolean, to make the plot interactive. default is FALSE.}
+\item{interactive}{Boolean, to make the plot interactive. default is FALSE.}
 }
 \value{
 a ggplot2 object.

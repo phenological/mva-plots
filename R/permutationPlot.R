@@ -12,9 +12,9 @@
 #' @param alpha A parameter for the \code{optns} list. A numeric of the alpha desired for the permuted results. Default size is 0.4, actual values are always opaque.
 #' @return Permutation plot of Q2 and R2Y. The caption denoted pQ2 and pR2Y which indicates how significantly different the real results are from the permuted. Example, pQ2=(1+n(permutedQ2>realQ2))/n(permutations)
 #' @examples
-#' #data(mtcars)
-#' #a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
-#' #permutationPlot(model = a, optns=list(shape="square", colorQ = "#FF5500", colorR = "pink", size = 5))
+#' data(mtcars)
+#' a <- oplsda(X = mtcars[,1:7], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
+#' permutationPlot(model = a, optns=list(shape="square", colorQ = "#FF5500", colorR = "pink", size = 5))
 #' @export
 permutationPlot <- function(model, optns = list()){
 df <- as.data.frame(model@suppLs[["permMN"]])
@@ -44,8 +44,6 @@ if(!("shape" %in% names(optns)))
 #size
 if(!("size" %in% names(optns)))
 {optns$size <- 3}
-
- ggplot(data = df)
 
  colors <- c("Q2(cum)" = optns$colorQ, "R2Y(cum)" = optns$colorR)
 
@@ -78,4 +76,7 @@ if(!("size" %in% names(optns)))
    ggtitle(plotTitle)
 
  print(permPlot)
+
+ model@suppLs[["permutationPlot"]] <- permPlot
+ return(model)
 }

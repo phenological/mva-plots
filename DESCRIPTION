@@ -1,6 +1,6 @@
 Package: mva.plots
 Title: Add visualisation capabilities to multivariate analysis
-Version: 0.0.3
+Version: 0.0.5
 Authors@R: 
     person("Lucy", "Grigoroff", , "Lucy.Grigoroff@murdoch.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "o"))

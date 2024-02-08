@@ -36,6 +36,6 @@ A list of objects used in further calculations.
 The prcomp function is applied and uses the singular value decomposition (SVD) method. The maximum number of principal components calculated is 8.
 }
 \examples{
-#data(iris)
-#a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
+data(iris)
+a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
 }
