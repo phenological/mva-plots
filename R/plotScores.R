@@ -5,57 +5,59 @@
 #' @param model A PCA or oplsda model.
 #' @param optns An empty list for additional options:
 #'  \itemize{
-#'    \item{plotTitle}{A character for the title of the plot.}
-#'    \item{thresh}{A numeric for the number of PCAs to display in the grid. The
+#'    \item{PCi} {A numeric for the x axis pricipal component for a single plot.}
+#'    \item{PCj} {A numeric for the y axis pricipal component for a single plot.}
+#'    \item{plotTitle} {A character for the title of the plot.}
+#'    \item{thresh} {A numeric for the number of PCAs to display in the grid. The
 #'    default is calculated in the PCA function.}
-#'    \item{color}{Either a column from the data frame or a character of the
+#'    \item{color} {Either a column from the data frame or a character of the
 #'    color desired (example "blue"). Default color is "black". When using on a
 #'    ropls object, it must match the quantitative data type (discrete or continuous).}
-#'    \item{shape}{Either a column from the data frame (must be discrete) or a
+#'    \item{shape} {Either a column from the data frame (must be discrete) or a
 #'    character of the shape desired. Default shape is "circle".}
-#'    \item{size}{Either a column from the data frame or a numeric of the size
+#'    \item{size} {Either a column from the data frame or a numeric of the size
 #'    desired. Default size is 3.}
-#'    \item{alpha}{Either a column from the data frame or a numeric of the alpha
+#'    \item{alpha} {Either a column from the data frame or a numeric of the alpha
 #'    desired. Default size is 0.5.}
-#'    \item{discretePalette}{Color palette for discrete values, you can assign
+#'    \item{discretePalette} {Color palette for discrete values, you can assign
 #'    colors to specific factors, example:
 #'    discretePalette = c("control" = "purple", "treatment" = "orange").
 #'    Or supply a concatenated list, example (and the default):
 #'    discretePalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC").
 #'    Hexadecimal or color names accepted.}
-#'    \item{continuousPalette}{Color palette for continuous values, use
+#'    \item{continuousPalette} {Color palette for continuous values, use
 #'    hexadecimal values (example and default:
 #'    continuousPalette =c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF",
 #'    "#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00",
 #'    "#FF5500","#FF0000","#CC0000")), grDevices names (example:
 #'    continousPalette = rainbow(4)) or color names (example :
 #'    continuousPalette =c("purple", "orange")).}
-#'    \item{theme}{Personalize the plot theme you would like applied as you
+#'    \item{theme} {Personalize the plot theme you would like applied as you
 #'    would using theme() in ggplot. Example set
 #'    theme = theme(legend.position = "left", text=element_text(size=5)).}
-#'    \item{ellipse}{A character or either "color", "hotellings", "t", or "normal"
+#'    \item{ellipse} {A character or either "color", "hotellings", "t", or "normal"
 #'    depending on desired method of calculation. If using color, a discrete variable
 #'    must be supplied to color.}
-#'    \item{ci}{Set your own limit for ellipses drawn. The default is ci = 0.95
+#'    \item{ci} {Set your own limit for ellipses drawn. The default is ci = 0.95
 #'    (95 percent confidence interval).}
-#'    \item{outlierLabels}{Only compatible with ellipse set to hotellings, T or
+#'    \item{outlierLabels} {Only compatible with ellipse set to hotellings, T or
 #'    normal. For ropls object, supply "outlierLabels" and rownames will appear.
 #'    For PCA model, supply a column from the data frame to label outliers. You
 #'    can set it to, for example, outlierLabels = row.names(iris) to identify the
 #'    outlier position in your dataframe.}
-#'    \item{annotation}{When supplying PCA object. Supply the columns you'd like
+#'    \item{annotation} {When supplying PCA object. Supply the columns you'd like
 #'    listed for the outliers, otherwise only that listed for outlierLabels will
 #'    be listed.}
-#'    \item {colorTitle}{A character of the desired color legend title when \code{color}
+#'    \item {colorTitle} {A character of the desired color legend title when \code{color}
 #'    is a variable. No color legend will appear if \code{color} is set to a simple
 #'    aesthetic such as "green". Default "color".}
-#'    \item {shapeTitle}{A character of the desired shape legend title when \code{shape}
+#'    \item {shapeTitle} {A character of the desired shape legend title when \code{shape}
 #'    is a variable. No shape legend will appear if \code{shape} is set to a simple
 #'    aesthetic such as "square". Default "Shape".}
-#'    \item {sizeTitle}{A character of the desired shape legend title when \code{size}
+#'    \item {sizeTitle} {A character of the desired shape legend title when \code{size}
 #'    is a variable. No size legend will appear if \code{size} is set to a simple
 #'    aesthetic such as 2. Default "Size".}
-#'    \item {alphaTitle}{A character of the desired alpha legend title when \code{alpha}
+#'    \item {alphaTitle} {A character of the desired alpha legend title when \code{alpha}
 #'    is a variable. No size legend will appear if \code{alpha} is set to a simple
 #'    aesthetic such as 0.3. Default "Alpha".}
 #' }
@@ -74,7 +76,20 @@
 #'                               gridTitle = "Iris PCA grid",
 #'                               thresh = 3,
 #'                               alpha = 0.7))
-#' #To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i],
+#'
+#' #for a signle plot istead of a grid:
+#'
+#' b <- plotScores(model = a,
+#'                 optns = list(color = iris[,"Species"],
+#'                               PCi = 2,
+#'                               PCj = 3,
+#'                               discretePalette = c("setosa" = "purple",
+#'                                                  "versicolor" = "orange",
+#'                                                  "virginica" = "steelblue"),
+#'                               colorTitle = "Flower Species",
+#'                               gridTitle = "Iris PCA grid",
+#'                               alpha = 0.7))
+#' #Alternatively, to access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i],
 #' #where j is the vertical and i is the horizontal position of the specific
 #' #plot in the grid.
 #' @import methods
@@ -423,6 +438,7 @@ if("outlierLabels" %in% names(optns)){
           theme_bw() +
           theme
 
+  onePlot[["data"]]$assignment <- optns$color
 #########ellipse & outliers########
 if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
 
@@ -562,6 +578,8 @@ if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
   pcaGridPlot <- gPairsLower(plotGT$pcaGridPlot)
 
   model$plots <- append(model$plots, list(pcaGrid = pcaGridPlot))
+
+  model[["plots"]][["pcaGrid"]][["data"]]$assignment <- optns$color
 
   model$data <- append(model$data, list(outliers = plotGT$outliers))
 
