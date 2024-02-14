@@ -24,7 +24,8 @@ Imports:
     reshape2,
     scales,
     BiocManager (>= 1.30.16),
-    stats
+    stats,
+    sf
 biocViews:
     ropls
 Suggests: 
