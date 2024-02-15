@@ -17,29 +17,34 @@ can be, for example, a p-value from lmm and needs to be provided in the
 
 \item{optns}{A list for additional options:
 \itemize{
-\item{external}{If stat is set to external supply the chosen column from
+\item{external} {If stat is set to external supply the chosen column from
 data frame here. Must be the same as the number of lipids.}
-\item{color}{If there is one Group to be plotted, this can be changed to
+\item{lipidStart} {A character of the name of the first lipid in the range
+you wish to include. If you have more than lipids in your model, it is essential
+to provide this and lipidEnd. Use the same syntax as you see in your model.}
+\item{lipidEnd} {A character of the name of the last lipid in the range
+you wish to include. Must be provided if lipidStart is provided.}
+\item{color} {If there is one Group to be plotted, this can be changed to
 "Direction" which will use colors according to if the stat is positive or
 negative.}
-\item{discretePalette}{Color palette for discrete values, you can assign colors to
+\item{discretePalette} {Color palette for discrete values, you can assign colors to
 specific factors, example:
 discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply
 a concatenated list, example (and the default):
 discretePalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0",
 "#92C5DE", "#4393C3", "#2166AC"). Hexadecimal or color names accepted.}
-\item{shape}{A character of the shape, Default shape is "circle".}
-\item{alpha}{A numeric of the alpha desired. Default size is 0.3.}
-\item{theme}{Personalize the plot theme you would like applied as you would
+\item{shape} {A character of the shape, Default shape is "circle".}
+\item{alpha} {A numeric of the alpha desired. Default size is 0.3.}
+\item{theme} {Personalize the plot theme you would like applied as you would
 using theme() in ggplot. Example:
 theme = theme(legend.position = "left", text=element_text(size=5)).}
-\item{guides}{Personalize the plot legend/guide how you would like applied as
+\item{guides} {Personalize the plot legend/guide how you would like applied as
 you would using guides() in ggplot. Example:
 guides = guides(color = guide_legend(title = "Color Legend"), size = "none")}
-\item{factor}{An object the same length as the data in the model supplied
+\item{factor} {An object the same length as the data in the model supplied
 that must have at least 2 unique groups such as treatment and control. More
 than 2 is allowable.}
-\item{control}{Character to set which group with the supplied factor you wish
+\item{control} {Character to set which group with the supplied factor you wish
 to set as the control for comparison to all other groups.}
 }}
 }

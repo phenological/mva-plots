@@ -348,6 +348,36 @@ test_that("You can use oplsda object", {
 })
 
 
+#provide specific range
+test_that("You can provide a start and end lipid", {
+  pca<- PCA(data = new_lipidData, plot = FALSE, rank =3)
+
+  #error should appear
+  expect_error(object = lipidGraph(model = pca,
+                                     stat = "cd",
+                                     optns = list(factor = (new_lipidMetadata$Timepoint),
+                                                  control = "Control",
+                                                  lipidStart = "CE(18:0)")), regexp =  "lipidEnd has not been supplied")
+  lg <- lipidGraph(
+                    model = pca,
+                    stat = "cd",
+                    optns = list(
+                      factor = (new_lipidMetadata$Timepoint),
+                      control = "Control",
+                      lipidStart = "CE(18:0)",
+                      lipidEnd = "LPC(20:0)"
+                    )
+                  )
+
+  expect_equal(object = lg[["data"]][["id"]][1], expected = "CE(18:0)")
+  expect_equal(object = lg[["data"]][["id"]][818], expected = "LPC(20:0)")
+
+})
+
+
+
+
+
 # # ################
 # #old annotation.dae
 # ANNO<-local(get(load("~/OneDrive - Murdoch University/datasets/covid19/mauritius/DataElements/covid19_mauritius_ANNO.daE")))
