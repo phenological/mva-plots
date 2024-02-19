@@ -6,31 +6,35 @@
 #' @param optns An empty list for additional options.
 #' @param optns A list for additional options:
 #'   \itemize{
-  #'     \item{factor}{used when supplying a PCA object. An object the same
+  #'     \item{factor} {Used when supplying a PCA object. An object the same
   #'     length as the data used to build the PCA model that must be a two
   #'     factor variable such as treatment and control.}
-  #'     \item{color}{Color coding for the eruption plot, choose from the
+  #'     \item{external} {An externally derived p-value. If you do not wish to
+  #'     use the automatically calculated p-value, which uses the non-parametric
+  #'     Kruskal-Wallis, provide your own. If you have already adjusted it, set
+  #'     method to "none".}
+  #'     \item{color} {Color coding for the eruption plot, choose from the
   #'     adjusted and re-scaled p-value "pval", correlation "corr", log2 fold
   #'     change "fc" or cliff's delta "cd". The default is the correlation.}
-  #'     \item{plotTitle}{A string specifying the plot title.Default is
+  #'     \item{plotTitle} {A string specifying the plot title.Default is
   #'     "Eruption Plot".}
-  #'     \item{method}{A string specifying the method parameter. Determines the
+  #'     \item{method} {A string specifying the method parameter. Determines the
   #'     method to adjust p-values by. The options the same as listed in
   #'     stats::p.adjust ("holm", "hochberg", "hommel", "bonferroni", "BH",
   #'     "BY","fdr", "none"). The default is "bonferroni".}
-  #'     \item{PC}{for a PCA object. A numeric for which principal component to
+  #'     \item{PC} {For a PCA object. A numeric for which principal component to
   #'     use for the loadings (for the plot y-axis) and scores (if correlation
   #'     is chosen for \code{colourCoding}).}
-  #'     \item{continuousPalette}{Color palette
+  #'     \item{continuousPalette} {Color palette
   #'     for continuous values, use hexadecimal values (example and default:
   #'      continuousPalette = c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF",
   #'      "#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00",
   #'      "#FF5500","#FF0000","#CC0000")),
   #'      grDevices names (example: continousPalette = rainbow(4)) or
   #'      color names (example : continuousPalette =c("purple", "orange")).}
-  #'      \item{x}{Choose your x-axis using the same options stated for color.
+  #'      \item{x} {Choose your x-axis using the same options stated for color.
   #'      The default is cliff's delta.}
-  #'      \item{y}{Choose your y-axis using the same options stated for color.
+  #'      \item{y} {Choose your y-axis using the same options stated for color.
   #'      The default is loadings.}
   #'   }
 #' @return The eruption plot is printed and the model is appended with the
@@ -108,10 +112,7 @@ eruptionPlot <- function(model, optns = list()){
     id <- as.data.frame(colnames(model$data$rawData))
     df <- model$data$rawData
     df[,"factor"] <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
-    #stop if more than 2 levels in df[,"factor"]
-
-    # model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
-    # df <- model$data$rawData
+    df <- as.data.frame(df)
     pcLoadings<-as.data.frame(abs(model$data$loadings[,PC]))
 
   }
@@ -120,10 +121,6 @@ eruptionPlot <- function(model, optns = list()){
     id <- as.data.frame(colnames(as.data.frame(model@suppLs[["x"]])))
     df <- as.data.frame(model@suppLs[["x"]])
     df[,"factor"] <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
-
-    #stop if more than 2 levels in df[,"factor"]
-
-    # df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
     pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]))
   }
 
@@ -153,14 +150,23 @@ eruptionPlot <- function(model, optns = list()){
 ##########Fold change#########
   fc <- foldChange(model = model, optns = optns)
 
-########adjusted p-value########
-pval<-list()
-for(i in 1:(ncol(df)-1)){
-  pval[[i]]<-kruskal.test(df[,i], df[,"factor"])$p.value
-}
+########p-value########
 
-unlist(pval)
-pvalUnadjusted <- t(as.data.frame(pval))
+  if("external" %in% names(optns)){
+    pval <- as.vector(optns$external)
+    pvalUnadjusted <- (as.data.frame(pval))
+  } else{
+    pval<-list()
+    for(i in 1:(ncol(df)-1)){
+      pval[[i]]<-kruskal.test(df[,i], df[,"factor"])$p.value
+    }
+    unlist(pval)
+    pvalUnadjusted <- t(as.data.frame(pval))
+  }
+
+########p-value adjustment########
+#keep for external provided p-value
+#pvalUnadjusted <- t(as.data.frame(pval))
 pvalAdjusted <- p.adjust(pval, method = method)
 pvalRescaled <- abs(log10(pvalAdjusted))
 pvalRescaled <- as.data.frame(pvalRescaled)
