@@ -9,10 +9,11 @@
   #'     \item{factor} {Used when supplying a PCA object. An object the same
   #'     length as the data used to build the PCA model that must be a two
   #'     factor variable such as treatment and control.}
-  #'     \item{external} {An externally derived p-value. If you do not wish to
-  #'     use the automatically calculated p-value, which uses the non-parametric
-  #'     Kruskal-Wallis, provide your own. If you have already adjusted it, set
-  #'     method to "none".}
+  #'     \item{external} {Must be a numeric vector. An externally derived
+  #'     p-value. If you do not wish to use the automatically calculated
+  #'     p-value, which uses the non-parametric Kruskal-Wallis, provide your
+  #'     own. If you have already adjusted it, set method to "none". It will
+  #'     automatically be log10 scaled.}
   #'     \item{color} {Color coding for the eruption plot, choose from the
   #'     adjusted and re-scaled p-value "pval", correlation "corr", log2 fold
   #'     change "fc" or cliff's delta "cd". The default is the correlation.}
@@ -96,9 +97,9 @@ eruptionPlot <- function(model, optns = list()){
 
   ###for pvalue adjustment, options the same as listed in stats::p.adjust c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
   if("method" %in% names(optns)){
-    method = optns$method
+     optns$method = optns$method
   }else{
-    method <- "bonferroni"
+    optns$method <- "bonferroni"
   }
 
   #choose which principal component loadings to plot (default PC1) and which PC scores to calculate correlation with
@@ -167,7 +168,7 @@ eruptionPlot <- function(model, optns = list()){
 ########p-value adjustment########
 #keep for external provided p-value
 #pvalUnadjusted <- t(as.data.frame(pval))
-pvalAdjusted <- p.adjust(pval, method = method)
+pvalAdjusted <- p.adjust(pval, method = optns$method)
 pvalRescaled <- abs(log10(pvalAdjusted))
 pvalRescaled <- as.data.frame(pvalRescaled)
 
@@ -270,7 +271,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
         theme(legend.title = element_text(margin = margin(t = 100)))
 
       eruptionPlot<- eruptionPlot +
-                      labs( caption = paste0("p-value adjustment method: ", method) )
+                      labs( caption = paste0("p-value adjustment method: ", optns$method) )
 
       eruptionPlot <- ggarrange(plots = list(eruptionPlot),
                                 legend.grob = (get_legend(plot1)),

@@ -14,10 +14,11 @@ eruptionPlot(model, optns = list())
 \item{factor} {Used when supplying a PCA object. An object the same
 length as the data used to build the PCA model that must be a two
 factor variable such as treatment and control.}
-\item{external} {An externally derived p-value. If you do not wish to
-use the automatically calculated p-value, which uses the non-parametric
-Kruskal-Wallis, provide your own. If you have already adjusted it, set
-method to "none".}
+\item{external} {Must be a numeric vector. An externally derived
+p-value. If you do not wish to use the automatically calculated
+p-value, which uses the non-parametric Kruskal-Wallis, provide your
+own. If you have already adjusted it, set method to "none". It will
+automatically be log10 scaled.}
 \item{color} {Color coding for the eruption plot, choose from the
 adjusted and re-scaled p-value "pval", correlation "corr", log2 fold
 change "fc" or cliff's delta "cd". The default is the correlation.}
