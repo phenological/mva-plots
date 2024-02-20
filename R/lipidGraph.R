@@ -68,18 +68,18 @@
 #' @import ggplot2
 #' @export
 
-lipidGraph <- function(model, stat = "fc", optns = list()){
+lipidGraph <- function(model, stat = "fc", filter = "none", optns = list()){
 
   #check factors to see if any group is empty
   if (any(is.na(optns$factor))) {
     stop("One of your factors is NA, please change this before running lipidGraph")
   }
 
-   if (!"control" %in% names(optns)) {
+  if (!"control" %in% names(optns)) {
     optns$control <- 1
     #print warning
     warning(paste0("No control specified in optns for factor. The first entry was set as the control"))
-   }
+  }
 
   if("method" %in% names(optns)){
     method = optns$method
@@ -101,8 +101,8 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
     df <- model$data$rawData
 
     # #empty df
-    # pvalUnadjusted <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
-    # pvalRescaled <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
+    pvalUnadjusted <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
+    pvalRescaled <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
 
     df[,"factor"] <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
 
@@ -116,8 +116,8 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
     df <- as.data.frame(model@suppLs[["x"]])
 
     # #empty df
-    # pvalUnadjusted <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
-    # pvalRescaled <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
+    pvalUnadjusted <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
+    pvalRescaled <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
 
     df[,"factor"] <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
 
@@ -131,8 +131,8 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
     df <- model
 
     # #empty df
-    # pvalUnadjusted <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
-    # pvalRescaled <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
+    pvalUnadjusted <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
+    pvalRescaled <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
 
     df[,"factor"] <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
 
@@ -141,8 +141,8 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
   }
 
 
-
-  unique_factors <- unique(df[,"factor"])
+  unique_factors <- unique(df$factor)
+  #unique_factors <- unique(df[,"factor"])
 
   if(!("discretePalette" %in% names(optns))){
     optns$discretePalette <- c("#66C2A5",
@@ -175,7 +175,7 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
                      size = guide_legend(title = paste0("|",stat,"|")))
   } else{guides <- optns$guides}
 
-########cliffs delta##########
+  ########cliffs delta##########
 
   if(stat == "cd"){
     cd <- cliffsDelta(model = model, optns = optns)
@@ -185,92 +185,107 @@ lipidGraph <- function(model, stat = "fc", optns = list()){
     statistic <- cd
   }
 
-##########correlations between scaled + centered original data and scores######
-if(stat == "corr"){
-  if(is(model)[1] == "list"){
-    corr <- abs(t(as.data.frame(cor(model$data$scores[,PC], model$data$dataSC))))
+  ##########correlations between scaled + centered original data and scores######
+  if(stat == "corr"){
+    if(is(model)[1] == "list"){
+      corr <- abs(t(as.data.frame(cor(model$data$scores[,PC], model$data$dataSC))))
+    }
+
+    if(is(model)[1] == "opls"){
+      corr <- abs(t(as.data.frame(cor(model@scoreMN[,PC], model@suppLs[["xModelMN"]]))))
+    }
+
+    if(is(model)[1] == "data.frame"){
+      #no correlation because there's no scores (not a model)
+      corr <- data.frame(matrix(0, nrow = ncol(model), ncol = 1))
+    }
+
+    statistic <- corr
   }
 
-  if(is(model)[1] == "opls"){
-    corr <- abs(t(as.data.frame(cor(model@scoreMN[,PC], model@suppLs[["xModelMN"]]))))
+  ##########Fold change#########
+
+  if(stat == "fc"){
+    fc <- foldChange(model = model, optns = optns)
+    if(length(fc) == 1){
+      fc <- cbind(NA, fc)
+    }
+    statistic <- fc
   }
 
-  if(is(model)[1] == "data.frame"){
-    #no correlation because there's no scores (not a model)
-    corr <- data.frame(matrix(0, nrow = ncol(model), ncol = 1))
-  }
-
-  statistic <- corr
-}
-
-##########Fold change#########
-
-if(stat == "fc"){
-  fc <- foldChange(model = model, optns = optns)
-  if(length(fc) == 1){
-    fc <- cbind(NA, fc)
-  }
-  statistic <- fc
-}
-
-########external########
+  ########external########
   if(stat == "external"){
     #add check that there is the correct length of this stat
     if(nrow(optns$external) == length(id)){
-    if(length(optns$external) == 1){
-      external <- cbind(NA, optns$external)
-    }
+
+      if(length(optns$external) == 1){
+        external <- cbind(NA, optns$external)
+      }
       statistic <- optns$external
+      significance <- optns$external
     }else {stop("length of externally provided stat does not match the number of lipids") }
   }
 
-########adjusted p-value########
+  ########Calculate internal adjusted p-value########
+  #only calculate it if an external p-value has not been provided
+  if(!"method" %in% names(optns)){
+    optns$method <- "bonferroni"
+  }
 
-  # if(!"method" %in% names(optns)){
-  #   optns$method <- "bonferroni"
-  # }
 
-  # if(stat == "pval"){
-  #   for(j in 2: length(unique_factors)){
-  #
-  #     df2 <- df[df[,"factor"] %in% c(1, j), ]
-  #
-  #      pval <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
-  #      for(i in 1:(ncol(df2)-1)){
-  #        pval[i,]<-kruskal.test(df2[,i], df2[,"factor"])$p.value
-  #       }
-  #
-  #     pvalUnadjusted[,j] <- pval
-  #
-  #     #rescaled and adjusted p-value
-  # for(i in 1:(ncol(df2)-1)){
-  #   pvalRescaled[i,j] <- abs(log10(p.adjust(pvalUnadjusted[i, j], method = optns$method)))
-  # }
-  #   }
-  #
-  #   # Create a mapping between numbers and words, rename pval dataframe columns
-  #   mapping <- setNames(unique(optns$factor), unique(df[,"factor"]))
-  #
-  #   testnames<- as.data.frame(mapping)
-  #   testnames$rowName <- rownames(testnames)
-  #
-  #   for (i in seq_len(nrow(testnames))) {
-  #     col_number <- as.numeric(testnames[i, 2])
-  #     new_col_name <- as.character(testnames[i, 1])
-  #     names(pvalUnadjusted)[col_number] <- new_col_name
-  #     names(pvalRescaled)[col_number] <- new_col_name
-  #   }
-  #
-  #   #if only 2 factors, just need the second column, since first is all NA (control to control)
-  #   if(length(unique_factors) == 2){
-  #     pvalUnadjusted <- as.data.frame(pvalUnadjusted[,2])
-  #     pvalRescaled <- as.data.frame(pvalRescaled[,2])
-  #   }
-  #
-  #   statistic <- pvalRescaled
-  # }
-  #
-#########shorten###################
+  if(!stat == "external"){
+    #create the pvalues
+    for(j in 2: length(unique_factors)){
+
+      df2 <- df[df$factor %in% c(1, j), ]
+      df2<- as.data.frame(df2)
+      pval <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
+      for(i in 1:(ncol(df2)-1)){
+        pval[i,] <- kruskal.test(df2[,i], df2$factor)$p.value
+      }
+
+      pvalUnadjusted[,j] <- pval
+
+      #rescaled and adjusted p-value
+      for(i in 1:(ncol(df2)-1)){
+        pvalRescaled[i,j] <- abs(log10(p.adjust(pvalUnadjusted[i, j], method = optns$method)))
+      }
+    }
+
+    df<-as.data.frame(df)
+    # Create a mapping between numbers and words, rename pval dataframe columns
+    mapping <- setNames(unique(optns$factor), unique(df[,"factor"]))
+
+    testnames<- as.data.frame(mapping)
+    testnames$rowName <- rownames(testnames)
+
+    for (i in seq_len(nrow(testnames))) {
+      col_number <- as.numeric(testnames[i, 2])
+      new_col_name <- as.character(testnames[i, 1])
+      names(pvalUnadjusted)[col_number] <- new_col_name
+      names(pvalRescaled)[col_number] <- new_col_name
+    }
+
+    #if only 2 factors, just need the second column, since first is all NA (control to control)
+    if(length(unique_factors) == 2){
+      # pvalUnadjusted <- as.data.frame(pvalUnadjusted[,2])
+      # pvalRescaled <- as.data.frame(pvalRescaled[,2])
+      # pvalRescaled <- cbind(NA, pvalRescaled)
+      pvalUnadjusted[,1] <- NA
+      pvalRescaled[,1] <- NA
+    }
+
+    significance <- pvalRescaled
+    colnames(significance) <- paste0("sig_", colnames(significance))
+
+    if(stat == "pval"){
+      statistic<- pvalRescaled
+    }
+
+  }
+
+
+  #########shorten###################
   if("lipidStart" %in% names(optns)){
     if(!"lipidEnd" %in% names(optns)){
       stop("lipidEnd has not been supplied")
@@ -279,10 +294,11 @@ if(stat == "fc"){
       end_col_index <- which((id) == optns$lipidEnd)
       id <- id[start_col_index:end_col_index]
       statistic <- statistic[start_col_index:end_col_index,]
+      significance <- significance[start_col_index:end_col_index,]
     }
   }
 
-#########lipid data frame############
+  #########lipid data frame############
   #if the labels us . instead of - and :
   if (any(grepl("\\.", id))) {
     # Apply substitution
@@ -291,7 +307,7 @@ if(stat == "fc"){
     id <- gsub("\\.", ":", id)
   }
 
-#make class and sc info
+  #make class and sc info
   lipids <- id
   lmc <- strsplit(lipids, "\\(")
   lmc <- rapply(lmc, function(x) c(x[1], gsub("\\)", "", x[2])),
@@ -335,33 +351,52 @@ if(stat == "fc"){
 
   colnames(lipidClass) <- c("class", "nC", "r", "sc1", "sc2")
 
-ld<-cbind(statistic, id, lipidClass)
+  ld<-cbind(statistic, id, lipidClass, significance)
 
-#which groups will be plotted
-if("columns_to_plot" %in% names(optns)){
-  columns_to_plot <- optns$columns_to_plot
-} else{columns_to_plot <- colnames(ld)[2:(which(colnames(ld) == "id") - 1)]}
+  #which groups will be plotted
+  if("columns_to_plot" %in% names(optns)){
+    columns_to_plot <- optns$columns_to_plot
+  } else{columns_to_plot <- colnames(ld)[2:(which(colnames(ld) == "id") - 1)]}
 
-if(length(columns_to_plot) > length(optns$discretePalette)) {
-  warning("You have more groups to plot than colors supplied, the default is 8 colors. Please supply the same or more number of colors as number of groups to plot.")
-}
+  if(length(columns_to_plot) > length(optns$discretePalette)) {
+    warning("You have more groups to plot than colors supplied, the default is 8 colors. Please supply the same or more number of colors as number of groups to plot.")
+  }
+
+  if(!"external" %in% names(optns)){
+    significance_columns_to_plot <- paste0("sig_", columns_to_plot)
+
+    #significance_columns_to_plot <- colnames(ld)[grep("Significance", colnames(ld))]
+  }
+
 
   # Filter the data frame to include only the relevant columns
-  plot_data <- ld[, c("class", "sc1", "id",columns_to_plot)]
+  plot_data <- ld[, c("class", "sc1", "id", columns_to_plot, significance_columns_to_plot)]
 
   # Reshape the data frame to long format manually
   plot_data_long <- reshape(plot_data,
                             idvar = c("class", "sc1", "id"),
-                            varying = list(columns_to_plot),
-                            v.names = c("Value"),
+                            varying = list(columns_to_plot, significance_columns_to_plot),
+                            v.names = c("Value", "sig"),
                             times = columns_to_plot,
                             direction = "long")
 
 
-  colnames(plot_data_long) <- c("class", "sc1", "id", "Group", "Value")
+  colnames(plot_data_long) <- c("class", "sc1", "id", "Group", "Value", "Sig")
 
+  ####filtering#####
+  if(filter == "none"){
+    plot_data_long <-  plot_data_long
+  }
 
-#only allow color to be set as pos and neg when there is one group and change guide title
+  if(is(filter)[1] == "numeric"){
+    plot_data_long <- plot_data_long[plot_data_long$Sig > filter, ]
+
+  }
+
+  if(is(filter)[1] == "integer"){
+
+  }
+  #only allow color to be set as pos and neg when there is one group and change guide title
   if(length(unique(plot_data_long$Group)) == 1){
 
     if("color" %in% names(optns)){
@@ -377,35 +412,29 @@ if(length(columns_to_plot) > length(optns$discretePalette)) {
   }else{optns$color <- plot_data_long$Group}
 
 
-
-########### Create the ggplot###########
-  lipidGraph <- ggplot(plot_data_long, aes(x = class,
-                                           y = sc1,
-                                           color = optns$color)) +
-                geom_jitter(aes(size = abs(Value)),
-                            position = position_jitter(height = 0,
-                                                       width = 0.3),
-                            alpha = optns$alpha,
-                            shape = optns$shape) +
-                xlab("Lipid Class") +
-                ylab("Side-Chain Length") +
-                theme_bw() +
-                theme(panel.grid.major = element_line(color = "gray95"),
-                      panel.grid.minor = element_blank()
-                      ) +
-                scale_color_manual(values  = optns$discretePalette,
-                                   na.value = "grey50" ) +
-                # geom_jitter(aes(size = abs(Value)),
-                #             position = position_nudge(x = ifelse(plot_data_long$Value == "positive", 0.5, -0.5)),
-                #             alpha = optns$alpha,
-                #             shape = optns$shape) +
+  ########### Create the ggplot###########
+  lipidGraph <- ggplot(data = plot_data_long, aes(x = class,
+                                                  y = sc1,
+                                                  color = optns$color)) +
+    geom_jitter(aes(size = abs(Value)),
+                position = position_jitter(height = 0,
+                                           width = 0.3),
+                alpha = optns$alpha,
+                shape = optns$shape) +
+    xlab("Lipid Class") +
+    ylab("Side-Chain Length") +
+    theme_bw() +
+    theme(panel.grid.major = element_line(color = "gray95"),
+          panel.grid.minor = element_blank()
+    ) +
+    scale_color_manual(values  = optns$discretePalette,
+                       na.value = "grey50" ) +
     theme +
     guides
 
 
 
-return(lipidGraph)
+  return(lipidGraph)
 }
-
 
 
