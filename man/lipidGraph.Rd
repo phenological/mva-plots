@@ -4,21 +4,34 @@
 \alias{lipidGraph}
 \title{Lipid Graph}
 \usage{
-lipidGraph(model, stat = "fc", optns = list())
+lipidGraph(model, stat = "fc", filter = "none", optns = list())
 }
 \arguments{
 \item{model}{A model from PCA or oplsda function, or a data frame of lipids.}
 
 \item{stat}{The statistic you would like to use. Either log2 fold change "fc",
-Cliff's Delta "cd", correlation "corr" or "external". "fc" and "cd" are
-calculated automatically. "external" is an externally supplied statistic that
-can be, for example, a p-value from lmm and needs to be provided in the
+Cliff's Delta "cd", p-value "pval" or "external". "fc", "pval" and "cd" are
+calculated automatically. The p-value is the log 10 kruskal wallis p-value
+adjusted by "bonferroni". You may select other p-value adjustments using method
+in the optns. "external" is an externally supplied statistic that can be, for
+example, a p-value from lmm and needs to be provided in the optns list.}
+
+\item{filter}{Either "none", a range (1:10) or a numeric (1.3) for significance.
+Based on internally calculated log 10 kruskal wallis p-value. A range will
+provide only the top significant lipids (eg 1:10 will graph only top 10). A
+numeric will filter out anything below this significance (eg 1.3, anything
+with log 10 p-value less than 1.3 is excluded). "none" is the default and will
+apply no filter. This is the only option available with externally provided stats.
 \code{optns}.}
 
 \item{optns}{A list for additional options:
 \itemize{
+\item{method} {adjustment for the internally calculated p-value. Default is
+"bonferroni", but can be set to "holm", "hochberg", "hommel", "bonferroni",
+"BH", "BY", "fdr" or "none".}
 \item{external} {If stat is set to external supply the chosen column from
-data frame here. Must be the same as the number of lipids.}
+data frame here. Must be the same as the number of lipids. Cannot filter
+when providing an external stat. Internal p-value will not be calculated.}
 \item{lipidStart} {A character of the name of the first lipid in the range
 you wish to include. If you have more than lipids in your model, it is essential
 to provide this and lipidEnd. Use the same syntax as you see in your model.}

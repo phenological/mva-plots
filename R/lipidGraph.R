@@ -4,14 +4,26 @@
 #'
 #' @param model A model from PCA or oplsda function, or a data frame of lipids.
 #' @param stat The statistic you would like to use. Either log2 fold change "fc",
-#' Cliff's Delta "cd", correlation "corr" or "external". "fc" and "cd" are
-#' calculated automatically. "external" is an externally supplied statistic that
-#' can be, for example, a p-value from lmm and needs to be provided in the
+#' Cliff's Delta "cd", p-value "pval" or "external". "fc", "pval" and "cd" are
+#' calculated automatically. The p-value is the log 10 kruskal wallis p-value
+#' adjusted by "bonferroni". You may select other p-value adjustments using method
+#' in the optns. "external" is an externally supplied statistic that can be, for
+#' example, a p-value from lmm and needs to be provided in the optns list.
+#' @param filter Either "none", a range (1:10) or a numeric (1.3) for significance.
+#' Based on internally calculated log 10 kruskal wallis p-value. A range will
+#' provide only the top significant lipids (eg 1:10 will graph only top 10). A
+#' numeric will filter out anything below this significance (eg 1.3, anything
+#' with log 10 p-value less than 1.3 is excluded). "none" is the default and will
+#' apply no filter. This is the only option available with externally provided stats.
 #' \code{optns}.
 #' @param optns A list for additional options:
 #'   \itemize{
+#'   \item{method} {adjustment for the internally calculated p-value. Default is
+#'   "bonferroni", but can be set to "holm", "hochberg", "hommel", "bonferroni",
+#'   "BH", "BY", "fdr" or "none".}
 #'    \item{external} {If stat is set to external supply the chosen column from
-#'    data frame here. Must be the same as the number of lipids.}
+#'    data frame here. Must be the same as the number of lipids. Cannot filter
+#'    when providing an external stat. Internal p-value will not be calculated.}
 #'    \item{lipidStart} {A character of the name of the first lipid in the range
 #'    you wish to include. If you have more than lipids in your model, it is essential
 #'    to provide this and lipidEnd. Use the same syntax as you see in your model.}
@@ -215,14 +227,29 @@ lipidGraph <- function(model, stat = "fc", filter = "none", optns = list()){
 
   ########external########
   if(stat == "external"){
-    #add check that there is the correct length of this stat
+
+    #cannot filter when externally provided stat is used
+    if(!is(filter)[1] == "character"){
+      filter = "none"
+      warning("filter automatically set to none for externally supplied stat. Please filter prior to using lipidGraph.")
+    }
+
+    #check class of provided argument
+    if(!is(optns$external)[1] == "data.frame"){
+      optns$external <- as.data.frame(optns$external)
+    }
+
+    #add check that there is the correct length of this external stat
     if(nrow(optns$external) == length(id)){
 
       if(length(optns$external) == 1){
         external <- cbind(NA, optns$external)
       }
+
+      #set it to the statistic and significance
       statistic <- optns$external
       significance <- optns$external
+      colnames(significance) <- paste0("sig_", colnames(significance))
     }else {stop("length of externally provided stat does not match the number of lipids") }
   }
 
@@ -353,38 +380,79 @@ lipidGraph <- function(model, stat = "fc", filter = "none", optns = list()){
 
   ld<-cbind(statistic, id, lipidClass, significance)
 
-  #which groups will be plotted
-  if("columns_to_plot" %in% names(optns)){
-    columns_to_plot <- optns$columns_to_plot
-  } else{columns_to_plot <- colnames(ld)[2:(which(colnames(ld) == "id") - 1)]}
+  ##### groups to be plotted####
+  if("columns_to_plot" %in% names(optns)) {
+    if ("external" %in% names(optns)) {
+      sorted_unique_factor <- sort(unique(optns$factor))
+      sorted_external_names <- sort(names(optns$external))
+
+      # Check if the sorted vectors are equal
+      if (all(sorted_unique_factor == sorted_external_names)) {
+        columns_to_plot <- optns$columns_to_plot
+      } else{
+        columns_to_plot <- colnames(optns$external)
+      }
+    } else{
+      columns_to_plot <- optns$columns_to_plot
+    }
+
+  } else{
+    columns_to_plot <- colnames(ld)[2:(which(colnames(ld) == "id") - 1)]
+  }
 
   if(length(columns_to_plot) > length(optns$discretePalette)) {
     warning("You have more groups to plot than colors supplied, the default is 8 colors. Please supply the same or more number of colors as number of groups to plot.")
   }
 
-  if(!"external" %in% names(optns)){
-    significance_columns_to_plot <- paste0("sig_", columns_to_plot)
+  #if external
+  # if("external" %in% names(optns)){
+  #
+  #   sorted_unique_factor <- sort(unique(optns$factor))
+  #   sorted_external_names <- sort(names(optns$external))
+  #
+  #   # Check if the sorted vectors are equal
+  #   if(all(sorted_unique_factor == sorted_external_names)){
+  #     significance_columns_to_plot <- paste0("sig_", columns_to_plot)
+  #   }else{significance_columns_to_plot <- colnames(significance)}
+  #
+  #   #significance_columns_to_plot <- colnames(ld)[grep("Significance", colnames(ld))]
+  # }else{significance_columns_to_plot <- paste0("sig_", columns_to_plot)}
 
-    #significance_columns_to_plot <- colnames(ld)[grep("Significance", colnames(ld))]
+
+  ####data frame for plotting####
+  # Filter the data frame to include only the relevant columns
+  if("external" %in% names(optns)){
+    plot_data <- ld[, c("class", "sc1", "id", columns_to_plot)]
+
+    var <- list(columns_to_plot)
+  } else{
+    significance_columns_to_plot <- paste0("sig_", columns_to_plot)
+    plot_data <- ld[, c("class", "sc1", "id", columns_to_plot, significance_columns_to_plot)]
+
+    var <- list(columns_to_plot,
+                significance_columns_to_plot)
   }
 
 
-  # Filter the data frame to include only the relevant columns
-  plot_data <- ld[, c("class", "sc1", "id", columns_to_plot, significance_columns_to_plot)]
+
 
   # Reshape the data frame to long format manually
   plot_data_long <- reshape(plot_data,
                             idvar = c("class", "sc1", "id"),
-                            varying = list(columns_to_plot, significance_columns_to_plot),
+                            varying = var,
                             v.names = c("Value", "sig"),
                             times = columns_to_plot,
                             direction = "long")
 
-
+if("external" %in% names(optns)){
+  colnames(plot_data_long) <- c("class", "sc1", "id", "Group", "Value")
+} else{
   colnames(plot_data_long) <- c("class", "sc1", "id", "Group", "Value", "Sig")
+}
+
 
   ####filtering#####
-  if(filter == "none"){
+  if(is(filter)[1] == "character"){
     plot_data_long <-  plot_data_long
   }
 
@@ -394,8 +462,13 @@ lipidGraph <- function(model, stat = "fc", filter = "none", optns = list()){
   }
 
   if(is(filter)[1] == "integer"){
+    ordered_df <- plot_data_long[order(plot_data_long$Sig, decreasing = TRUE), ]
 
+    # Retain the top x rows
+    plot_data_long <- ordered_df[filter, , drop = FALSE]
   }
+
+  ####Color to direction####
   #only allow color to be set as pos and neg when there is one group and change guide title
   if(length(unique(plot_data_long$Group)) == 1){
 
