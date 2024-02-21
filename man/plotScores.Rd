@@ -4,10 +4,14 @@
 \alias{plotScores}
 \title{Plot Scores.}
 \usage{
-plotScores(model, optns = list())
+plotScores(model, flat = FALSE, optns = list())
 }
 \arguments{
 \item{model}{A PCA or oplsda model.}
+
+\item{flat}{A logical for a flat O-PLS(DA) scores plot. Only applicable to
+oplsda models with an orthogonal component. Default is FALSE. Outliers and
+ellipse are not available for a flat plotscore.}
 
 \item{optns}{An empty list for additional options:
 \itemize{

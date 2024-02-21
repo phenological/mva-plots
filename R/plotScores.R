@@ -3,6 +3,9 @@
 #' Grid of the score plots using GGally::ggpairs up to a threshold number.
 #'
 #' @param model A PCA or oplsda model.
+#' @param flat A logical for a flat O-PLS(DA) scores plot. Only applicable to
+#' oplsda models with an orthogonal component. Default is FALSE. Outliers and
+#' ellipse are not available for a flat plotscore.
 #' @param optns An empty list for additional options:
 #'  \itemize{
 #'    \item{PCi} {A numeric for the x axis pricipal component for a single plot.}
@@ -99,7 +102,7 @@
 
 
 
-plotScores<-function(model, optns=list()){
+plotScores<-function(model, flat = FALSE,  optns=list()){
 
   #outlier annotation
   if("annotation" %in% names(optns)){
@@ -357,6 +360,7 @@ plotScores<-function(model, optns=list()){
       gl <- labs(x = paste0('tp1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('to1'))
     }else{
+      #flat <- FALSE
       df <- as.data.frame(model@scoreMN)
       df2 <- as.data.frame(model@loadingMN)
       gl <- labs(x = paste0('t1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
@@ -382,6 +386,7 @@ if("outlierLabels" %in% names(optns)){
 #########PCA objects##################
   if(is(model)[1]=="list"){
 
+    #flat <- FALSE
     df <- model$data$pcdf
 
     gc <- if(is(optns$color)[1] == "numeric" | is(optns$color)[1] == "integer" | is(optns$color)[1] == "double"){
@@ -439,6 +444,43 @@ if("outlierLabels" %in% names(optns)){
           theme
 
   onePlot[["data"]]$assignment <- optns$color
+
+#########flat O-PLS(DA)##########
+  if(flat == TRUE) {
+    if ("OPLS-DA" %in% model@typeC) {
+      unique_y1 <- unique(df$y1)
+      df$y <-  ifelse(df$y1 == unique_y1[1], 0.02, 0.04)
+      y <- df$y
+    } else {
+      y <- 0.002
+    }
+    onePlot <- ggplot(data = df,
+                      aes(x = df[, PCi], y = y)) +
+      ggtitle(plotTitle) +
+      gl +
+      gc +
+      gp +
+      gu +
+      labs(color = optns$colorTitle,
+           shape = optns$shapeTitle,
+           size = optns$sizeTitle,
+           alpha = optns$alphaTitle ) +
+      scale_y_continuous(limits = c(0, 0.1),
+                         expand = c(0, 0)) +  # Set limits and remove expansion
+      theme_bw() +
+      theme +
+      theme(
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.y = element_blank()
+      )
+    print(onePlot)
+
+    model@suppLs[["ScoresPlot"]] <- onePlot
+    return(model)
+  }
+
 #########ellipse & outliers########
 if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
 

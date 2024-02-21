@@ -99,4 +99,42 @@ test_that("opls object is handled correctly", {
 
 })
 
+test_that("can have a flat plotscore for O-PLS(DA) model", {
+  exampleData <- mtcars
 
+  colnames(exampleData) <- c("metab1", "metab2", "metab3", "metab4", "metab5", "metab6", "age", "status", "sex")
+
+  exampleData$status <- ifelse(exampleData$status == 1, "treatment", "control")
+  exampleData$sex <- ifelse(exampleData$sex == 1, "male", "female")
+  rownames(exampleData) <- paste0("subject", 1:nrow(exampleData))
+
+  #discriminant Analysis
+  model <- oplsda(Y = (exampleData[, "status"]),
+                  X = exampleData[,1:5],
+                  type = "OPLS")
+
+  ps <- plotScores(model = model, flat = TRUE,
+                   optns = list(color = exampleData[,"status"]))
+
+
+#has the plot appended to the model
+  expect_contains(object = names(ps@suppLs), expected = "ScoresPlot")
+
+#are there 2 colors present at different heights
+  expect_equal(object = length(unique(ps@suppLs[["ScoresPlot"]][["data"]][["y"]])), expected = 2)
+
+  #continuous Y
+  model <- oplsda(Y = (exampleData[, "age"]),
+                  X = exampleData[,1:5],
+                  type = "OPLS")
+
+
+  ps <- plotScores(model = model, flat = TRUE,
+                   optns = list(color = exampleData[,"age"],
+                                colorTitle = "age"))
+
+  #has the plot appended to the model
+  expect_contains(object = names(ps@suppLs), expected = "ScoresPlot")
+  #is there only one height
+expect_true(object = length(unique(ps@suppLs[["ScoresPlot"]][["data"]][["y1"]])) > 2)
+})
