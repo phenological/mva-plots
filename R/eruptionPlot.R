@@ -296,6 +296,6 @@ if(is(model)[1] == "opls"){
 }
 
 invisible(model)
-print(eruptionPlot)
+#print(eruptionPlot)
 }
 
