@@ -3,6 +3,8 @@
 #' Grid of the loadings plots using GGally::ggpairs up to a threshold number.
 #'
 #' @param model A PCA, oplsda or ropls object.
+#' @param flat A logical for a flat O-PLS(DA) loadings plot. Only applicable to
+#' oplsda models with an orthogonal component. Default is FALSE.
 #' @param optns An empty list for addtional options:
 #'    \itemize{
 #'     \item{plotTitle}{A character for the title of the grid.}
@@ -24,7 +26,7 @@
 #' @export
 
 
-plotLoadings <- function(model, optns=list()){
+plotLoadings <- function(model, flat = FALSE, optns=list()){
   #plot title (working)
   if("plotTitle" %in% names(optns)){
     plotTitle = optns$plotTitle
@@ -65,6 +67,36 @@ plotLoadings <- function(model, optns=list()){
         geom_vline(xintercept = 0, colour = "gray70") +
         theme_bw() +
         theme
+
+      if(flat == TRUE){
+        onePlot <- ggplot(data = df,
+                          aes(x = df[,PCi], y = 0.001)) +
+          ggtitle(plotTitle) +
+          gl +
+          geom_point(color= "blue",
+                     size = 1) +
+          scale_y_continuous(limits = c(0, 0.1),
+                             expand = c(0, 0)) +  # Set limits and remove expansion
+          geom_text_repel(
+            aes(label = rownames(df)),
+            size = 3,
+            angle = 90,
+            #segment.color = NA, # Remove the connecting segments
+            nudge_x = 0.011,        # Center the label horizontally
+            nudge_y = 0.0051,      # Move the label above the point
+            direction = "x",    # Orient the labels vertically
+            hjust = 0.1,        # Center the label horizontally
+            vjust = -1,
+            box.padding = 0.05) +       # Move the label above the point
+          theme_bw() +
+          theme+
+          theme(axis.title.y=element_blank(),
+                axis.text.y=element_blank(),
+                axis.ticks.y=element_blank(),
+                axis.line.y=element_blank())
+
+      }
+
 
       print(onePlot)
 

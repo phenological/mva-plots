@@ -74,7 +74,8 @@
 #'   optns <- list(control = "Control",
 #'                 factor = AnnoR$Class,
 #'                 lipidStart = "CE(14:0)",
-#'                 lipidEnd = "TAG(60:11_FA22:6)")
+#'                 lipidEnd = "TAG(60:11_FA22:6)",
+#'                 method = "BH")
 #'
 #'   #check factors to see if any group is empty
 #'   if (any(is.na(optns$factor))) {
@@ -315,33 +316,33 @@
 #'     plot_data_long2 <- ordered_df[filter, , drop = FALSE]
 #'   }
 #'
-#'   #put back matching group values
-#'   idx <- unique(plot_data_long2$id)
+#'   # #put back matching group values
+#'   # idx <- unique(plot_data_long2$id)
 #'
-#'   matched_rows <- plot_data_long[plot_data_long$id %in% idx, ]
+#'   matched_rows <- plot_data_long2[plot_data_long2$id %in% idx, ]
 #'
-#'   # Calculate the absolute values
-#'   matched_rows$abs_Value <- abs(matched_rows$Value)
-#'
-#'   # Initialize an empty data frame to store the results
-#'   result <- data.frame(analyte = character(), Value = numeric())
-#'
-#'   # Loop through each unique analyte
-#'   for (ana in unique(matched_rows$analyte)) {
-#'     # Subset the data for the current analyte
-#'     subset_data <- matched_rows[matched_rows$analyte == ana, ]
-#'
-#'     # Find the row with the maximum absolute Value
-#'     max_row <- subset_data[which.max(subset_data$abs_Value), ]
-#'
-#'     # Append the row to the result data frame
-#'     result <- rbind(result, max_row)
-#'   }
-#'
-#'   # Remove the abs_Value column
-#'   matched_rows$abs_Value <- NULL
-#'
-#'   # result will now contain the analyte and the corresponding Value with the highest absolute Value
+#'   # # Calculate the absolute values
+#'   # matched_rows$abs_Value <- abs(matched_rows$Value)
+#'   #
+#'   # # Initialize an empty data frame to store the results
+#'   # result <- data.frame(analyte = character(), Value = numeric())
+#'   #
+#'   # # Loop through each unique analyte
+#'   # for (ana in unique(matched_rows$analyte)) {
+#'   #   # Subset the data for the current analyte
+#'   #   subset_data <- matched_rows[matched_rows$analyte == ana, ]
+#'   #
+#'   #   # Find the row with the maximum absolute Value
+#'   #   max_row <- subset_data[which.max(subset_data$abs_Value), ]
+#'   #
+#'   #   # Append the row to the result data frame
+#'   #   result <- rbind(result, max_row)
+#'   # }
+#'   #
+#'   # # Remove the abs_Value column
+#'   # matched_rows$abs_Value <- NULL
+#'   #
+#'   # # result will now contain the analyte and the corresponding Value with the highest absolute Value
 #'
 #'
 #'

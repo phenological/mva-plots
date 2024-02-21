@@ -4,10 +4,13 @@
 \alias{plotLoadings}
 \title{Plot loadings.}
 \usage{
-plotLoadings(model, optns = list())
+plotLoadings(model, flat = FALSE, optns = list())
 }
 \arguments{
 \item{model}{A PCA, oplsda or ropls object.}
+
+\item{flat}{A logical for a flat O-PLS(DA) loadings plot. Only applicable to
+oplsda models with an orthogonal component. Default is FALSE.}
 
 \item{optns}{An empty list for addtional options:
 \itemize{
