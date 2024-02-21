@@ -281,7 +281,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
 
   }
 
-print(eruptionPlot)
+
 #########append#############
 
 #append to data and plots
@@ -296,6 +296,6 @@ if(is(model)[1] == "opls"){
 }
 
 invisible(model)
-
+print(eruptionPlot)
 }
 
