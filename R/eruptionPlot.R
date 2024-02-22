@@ -110,19 +110,19 @@ eruptionPlot <- function(model, optns = list()){
   }
 
   if(is(model)[1] == "list"){
-    id <- as.data.frame(colnames(model$data$rawData))
+    id <- as.data.frame(colnames(model$data$rawData), check.names = F)
     df <- model$data$rawData
     df[,"factor"] <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
-    df <- as.data.frame(df)
-    pcLoadings<-as.data.frame(abs(model$data$loadings[,PC]))
+    df <- as.data.frame(df, check.names = F)
+    pcLoadings<-as.data.frame(abs(model$data$loadings[,PC]), check.names = F)
 
   }
 
   if(is(model)[1] == "opls"){
-    id <- as.data.frame(colnames(as.data.frame(model@suppLs[["x"]])))
-    df <- as.data.frame(model@suppLs[["x"]])
+    id <- as.data.frame(colnames(as.data.frame(model@suppLs[["x"]], check.names = F)))
+    df <- as.data.frame(model@suppLs[["x"]], check.names = F)
     df[,"factor"] <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
-    pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]))
+    pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]), check.names = F)
   }
 
   #stop if there are more than 2 groups in factor
@@ -133,7 +133,7 @@ eruptionPlot <- function(model, optns = list()){
   #ensure "factor" isn't included in id
   if(any(id == "factor")){
     idx <- which(id == "factor")
-    id <- as.data.frame(id[-idx,])
+    id <- as.data.frame(id[-idx,], check.names = F)
   }
 
 ########cliffs delta##########
@@ -141,11 +141,11 @@ eruptionPlot <- function(model, optns = list()){
 
 ##########correlations between scaled + centered original data and scores######
     if(is(model)[1]== "list"){
-      corr <- abs(t(as.data.frame(cor(model$data$scores[,PC], model$data$dataSC))))
+      corr <- abs(t(as.data.frame(cor(model$data$scores[,PC], model$data$dataSC), check.names = F)))
     }
 
     if(is(model)[1]=="opls"){
-      corr <- abs(t(as.data.frame(cor(model@scoreMN[,PC], model@suppLs[["xModelMN"]]))))
+      corr <- abs(t(as.data.frame(cor(model@scoreMN[,PC], model@suppLs[["xModelMN"]]), check.names = F)))
     }
 
 ##########Fold change#########
@@ -162,7 +162,7 @@ eruptionPlot <- function(model, optns = list()){
       pval[[i]]<-kruskal.test(df[,i], df[,"factor"])$p.value
     }
     unlist(pval)
-    pvalUnadjusted <- t(as.data.frame(pval))
+    pvalUnadjusted <- t(as.data.frame(pval, check.names = F))
   }
 
 ########p-value adjustment########
@@ -170,7 +170,7 @@ eruptionPlot <- function(model, optns = list()){
 #pvalUnadjusted <- t(as.data.frame(pval))
 pvalAdjusted <- p.adjust(pval, method = optns$method)
 pvalRescaled <- abs(log10(pvalAdjusted))
-pvalRescaled <- as.data.frame(pvalRescaled)
+pvalRescaled <- as.data.frame(pvalRescaled, check.names = F)
 
 #eruption data frame
 ed<-cbind(cd, fc, pvalRescaled, pvalUnadjusted, pcLoadings, id, corr)

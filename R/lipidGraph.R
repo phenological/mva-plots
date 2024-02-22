@@ -125,7 +125,7 @@ lipidGraph <- function(model, stat = "fc", filter = "none", optns = list()){
   if(is(model)[1] == "opls"){
     #id <- as.data.frame(colnames(as.data.frame(model@suppLs[["x"]])))
     id <-names(model@suppLs[["x"]])
-    df <- as.data.frame(model@suppLs[["x"]])
+    df <- as.data.frame(model@suppLs[["x"]], check.names = F)
 
     # #empty df
     pvalUnadjusted <- data.frame(matrix(NA, nrow = ncol(df), ncol = 1))
@@ -200,11 +200,11 @@ lipidGraph <- function(model, stat = "fc", filter = "none", optns = list()){
   ##########correlations between scaled + centered original data and scores######
   if(stat == "corr"){
     if(is(model)[1] == "list"){
-      corr <- abs(t(as.data.frame(cor(model$data$scores[,PC], model$data$dataSC))))
+      corr <- abs(t(as.data.frame(cor(model$data$scores[,PC], model$data$dataSC), check.names = F)))
     }
 
     if(is(model)[1] == "opls"){
-      corr <- abs(t(as.data.frame(cor(model@scoreMN[,PC], model@suppLs[["xModelMN"]]))))
+      corr <- abs(t(as.data.frame(cor(model@scoreMN[,PC], model@suppLs[["xModelMN"]]), check.names = F)))
     }
 
     if(is(model)[1] == "data.frame"){
@@ -236,7 +236,7 @@ lipidGraph <- function(model, stat = "fc", filter = "none", optns = list()){
 
     #check class of provided argument
     if(!is(optns$external)[1] == "data.frame"){
-      optns$external <- as.data.frame(optns$external)
+      optns$external <- as.data.frame(optns$external, check.names = F)
     }
 
     #add check that there is the correct length of this external stat
@@ -265,7 +265,7 @@ lipidGraph <- function(model, stat = "fc", filter = "none", optns = list()){
     for(j in 2: length(unique_factors)){
 
       df2 <- df[df$factor %in% c(1, j), ]
-      df2<- as.data.frame(df2)
+      df2<- as.data.frame(df2, check.names = F)
       pval <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
       for(i in 1:(ncol(df2)-1)){
         pval[i,] <- kruskal.test(df2[,i], df2$factor)$p.value
@@ -279,7 +279,7 @@ lipidGraph <- function(model, stat = "fc", filter = "none", optns = list()){
       }
     }
 
-    df<-as.data.frame(df)
+    df<-as.data.frame(df, check.names = F)
     # Create a mapping between numbers and words, rename pval dataframe columns
     mapping <- setNames(unique(optns$factor), unique(df[,"factor"]))
 

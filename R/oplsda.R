@@ -149,7 +149,7 @@ if("permI" %in% names(optns)){
 
 #make sure X is a data frame for other functions
   if(!(is(X)[1] == "data.frame")){
-    X <- as.data.frame(X)
+    X <- as.data.frame(X, check.names = FALSE)
   }
 
   model <- ropls::opls(x = X,

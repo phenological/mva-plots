@@ -69,7 +69,7 @@ PCA <- function(data, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns
 
   rank <- ncol(results[["rotation"]])
 
-  pcSum <- (as.data.frame(t(summary(results)[["importance"]])))
+  pcSum <- as.data.frame(t(summary(results)[["importance"]]), check.names = F)
   pcSum <- pcSum[1:rank,]*100
   pcSum[, "Principal Component"] <- rownames(pcSum)
   pcSum[, "Principal Component"] <- factor(pcSum$`Principal Component`, levels = pcSum$`Principal Component`)
@@ -84,11 +84,11 @@ PCA <- function(data, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns
 
   scale <- results[["scale"]]
 
-  pcdf <- cbind(as.data.frame(scores))
+  pcdf <- cbind(as.data.frame(scores, check.names = F))
 
   rawData <- data
 
-  dataSC<- as.data.frame(scale(rawData, scale=TRUE, center=T))
+  dataSC<- as.data.frame(scale(rawData, scale=TRUE, center=T), check.names = F)
 
  if("cutoff" %in% optns){
    cutoff = optns$cutoff

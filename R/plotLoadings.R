@@ -43,11 +43,11 @@ plotLoadings <- function(model, flat = FALSE, optns=list()){
   if(is(model)[1]=="opls"){
 
     if(grepl("O", model@typeC) == TRUE){
-      df <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN))
+      df <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN), check.names = F)
       gl <- labs(x = paste0('p1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('po1'))
     }else{
-      df <- as.data.frame(model@loadingMN)
+      df <- as.data.frame(model@loadingMN, check.names = F)
       gl <- labs(x = paste0('p1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('p2 (', round(model@modelDF[["R2X"]][2]*100, 1), '%)'))
     }
@@ -107,7 +107,7 @@ plotLoadings <- function(model, flat = FALSE, optns=list()){
   #########PCA objects##################
   if(is(model)[1]=="list"){
 
-    df<- as.data.frame(model$data$loadings)
+    df<- as.data.frame(model$data$loadings, check.names = F)
 
   #number of pcas (working)
   if("thresh" %in% names(optns)){

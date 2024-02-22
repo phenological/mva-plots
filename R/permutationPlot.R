@@ -34,7 +34,7 @@
 #'                            size = 5))
 #' @export
 permutationPlot <- function(model, optns = list()){
-df <- as.data.frame(model@suppLs[["permMN"]])
+df <- as.data.frame(model@suppLs[["permMN"]], check.names = F)
 
 #plot title
 if("plotTitle" %in% names(optns)){

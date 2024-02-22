@@ -355,14 +355,14 @@ plotScores<-function(model, flat = FALSE,  optns=list()){
   if(is(model)[1]=="opls"){
 
     if(grepl("O", model@typeC) == TRUE){
-      df <- as.data.frame(cbind(model@scoreMN, model@orthoScoreMN))
-      df2 <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN))
+      df <- as.data.frame(cbind(model@scoreMN, model@orthoScoreMN), check.names = F)
+      df2 <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN), check.names = F)
       gl <- labs(x = paste0('tp1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('to1'))
     }else{
       #flat <- FALSE
-      df <- as.data.frame(model@scoreMN)
-      df2 <- as.data.frame(model@loadingMN)
+      df <- as.data.frame(model@scoreMN, check.names = F)
+      df2 <- as.data.frame(model@loadingMN, check.names = F)
       gl <- labs(x = paste0('t1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('t2 (', round(model@modelDF[["R2X"]][2]*100, 1), '%)'))
     }

@@ -13,7 +13,7 @@ cliffsDelta <- function(model, optns = optns) {
   }
 
   if(is(model)[1] == "opls"){
-    df <- as.data.frame(model@suppLs[["x"]])
+    df <- as.data.frame(model@suppLs[["x"]], check.names = F)
     df[,"factor"] <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
     cd_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
   }
@@ -30,7 +30,7 @@ cliffsDelta <- function(model, optns = optns) {
   }
 
   if(is(df)[1] == "data.table" | is(df)[1] == "tbl_df"){
-    df <- as.data.frame(df)
+    df <- as.data.frame(df, check.names = F)
   }
 
   # ##cliffs delta manually
@@ -105,7 +105,7 @@ cliffsDelta <- function(model, optns = optns) {
   # Create a mapping between numbers and words, rename cd dataframe columns
   mapping <- setNames(unique(optns$factor), unique(df[,"factor"]))
 
-  testnames<- as.data.frame(mapping)
+  testnames<- as.data.frame(mapping, check.names = F)
   testnames$rowName <- rownames(testnames)
 
   for (i in seq_len(nrow(testnames))) {

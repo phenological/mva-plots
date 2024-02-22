@@ -15,7 +15,7 @@ foldChange <- function(model = model, optns = optns){
   }
 
   if(is(model)[1] == "opls"){
-    df <- as.data.frame(model@suppLs[["x"]])
+    df <- as.data.frame(model@suppLs[["x"]], check.names = F)
     df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
     # Initialize an empty data frame to store log2fc values
     log2fc_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
@@ -45,8 +45,8 @@ foldChange <- function(model = model, optns = optns){
     t <- log2(apply(X = treatment, MARGIN = 2, FUN = mean))
 
     # log2 fold change
-    log2fc <- as.data.frame(c - t)
-    log2fc <- as.data.frame(log2fc[1:(nrow(log2fc) - 1), ])
+    log2fc <- as.data.frame(c - t, check.names =F)
+    log2fc <- as.data.frame(log2fc[1:(nrow(log2fc) - 1), ], check.names = F)
 
     # Assign the log2fc as a column in the data frame
     col_name <- paste0("log2fc_", i)
