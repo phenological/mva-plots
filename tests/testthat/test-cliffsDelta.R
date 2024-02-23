@@ -38,13 +38,13 @@ test_that("cliffDelta calculates correctly for opls", {
 
   # Do oplsda for opls option
   result2<- oplsda(X = mtcars[,1:5], Y = mtcars$vs, type = "OPLS")
-  cdopls <-cliffsDelta(model = result2, optns = list(factor = mtcars$vs, control = 0))
+  cdopls <-cliffsDelta(model = result2, optns = list(factor = mtcars$vs, control = "0"))
 
   model = result2
-  optns = list(factor = mtcars$vs, control = 0)
+  optns = list(factor = mtcars$vs, control = "0")
   if(is(model)[1] == "opls"){
     df <- as.data.frame(model@suppLs[["x"]])
-    df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
     cd_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
   }
 
@@ -52,7 +52,7 @@ test_that("cliffDelta calculates correctly for opls", {
   #manual calc
   model <- result2
   df <- as.data.frame(model@suppLs[["x"]])
-  df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+  df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
 
   #control
   idx<- which(df[,"factor"] == 1)
@@ -113,13 +113,30 @@ test<- cliffsDelta(model = data2[,1:5], optns=list(control = "control", factor =
 #is the first column control
 expect_equal(object = colnames(original)[1], expected = "control")
 
-#is the cliff's delta for treatment the same when there is all 4 factors and when there is just control and treatment
+#check correct group assigned: is the cliff's delta for treatment the same when there is all 4 factors and when there is just control and treatment
 expect_equal(object = as.numeric(original[,"treatment"]), expected = as.numeric(unlist(test)))
+
+#check correct group assigned for misc1
+data2 <- rbind(data1[which(data1$fact == "control"),], data1[which(data1$fact == "misc1"),])
+test<- cliffsDelta(model = data2[,1:5], optns=list(control = "control", factor = data2$fact))
+expect_equal(object = as.numeric(original[,"misc1"]), expected = as.numeric(unlist(test)))
+
+#check correct group assigned for misc2
+data2 <- rbind(data1[which(data1$fact == "control"),], data1[which(data1$fact == "misc2"),])
+test<- cliffsDelta(model = data2[,1:5], optns=list(control = "control", factor = data2$fact))
+expect_equal(object = as.numeric(original[,"misc2"]), expected = as.numeric(unlist(test)))
 
 cliffDf<- cliffsDelta(model = data1[,1:5], optns=list(control = "control", factor = data1$fact))
 
 #should have 4 columns in result
 expect_equal(object = length(cliffDf), expected = 4)
+
+#check correct group assigned for misc2 if control is set to treatment
+original<- cliffsDelta(model = data1[,1:5], optns=list(control = "treatment", factor = data1$fact))
+data2 <- rbind(data1[which(data1$fact == "treatment"),], data1[which(data1$fact == "misc2"),])
+test<- cliffsDelta(model = data2[,1:5], optns=list(control = "treatment", factor = data2$fact))
+expect_equal(object = as.numeric(original[,"misc2"]), expected = as.numeric(unlist(test)))
+
 
 })
 

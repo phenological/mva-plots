@@ -9,7 +9,9 @@ test_that("foldChange calculates log2 fold change correctly for PCA", {
 
   # Do PCA function for list option
   result <- PCA(data[,1:5], optns = list(factor = data$fact))
-  log2fclist <- foldChange(model = result, optns = list(factor = data$fact))
+  log2fclist <- foldChange(model = result,
+                           optns = list(factor = data$fact,
+                                        control = "control"))
 
   #manual calc
   result$data$rawData$factor <- as.numeric(as.factor(data$fact))
@@ -37,12 +39,12 @@ test_that("foldChange calculates log2 fold change correctly for opls", {
 
   # Do oplsda for opls option
   result2<- oplsda(X = mtcars[,1:5], Y = mtcars$vs, type = "OPLS")
-  log2fcopls <-foldChange(model = result2, optns = list(factor = mtcars$vs))
+  log2fcopls <-foldChange(model = result2, optns = list(factor = mtcars$vs, control = "0"))
 
   #manual calc
   model <- result2
   df <- as.data.frame(model@suppLs[["x"]])
-  df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+  df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]), ref = 0)
 
   idx<- which(df[,"factor"] == 1)
   control <- df[idx, -which(colnames(df) == "factor")]
@@ -78,13 +80,33 @@ test_that("can use with dataframe with more than 2 groups",{
   #is the first column control
   expect_equal(object = colnames(original)[1], expected = "control")
 
-  #is the foldchange for treatment the same when there is all 4 factors and when there is just control and treatment
+  #check correct group was assigned by: is the foldchange for treatment the same when there is all 4 factors and when there is just control and treatment
   expect_equal(object = as.numeric(original[,"treatment"]), expected = as.numeric(unlist(test)))
+
+  #check group assignment for misc1
+  data2 <- rbind(data1[which(data1$fact == "control"),], data1[which(data1$fact == "misc1"),])
+  test<- foldChange(model = data2[,1:5], optns=list(control = "control", factor = data2$fact))
+  expect_equal(object = as.numeric(original[,"misc1"]), expected = as.numeric(unlist(test)))
+
+  #check group assignment for misc2
+  data2 <- rbind(data1[which(data1$fact == "control"),], data1[which(data1$fact == "misc2"),])
+  test<- foldChange(model = data2[,1:5], optns=list(control = "control", factor = data2$fact))
+  expect_equal(object = as.numeric(original[,"misc2"]), expected = as.numeric(unlist(test)))
 
   log2fcdf<- foldChange(model = data1[,1:5], optns=list(control = "control", factor = data1$fact))
 
   #should have 4 columns in result
   expect_equal(object = length(log2fcdf), expected = 4)
+
+  #check correct assignment for PCA object (a list)
+  result <- PCA(data1[,1:5], optns = list(factor = data1$fact))
+  log2fclist <- foldChange(model = result,
+                           optns = list(factor = data1$fact,
+                                        control = "misc1"))
+
+  data2 <- rbind(data1[which(data1$fact == "misc1"),], data1[which(data1$fact == "treatment"),])
+  test<- foldChange(model = data2[,1:5], optns=list(control = "misc1", factor = data2$fact))
+  expect_equal(object = as.numeric(log2fclist[,"treatment"]), expected = as.numeric(unlist(test)))
 
 
 })

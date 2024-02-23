@@ -7,11 +7,26 @@
 foldChange(model = model, optns = optns)
 }
 \arguments{
-\item{model}{A PCA or oplsda object from mva.plots or a data frame passed to
-this function.}
+\item{model}{A data frame, PCA or oplsda object from mva.plots.}
 
-\item{optns}{A list passed to foldChange with additional arguments.}
+\item{optns}{A list passed to foldChange with additional arguments.
+\itemize{
+\item{fun} {Either mean or median for the foldchange calculation. The
+default is mean.}
+\item{factor} {An object the same length as the data in the model supplied
+that must have at least 2 unique groups such as treatment and control. More
+than 2 is allowable.}
+\item{control} {Character to set which group with the supplied factor you wish
+to set as the control for comparison to all other groups. If your factor is
+already numeric, when specifying the control, supply it as a character, for
+example, control = "0". If not manually set, the unique factor assigned one
+from the supplied factor will be automatically selected}
+}}
+}
+\value{
+Creates a dataframe of foldchanges. For more than 2 groups, pairwise
+foldchange to the selected control will be returned.
 }
 \description{
-Fold Change
+The log2 fold change.
 }

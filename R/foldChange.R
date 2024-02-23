@@ -1,22 +1,50 @@
 #' Fold Change
 #'
-#' @param model A PCA or oplsda object from mva.plots or a data frame passed to
-#' this function.
+#' The log2 fold change.
+#'
+#' @param model A data frame, PCA or oplsda object from mva.plots.
 #' @param optns A list passed to foldChange with additional arguments.
+#' \itemize{
+#'    \item{fun} {Either mean or median for the foldchange calculation. The
+#'    default is mean.}
+#'    \item{factor} {An object the same length as the data in the model supplied
+#'    that must have at least 2 unique groups such as treatment and control. More
+#'    than 2 is allowable.}
+#'    \item{control} {Character to set which group with the supplied factor you wish
+#'    to set as the control for comparison to all other groups. If your factor is
+#'    already numeric, when specifying the control, supply it as a character, for
+#'    example, control = "0". If not manually set, the unique factor assigned one
+#'    from the supplied factor will be automatically selected}
+#' }
+#' @return Creates a dataframe of foldchanges. For more than 2 groups, pairwise
+#' foldchange to the selected control will be returned.
+#' @export
 
 
 foldChange <- function(model = model, optns = optns){
 
+  if(!"fun" %in% names(optns)){
+    optns$fun <- "mean"
+  }
+
+  if (!"control" %in% names(optns)) {
+    optns$control <- 1
+    # #print warning
+    # warning(paste0("No control specified in optns for factor. The first entry was set as the control"))
+  }
+
   if(is(model)[1] == "list"){
-    model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
+    #model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
     df <- model$data$rawData
+    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
     # Initialize an empty data frame to store log2fc values
     log2fc_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
   }
 
   if(is(model)[1] == "opls"){
     df <- as.data.frame(model@suppLs[["x"]], check.names = F)
-    df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+    #df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+    df$factor <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
     # Initialize an empty data frame to store log2fc values
     log2fc_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
   }
@@ -31,7 +59,7 @@ foldChange <- function(model = model, optns = optns){
   # logmean for control
   idx<- which(df$factor == 1)
   control <- df[idx,]
-  c <- log2(apply(X = control, MARGIN = 2, FUN = mean))
+  c <- log2(apply(X = control, MARGIN = 2, FUN = optns$fun))
 
   # Dynamically assigning factors for one to one calculations
   unique_factors <- unique(df$factor)
@@ -42,7 +70,7 @@ foldChange <- function(model = model, optns = optns){
     # logmean treatment
     idx <- which(df[,"factor"] == i)
     treatment <- df[idx, ]
-    t <- log2(apply(X = treatment, MARGIN = 2, FUN = mean))
+    t <- log2(apply(X = treatment, MARGIN = 2, FUN = optns$fun))
 
     # log2 fold change
     log2fc <- as.data.frame(c - t, check.names =F)

@@ -18,6 +18,8 @@
 #' \code{optns}.
 #' @param optns A list for additional options:
 #'   \itemize{
+#'   \item{fun} {Either mean or median if the foldchange is the selected stat.
+#'   The default is mean.}
 #'   \item{method} {adjustment for the internally calculated p-value. Default is
 #'   "bonferroni", but can be set to "holm", "hochberg", "hommel", "bonferroni",
 #'   "BH", "BY", "fdr" or "none".}

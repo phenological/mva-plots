@@ -1,26 +1,52 @@
 #' Cliff's Delta
 #'
-#' @param model A PCA or oplsda object from mva.plots or a data frame passed to
-#' this function.
+#' Cliff's delta, a measure of a non-parametric effect size measure used to
+#' quantify the difference between two groups or conditions. It provides a
+#' measure of the ordinal association between two variables. Ranges between (-1)
+#' and (1).
+#'
+#' @param model A PCA or oplsda object from mva.plots or a data frame.
 #' @param optns A list passed to cliffsDelta with additional arguments.
+#'  \itemize{
+#'    \item{factor} {An object the same length as the data in the model supplied
+#'    that must have at least 2 unique groups such as treatment and control. More
+#'    than 2 is allowable.}
+#'    \item{control} {Character to set which group with the supplied factor you wish
+#'    to set as the control for comparison to all other groups. If your factor is
+#'    already numeric, when specifying the control, supply it as a character, for
+#'    example, control = "0". If not manually set, the unique factor assigned one
+#'    from the supplied factor will be automatically selected}
+#' }
+#' @return Creates a dataframe of Cliff's Detlas. For more than 2 groups, pairwise
+#' calculations to the selected control will be returned.
+#' @export
 
 cliffsDelta <- function(model, optns = optns) {
 
+  if (!"control" %in% names(optns)) {
+    optns$control <- 1
+    # #print warning
+    # warning(paste0("No control specified in optns for factor. The first entry was set as the control"))
+  }
+
   if(is(model)[1] == "list"){
-    model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
+
+    #model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
     df <- model$data$rawData
+    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
     cd_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
   }
 
   if(is(model)[1] == "opls"){
     df <- as.data.frame(model@suppLs[["x"]], check.names = F)
-    df[,"factor"] <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+    #df[,"factor"] <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
+    df$factor <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
     cd_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
   }
 
   if(is(model)[1] == "data.frame"){
     df <- model
-    df[,"factor"] <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
+    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
     # Initialize an empty data frame to store cd values
     cd_df <- data.frame(matrix(NA, nrow = ncol(model), ncol = 1))
   }

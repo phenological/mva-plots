@@ -17,6 +17,8 @@
   #'     \item{color} {Color coding for the eruption plot, choose from the
   #'     adjusted and re-scaled p-value "pval", correlation "corr", log2 fold
   #'     change "fc" or cliff's delta "cd". The default is the correlation.}
+  #'     \item{fun} {Either mean or median for foldchange calculation. The
+  #'     default is mean.}
   #'     \item{plotTitle} {A string specifying the plot title.Default is
   #'     "Eruption Plot".}
   #'     \item{method} {A string specifying the method parameter. Determines the
