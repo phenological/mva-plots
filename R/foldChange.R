@@ -73,7 +73,7 @@ foldChange <- function(model = model, optns = optns){
     t <- log2(apply(X = treatment, MARGIN = 2, FUN = optns$fun))
 
     # log2 fold change
-    log2fc <- as.data.frame(c - t, check.names =F)
+    log2fc <- as.data.frame(t - c, check.names =F)
     log2fc <- as.data.frame(log2fc[1:(nrow(log2fc) - 1), ], check.names = F)
 
     # Assign the log2fc as a column in the data frame

@@ -26,7 +26,7 @@ test_that("foldChange calculates log2 fold change correctly for PCA", {
   t <- log2(apply(X = treatment, MARGIN = 2, FUN = mean))
 
   #log2 fold change
-  expected_log2fc <- as.data.frame(c-t)
+  expected_log2fc <- as.data.frame(t - c)
   expected_log2fc <- as.data.frame(expected_log2fc[1:(nrow(expected_log2fc)),])
 
   # Check if the calculated log2 fold change matches the expected values
@@ -55,7 +55,7 @@ test_that("foldChange calculates log2 fold change correctly for opls", {
   t <- log2(apply(X = treatment, MARGIN = 2, FUN = mean))
 
   #log2 fold change
-  expected_log2fc <- as.data.frame(c-t)
+  expected_log2fc <- as.data.frame(t-c)
   expected_log2fc <- as.data.frame(expected_log2fc[1:(nrow(expected_log2fc)),])
 
   # Check if the calculated log2 fold change matches the expected values
