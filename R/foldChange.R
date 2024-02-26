@@ -1,6 +1,7 @@
 #' Fold Change
 #'
-#' The log2 fold change.
+#' The log2 fold change. if you're calculating the fold change from control to
+#' treatment, log2fc is log2(treatment) - log2(control).
 #'
 #' @param model A data frame, PCA or oplsda object from mva.plots.
 #' @param optns A list passed to foldChange with additional arguments.

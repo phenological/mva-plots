@@ -2,6 +2,7 @@
 
 export(PCA)
 export(PlotLoadSpec)
+export(analyteGraph)
 export(binSpectra)
 export(cliffsDelta)
 export(ellipseSimilarity)

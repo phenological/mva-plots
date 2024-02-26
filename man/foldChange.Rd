@@ -28,5 +28,6 @@ Creates a dataframe of foldchanges. For more than 2 groups, pairwise
 foldchange to the selected control will be returned.
 }
 \description{
-The log2 fold change.
+The log2 fold change. if you're calculating the fold change from control to
+treatment, log2fc is log2(treatment) - log2(control).
 }
