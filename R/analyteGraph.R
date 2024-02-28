@@ -2,36 +2,29 @@
 #'
 #' Analyte versus statistic.
 #'
-#' @param model A model from PCA or oplsda function, or a data frame of lipids.
+#' @param model A model from PCA or oplsda function, or a data frame of analytes.
 #' @param stat The statistic you would like to use. Either log2 fold change "fc",
-#' Cliff's Delta "cd", p-value "pval" or "external". "fc", "pval" and "cd" are
-#' calculated automatically. The p-value is the log 10 kruskal wallis p-value
-#' adjusted by "bonferroni". You may select other p-value adjustments using method
-#' in the optns. "external" is an externally supplied statistic that can be, for
-#' example, a p-value from lmm and needs to be provided in the optns list.
+#' Cliff's Delta "cd", p-value "pval". "fc", "pval" and "cd" are calculated
+#' automatically. The p-value is the log 10 kruskal wallis p-value adjusted by
+#' "bonferroni". You may select other p-value adjustments using method in the
+#' optns.
 #' @param filter Either "none", a range (1:10) or a numeric (1.3) for significance.
 #' Based on internally calculated log 10 kruskal wallis p-value. A range will
 #' provide only the top significant lipids (eg 1:10 will graph only top 10). A
 #' numeric will filter out anything below this significance (eg 1.3, anything
 #' with log 10 p-value less than 1.3 is excluded). "none" is the default and will
-#' apply no filter. This is the only option available with externally provided stats.
+#' apply no filter.
 #' \code{optns}.
 #' @param optns A list for additional options:
 #'   \itemize{
 #'   \item{method} {adjustment for the internally calculated p-value. Default is
 #'   "bonferroni", but can be set to "holm", "hochberg", "hommel", "bonferroni",
 #'   "BH", "BY", "fdr" or "none".}
-#'    \item{external} {If stat is set to external supply the chosen column from
-#'    data frame here. Must be the same as the number of lipids. Cannot filter
-#'    when providing an external stat. Internal p-value will not be calculated.}
 #'    \item{lipidStart} {A character of the name of the first lipid in the range
-#'    you wish to include. If you have more than lipids in your model, it is essential
+#'    you wish to exclude. If you want to exclude lipids, it is essential
 #'    to provide this and lipidEnd. Use the same syntax as you see in your model.}
 #'    \item{lipidEnd} {A character of the name of the last lipid in the range
-#'    you wish to include. Must be provided if lipidStart is provided.}
-#'    \item{color} {If there is one Group to be plotted, this can be changed to
-#'    "Direction" which will use colors according to if the stat is positive or
-#'    negative.}
+#'    you wish to exclude. Must be provided if lipidStart is provided.}
 #'    \item{discretePalette} {Color palette for discrete values, you can assign colors to
 #'    specific factors, example:
 #'    discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply
@@ -43,12 +36,9 @@
 #'    \item{theme} {Personalize the plot theme you would like applied as you would
 #'    using theme() in ggplot. Example:
 #'    theme = theme(legend.position = "left", text=element_text(size=5)).}
-#'    \item{guides} {Personalize the plot legend/guide how you would like applied as
-#'    you would using guides() in ggplot. Example:
-#'    guides = guides(color = guide_legend(title = "Color Legend"), size = "none")}
 #'    \item{factor} {An object the same length as the data in the model supplied
 #'    that must have at least 2 unique groups such as treatment and control. More
-#'    than 2 is allowable.}
+#'    than 2 groups is allowable.}
 #'    \item{control} {Character to set which group with the supplied factor you wish
 #'    to set as the control for comparison to all other groups.}
 #' }
@@ -147,12 +137,6 @@ analyteGraph <- function(model, stat = "fc", filter = "none", optns = list()){
     theme <- theme()
   } else{theme <- optns$theme}
 
-  # #guides
-  # if(!("guides" %in% names(optns))){
-  #   guides <- guides(color = guide_legend(title = "Group"),
-  #                    size = guide_legend(title = paste0("|",stat,"|")))
-  # } else{guides <- optns$guides}
-
   ########cliffs delta##########
 
   if(stat == "cd"){
@@ -187,8 +171,7 @@ analyteGraph <- function(model, stat = "fc", filter = "none", optns = list()){
   }
 
   ########Calculate internal adjusted p-value########
-  #only calculate it if an external p-value has not been provided
-  if(!stat == "external"){
+
     #create the pvalues
     for(j in 2: length(unique_factors)){
 
@@ -240,8 +223,6 @@ analyteGraph <- function(model, stat = "fc", filter = "none", optns = list()){
       cap <- labs( caption = paste0("p-value adjustment method: ", optns$method) )
     }
 
-  }
-
   #########shorten###################
   if("lipidStart" %in% names(optns)){
     if(!"lipidEnd" %in% names(optns)){
@@ -258,24 +239,9 @@ analyteGraph <- function(model, stat = "fc", filter = "none", optns = list()){
   ad<-cbind(statistic, id, significance)
   test <- ad[, colSums(is.na(ad)) != nrow(ad)]
 
-
-
   ##### groups to be plotted####
   if("columns_to_plot" %in% names(optns)) {
-    # if ("external" %in% names(optns)) {
-    #   sorted_unique_factor <- sort(unique(optns$factor))
-    #   sorted_external_names <- sort(names(optns$external))
-    #
-    #   # Check if the sorted vectors are equal
-    #   if (all(sorted_unique_factor == sorted_external_names)) {
-    #     columns_to_plot <- optns$columns_to_plot
-    #   } else{
-    #     columns_to_plot <- colnames(optns$external)
-    #   }
-    # } else{
     columns_to_plot <- optns$columns_to_plot
-    # }
-
   } else{
     columns_to_plot <- colnames(ad)[2:(which(colnames(ad) == "id") - 1)]
   }
@@ -374,7 +340,7 @@ analyteGraph <- function(model, stat = "fc", filter = "none", optns = list()){
                      y = order,
                      yend = order,
                      color = Group),
-                 size = optns$size,
+                 linewidth = optns$size,
                  alpha = optns$alpha) +
     scale_y_discrete(labels = ordered$id) +
     geom_point(aes(x = Value,

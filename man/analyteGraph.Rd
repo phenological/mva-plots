@@ -7,21 +7,20 @@
 analyteGraph(model, stat = "fc", filter = "none", optns = list())
 }
 \arguments{
-\item{model}{A model from PCA or oplsda function, or a data frame of lipids.}
+\item{model}{A model from PCA or oplsda function, or a data frame of analytes.}
 
 \item{stat}{The statistic you would like to use. Either log2 fold change "fc",
-Cliff's Delta "cd", p-value "pval" or "external". "fc", "pval" and "cd" are
-calculated automatically. The p-value is the log 10 kruskal wallis p-value
-adjusted by "bonferroni". You may select other p-value adjustments using method
-in the optns. "external" is an externally supplied statistic that can be, for
-example, a p-value from lmm and needs to be provided in the optns list.}
+Cliff's Delta "cd", p-value "pval". "fc", "pval" and "cd" are calculated
+automatically. The p-value is the log 10 kruskal wallis p-value adjusted by
+"bonferroni". You may select other p-value adjustments using method in the
+optns.}
 
 \item{filter}{Either "none", a range (1:10) or a numeric (1.3) for significance.
 Based on internally calculated log 10 kruskal wallis p-value. A range will
 provide only the top significant lipids (eg 1:10 will graph only top 10). A
 numeric will filter out anything below this significance (eg 1.3, anything
 with log 10 p-value less than 1.3 is excluded). "none" is the default and will
-apply no filter. This is the only option available with externally provided stats.
+apply no filter.
 \code{optns}.}
 
 \item{optns}{A list for additional options:
@@ -29,17 +28,11 @@ apply no filter. This is the only option available with externally provided stat
 \item{method} {adjustment for the internally calculated p-value. Default is
 "bonferroni", but can be set to "holm", "hochberg", "hommel", "bonferroni",
 "BH", "BY", "fdr" or "none".}
-\item{external} {If stat is set to external supply the chosen column from
-data frame here. Must be the same as the number of lipids. Cannot filter
-when providing an external stat. Internal p-value will not be calculated.}
 \item{lipidStart} {A character of the name of the first lipid in the range
-you wish to include. If you have more than lipids in your model, it is essential
+you wish to exclude. If you want to exclude lipids, it is essential
 to provide this and lipidEnd. Use the same syntax as you see in your model.}
 \item{lipidEnd} {A character of the name of the last lipid in the range
-you wish to include. Must be provided if lipidStart is provided.}
-\item{color} {If there is one Group to be plotted, this can be changed to
-"Direction" which will use colors according to if the stat is positive or
-negative.}
+you wish to exclude. Must be provided if lipidStart is provided.}
 \item{discretePalette} {Color palette for discrete values, you can assign colors to
 specific factors, example:
 discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply
@@ -51,12 +44,9 @@ discretePalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0",
 \item{theme} {Personalize the plot theme you would like applied as you would
 using theme() in ggplot. Example:
 theme = theme(legend.position = "left", text=element_text(size=5)).}
-\item{guides} {Personalize the plot legend/guide how you would like applied as
-you would using guides() in ggplot. Example:
-guides = guides(color = guide_legend(title = "Color Legend"), size = "none")}
 \item{factor} {An object the same length as the data in the model supplied
 that must have at least 2 unique groups such as treatment and control. More
-than 2 is allowable.}
+than 2 groups is allowable.}
 \item{control} {Character to set which group with the supplied factor you wish
 to set as the control for comparison to all other groups.}
 }}
