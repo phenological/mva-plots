@@ -29,7 +29,6 @@ if plot=TRUE, a ggplot2 object. Otherwise, a data.frame with the
 correlations and covariances of Y with the driver and the corresponding ppm
 scale, restricted to the given roi. The "driver" (either a cshift or a vector
 of intensities) is stored as an attribute of the data.frame.
-@export
 }
 \description{
 Simple STOCSY implementation
