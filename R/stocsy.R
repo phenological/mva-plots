@@ -15,6 +15,8 @@
 #' correlations and covariances of Y with the driver and the corresponding ppm
 #' scale, restricted to the given roi. The "driver" (either a cshift or a vector
 #'  of intensities) is stored as an attribute of the data.frame.
+#'  @export
+
 
 stocsy <- function(x, Y, driver, roi = range(x), plot = TRUE, breaks = 10){
   #Parse the driver, which may be a chem. shift, into a driver vector

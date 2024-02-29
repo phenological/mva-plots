@@ -272,6 +272,8 @@ dfo$type <- "original"
 
 df<- rbind(dfo, dfp)
 
+library(ggplot2)
+
 ggplot(data = df, 
        aes(x = p1, 
            y = o1, 

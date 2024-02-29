@@ -186,7 +186,7 @@ lg<- lipidGraph(model = as.data.frame(new_lipidData),
                              )
                 )
 
-expect_equal(object = lg[["guides"]][["colour"]][["title"]], expected = "Polarity")
+expect_equal(object = lg[["guides"]][["guides"]][["colour"]][["params"]][["title"]], expected = "Polarity")
 })
 
 #if no second side chain is listed

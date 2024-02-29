@@ -34,3 +34,5 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 pca_pred.png
+/doc/
+/Meta/
