@@ -18,6 +18,11 @@
 #' @param X spectral data matrix used for the model.
 #'        This is needed for PCA with prcomp package, or
 #'        (O)PLS with type = "Statistical reconstruction".
+#' @param Median only works for OPLS-DA model using mva.plot().
+#'        Default is FALSE.
+#'        When Median = True
+#'        Median spectra of each groups will be added on the top of loading plot showing the same direction as score plot
+#' 
 #' @param optns An empty list for additional options.
 #' @return plot of the loadings
 #' @import scales
@@ -38,7 +43,8 @@
 #' #PlotLoadSpec(model = prcomp_pca_model)
 #' @export
 
-PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X = NULL, optns = list()){
+
+PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X = NULL, Median=FALSE, optns = list()){
 
   continuousPalette<- c(
                         "#0000CC",
@@ -163,22 +169,75 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
              y = "") +
         theme_bw()
   }else{
-    p1<-ggplot(df,
-               aes(x = x,
-                   y = y,
-                   color = col)) +
-      geom_line() +
-      scale_x_reverse(breaks = breaks_pretty(n = 15)) +
-      scale_colour_gradientn(colors = continuousPalette,
-                             na.value = "grey50",
-                             limits = raCol,
-                             name = expression("|p"["sc"] * "|")) +
-      labs(title = method,
-           subtitle = type,
-           caption = paste0("component: ", PC, " loadings"),
-           x = expression(delta ~ {}^1 * H ~ (ppm)),
-           y = "") +
-      theme_bw()
+    if( is(model)[1] == "opls" &  model@typeC=="OPLS-DA" & Median =="TRUE"){
+      spec_df<-data.frame(t(do.call("rbind",model@suppLs$x)))
+      x = as.numeric(gsub("X","",colnames(spec_df)))
+      # y_groups<-unique(model@suppLs$y)
+      data.frame(y = model@suppLs$y, model@scoreMN)->y_groups
+      y_groups$p1[which(y_groups$p1>0)]<-1
+      y_groups$p1[which(y_groups$p1<0)]<- -1
+      y_groups<-unique(y_groups)
+      idx =  which(x>roi[1] & x<roi[2])
+      median_spectra_df<-list()
+      for (i in 1:nrow(y_groups)) {
+        if (y_groups$p1[i] > 0) {
+          median_spectra_df[["pos"]] <-
+            apply(spec_df[which(model@suppLs$y == y_groups$y[i]), idx], 2, median)
+        } else{
+          median_spectra_df[["neg"]] <-
+            -apply(spec_df[which(model@suppLs$y == y_groups$y[i]), idx], 2, median)
+        }
+      }
+      txt= paste0(as.character(y_groups$y[1])," = ",ifelse(y_groups$p1[1]>0,"Pos","Neg")," , ",
+                  as.character(y_groups$y[2])," = ",ifelse(y_groups$p1[2]>0,"Pos","Neg"))
+      df<-cbind(df,t(do.call("rbind",median_spectra_df)))
+      coef =floor(c(max(abs(df$neg)),max(df$pos))[which.max(c(max(abs(df$neg)),max(df$pos)))]/max(abs(df$y)))
+      p1 <- ggplot(df,
+                   aes(x = x,
+                       y = y,
+                       color = col)) +
+        geom_line() +
+        geom_line(aes(y = pos / coef), color = "grey30",linetype =1) +
+        geom_line(aes(y = neg / coef), color = "grey30",linetype =1) +
+        scale_x_reverse(breaks = breaks_pretty(n = 15)) +
+        scale_y_continuous(# Features of the first axis
+          name = "",
+          # Add a second axis and specify its features
+          sec.axis = sec_axis( ~ . * coef, name = "Median")) +
+        scale_colour_gradientn(
+          colors = continuousPalette,
+          na.value = "grey50",
+          limits = raCol,
+          name = expression("|p"["sc"] * "|")
+        ) +
+        labs(
+          title = method,
+          subtitle = paste0(type,"\n",txt),
+          caption = paste0("component: ", PC, " loadings"),
+          x = expression(delta ~ {
+          } ^ 1 * H ~ (ppm))
+        ) +
+        theme_bw()
+    }else{
+      p1<-ggplot(df,
+                 aes(x = x,
+                     y = y,
+                     color = col)) +
+        geom_line() +
+        scale_x_reverse(breaks = breaks_pretty(n = 15)) +
+        scale_colour_gradientn(colors = continuousPalette,
+                               na.value = "grey50",
+                               limits = raCol,
+                               name = expression("|p"["sc"] * "|")) +
+        labs(title = method,
+             subtitle = type,
+             caption = paste0("component: ", PC, " loadings"),
+             x = expression(delta ~ {}^1 * H ~ (ppm)),
+             y = "") +
+        theme_bw()
+    }
+   
+
   }
 
   return(p1)
