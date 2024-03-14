@@ -87,8 +87,8 @@ if(!("size" %in% names(optns)))
         y = "Value",
         caption = paste0("pR2Y = ", model@summaryDF[, "pR2Y"],", pQ2 = ", model@summaryDF[, "pQ2"])) +
    scale_color_manual(values = colors) +
-   theme(legend.title=element_blank(),
-         legend.position = c(0.9, 0.1),
+   theme(legend.title = element_blank(),
+         legend.position.inside = c(0.9, 0.1),
          legend.justification = c("right", "bottom")) +
    ggtitle(plotTitle)
 
