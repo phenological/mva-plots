@@ -3,10 +3,17 @@
 #' Grid of the loadings plots using GGally::ggpairs up to a threshold number.
 #'
 #' @param model A PCA, oplsda or ropls object.
-#' @param optns An empty list for aesthetic options.
-#' @param plotTitle A parameter for the optns list. A character for the title of the grid.
-#' @param theme A parameter for the \code{optns} list. Personalize the plot theme you would like applied as you would using theme() in ggplot. Example set theme = theme(legend.position = "left", text=element_text(size=5)) in optns.
-#' @param thresh A parameter for the optns list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.
+#' @param flat A logical for a flat O-PLS(DA) loadings plot. Only applicable to
+#' oplsda models with an orthogonal component. Default is FALSE.
+#' @param optns An empty list for addtional options:
+#'    \itemize{
+#'     \item{plotTitle}{A character for the title of the grid.}
+#'     \item{theme}{Personalize the plot theme you would like applied as you
+#'     would using theme() in ggplot. Example set
+#'     theme = theme(legend.position = "left", text=element_text(size=5)) in optns.}
+#'     \item{thresh}{A numeric for the number of PCAs to display in the grid.
+#'     The default is calculated in the PCA function.}
+#' }
 #'
 #' @return The model list appended with the grid of loadings under plots.
 #' @import GGally
@@ -19,7 +26,7 @@
 #' @export
 
 
-plotLoadings <- function(model, optns=list()){
+plotLoadings <- function(model, flat = FALSE, optns=list()){
   #plot title (working)
   if("plotTitle" %in% names(optns)){
     plotTitle = optns$plotTitle
@@ -36,11 +43,11 @@ plotLoadings <- function(model, optns=list()){
   if(is(model)[1]=="opls"){
 
     if(grepl("O", model@typeC) == TRUE){
-      df <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN))
+      df <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN), check.names = F)
       gl <- labs(x = paste0('p1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('po1'))
     }else{
-      df <- as.data.frame(model@loadingMN)
+      df <- as.data.frame(model@loadingMN, check.names = F)
       gl <- labs(x = paste0('p1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('p2 (', round(model@modelDF[["R2X"]][2]*100, 1), '%)'))
     }
@@ -61,6 +68,36 @@ plotLoadings <- function(model, optns=list()){
         theme_bw() +
         theme
 
+      if(flat == TRUE){
+        onePlot <- ggplot(data = df,
+                          aes(x = df[,PCi], y = 0.001)) +
+          ggtitle(plotTitle) +
+          gl +
+          geom_point(color= "blue",
+                     size = 1) +
+          scale_y_continuous(limits = c(0, 0.1),
+                             expand = c(0, 0)) +  # Set limits and remove expansion
+          geom_text_repel(
+            aes(label = rownames(df)),
+            size = 3,
+            angle = 90,
+            #segment.color = NA, # Remove the connecting segments
+            nudge_x = 0.011,        # Center the label horizontally
+            nudge_y = 0.0051,      # Move the label above the point
+            direction = "x",    # Orient the labels vertically
+            hjust = 0.1,        # Center the label horizontally
+            vjust = -1,
+            box.padding = 0.05) +       # Move the label above the point
+          theme_bw() +
+          theme+
+          theme(axis.title.y=element_blank(),
+                axis.text.y=element_blank(),
+                axis.ticks.y=element_blank(),
+                axis.line.y=element_blank())
+
+      }
+
+
       print(onePlot)
 
       model@suppLs[["LoadingsPlot"]] <- onePlot
@@ -70,7 +107,7 @@ plotLoadings <- function(model, optns=list()){
   #########PCA objects##################
   if(is(model)[1]=="list"){
 
-    df<- as.data.frame(model$data$loadings)
+    df<- as.data.frame(model$data$loadings, check.names = F)
 
   #number of pcas (working)
   if("thresh" %in% names(optns)){

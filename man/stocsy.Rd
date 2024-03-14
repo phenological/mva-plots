@@ -11,16 +11,24 @@ stocsy(x, Y, driver, roi = range(x), plot = TRUE, breaks = 10)
 
 \item{Y}{numeric, spectra matrix, spectra in rows}
 
-\item{driver}{numeric, reference to compute correlation. If length(driver) matches the number of spectra, it is interpreted as the vector of observations of the driver variable. Otherwise, driver\link{1} is interpreted as the chemical shift coordinate of the driver.}
+\item{driver}{numeric, reference to compute correlation. If length(driver)
+matches the number of spectra, it is interpreted as the vector of
+observations of the driver variable. Otherwise, the first element of driver
+(\code{driver[1]}) is interpreted as the chemical shift coordinate of the driver.}
 
-\item{roi}{numeric, upper and lower limit of the Region Of Interest to be correlated. The whole spectra range by default.}
+\item{roi}{numeric, upper and lower limit of the Region Of Interest to be
+correlated. The whole spectra range by default.}
 
-\item{plot, }{boolean, whether to return the plot of the STOCSY (TRUE, default) or the numbers}
+\item{plot, }{boolean, whether to return the plot of the STOCSY (TRUE,
+default) or the numbers}
 
 \item{breaks}{numeric, number of breaks in the x axis or the STOCSY plot}
 }
 \value{
-if plot=TRUE, a ggplot2 object. Otherwise, a data.frame with the correlations and covariances of Y with the driver and the corresponding ppm scale, restricted to the given roi. The "driver" (either a cshift or a vector of intensities) is stored as an attribute of the data.frame.
+if plot=TRUE, a ggplot2 object. Otherwise, a data.frame with the
+correlations and covariances of Y with the driver and the corresponding ppm
+scale, restricted to the given roi. The "driver" (either a cshift or a vector
+of intensities) is stored as an attribute of the data.frame.
 }
 \description{
 Simple STOCSY implementation

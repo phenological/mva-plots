@@ -18,6 +18,7 @@
 #' @param X spectral data matrix used for the model.
 #'        This is needed for PCA with prcomp package, or
 #'        (O)PLS with type = "Statistical reconstruction".
+#' @param optns An empty list for additional options.
 #' @return plot of the loadings
 #' @import scales
 #' @import methods
@@ -37,7 +38,7 @@
 #' #PlotLoadSpec(model = prcomp_pca_model)
 #' @export
 
-PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NULL,option = list()){
+PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X = NULL, optns = list()){
 
   continuousPalette<- c(
                         "#0000CC",
@@ -57,8 +58,8 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
                         "#CC0000")
 
 
-  if(class(model)[1]=="prcomp"){
-    df <- data.frame(-model$rotation)
+  if(class(model)[1] == "prcomp"){
+    df <- data.frame(-model$rotation, check.names = F)
     res <- summary(model)
     res <- round(c(res$importance['Proportion of Variance',1:ncol(df)])*100,1)
     x <- as.numeric(rownames(df))
@@ -80,7 +81,7 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
   }
   if(is(model)[1] == "list" & length(model) == 2){  # need to change this, for now, PCA() using library(prcomp) return list of 2
     res <- model$data$pcSum$`Proportion of Variance`
-    df <- as.data.frame(-model$data$loadings)
+    df <- as.data.frame(-model$data$loadings, check.names = F)
     x <- as.numeric(rownames(df))
     idx <- which(x>roi[1] & x<roi[2])
     # cen<-data.frame(model$data$center[idx])
@@ -99,20 +100,20 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
     method <- model@typeC
     res <- model@summaryDF
     if(type == "Backscaled"){
-      df <- data.frame(-model@loadingMN)
+      df <- data.frame(-model@loadingMN, check.names = F)
       x <- as.numeric(rownames(df))
       idx <- which(x>roi[1] & x<roi[2])
       if(ncol(df)< PC){
         stop("PC selected is larger than the dimension of the model")
       }
-      cen<--data.frame(model@xSdVn[idx])
+      cen<--data.frame(model@xSdVn[idx], check.names = F)
       df <- df[idx,PC]
       x <-x [idx]
       m <- abs(df)
       y <- df*cen
       names(y)[1]<-"y"
       col <- (m - min(m))/(max(m) - min(m))
-      df <- data.frame(x = x,y = y,col = col)
+      df <- data.frame(x = x, y = y, col = col)
       raCol = NULL
     }
     if(type=="Statistical reconstruction"){
@@ -121,9 +122,9 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
       }
 
       if(grepl("O",method)){ # for opls use scores
-        df <- data.frame(model@orthoScoreMN)
+        df <- data.frame(model@orthoScoreMN, check.names = F)
       }else{ # for pls use orthogonal
-        df <- data.frame(model@scoreMN)
+        df <- data.frame(model@scoreMN, check.names = F)
       }
       x <- as.numeric(rownames(-model@loadingMN))
       idx <- which(x>roi[1] & x<roi[2])
@@ -135,7 +136,7 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
       cc <- abs(cor(X[,idx],df))
       cv <- cov(X[,idx],df)
       raCol <- c(0, max(cc))
-      df <- data.frame(x = x,y = cv,col = cc)
+      df <- data.frame(x = x, y = cv, col = cc)
     }
     if(type != "Backscaled" & type !="Statistical reconstruction"){
       stop("Name for the visualization type must be 'Backscaled' or 'Statistical reconstruction'. ")
@@ -145,22 +146,22 @@ PlotLoadSpec<-function(model,PC = 1,roi = c(0.5,9.5),type = "Backscaled",X = NUL
     stop("Check the Model class: must be prcomp,opls, or the results from PCA")
   }
 
-  if(method=="PCA"){
-    p1<-ggplot(df,
-               aes(x = x,
-                   y = y,
-                   color = col)) +
-      geom_line() +
-      scale_x_reverse(breaks = breaks_pretty(n = 15)) +
-      scale_colour_gradientn(colors = continuousPalette,
-                             limits = raCol,
-                             name = expression("|p"["sc"] * "|")) +
-      labs(title = method,
-           subtitle = "Statistical reconstruction",
-           caption = paste0("PC: ", PC, " loadings"),
-           x = expression(delta ~ {}^1 * H ~ (ppm)),
-           y = "") +
-      theme_bw()
+  if(method == "PCA"){
+    p1 <- ggplot(df,
+                 aes(x = x,
+                     y = y,
+                     color = col)) +
+        geom_line() +
+        scale_x_reverse(breaks = breaks_pretty(n = 15)) +
+        scale_colour_gradientn(colors = continuousPalette,
+                               limits = raCol,
+                               name = expression("|p"["sc"] * "|")) +
+        labs(title = method,
+             subtitle = "Statistical reconstruction",
+             caption = paste0("PC: ", PC, " loadings"),
+             x = expression(delta ~ {}^1 * H ~ (ppm)),
+             y = "") +
+        theme_bw()
   }else{
     p1<-ggplot(df,
                aes(x = x,

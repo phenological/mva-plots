@@ -23,6 +23,8 @@ class against all the others (assumed as one) or the One-vs-One scheme, which
 compares every unique pairwise combination of classes. For the One-vs-One,
 you can specify different combinations of classes as x and y.}
 
+\item{PC}{A concatenation of the principal components to use, default is c(1, 2)}
+
 \item{col}{colors of the ROC and PR curves, supplied as name (eg "red") or
 hexadecimal or color. Default it col = c("red", "black").}
 
@@ -45,11 +47,11 @@ Y<-as.factor(mtcars$vs)  # for DA
 
 #PLS-DA
 plsda_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "PLS")
-ropls_plsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = NA, orthoI = 0)
+#ropls_plsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = NA, orthoI = 0)
 
 #O-PLS-DA
 oplsda_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "OPLS")
-ropls_oplsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = 1, orthoI = NA)
+#ropls_oplsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = 1, orthoI = NA)
 
 t<-plotPRROC(oplsda_model, caption = FALSE)
 

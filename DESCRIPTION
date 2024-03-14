@@ -1,6 +1,6 @@
 Package: mva.plots
 Title: Add visualisation capabilities to multivariate analysis
-Version: 0.0.5
+Version: 0.0.6
 Authors@R: 
     person("Lucy", "Grigoroff", , "Lucy.Grigoroff@murdoch.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "o"))
@@ -12,7 +12,6 @@ RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 Imports:
     caret,
-    colorRamps,
     crayon,
     egg,
     GGally,
@@ -23,15 +22,20 @@ Imports:
     plotly,
     PRROC,
     reshape2,
-    roxygen2,
     scales,
+    BiocManager (>= 1.30.16),
     stats,
-    testthat
+    sf
 biocViews:
     ropls
 Suggests: 
     knitr,
     rmarkdown,
-    testthat
+    roxygen2,
+    testthat,
+    devtools
 VignetteBuilder: 
     knitr
+Depends: 
+    R (>= 2.10)
+LazyData: true

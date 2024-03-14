@@ -22,12 +22,12 @@ test_that("When performing OPLS, if number of levels is not 2, the correct actio
   #if there are less than 2 levels in your Y, it stops
   mtcars$paint <- factor("red")
   expect_error(oplsda(X = mtcars[,1:5], Y = mtcars$paint, type = "OPLS"),
-               "Error: You have less than 2 levels in your Y. O-PLS requires exactly 2 levels.")
+               "Error: You have less than 2 levels in your Y. DA requires at least 2 levels.")
 
   #if there are more than 2 levels in your Y, it stops
   mtcars$paint <- factor(rep(c("red", "green", "blue"), length.out = nrow(mtcars)))
   expect_error(oplsda(X = mtcars[,1:5], Y = mtcars$paint, type = "OPLS"),
-               "Error: You have more than 2 levels in your Y. OPLS requires exactly 2 levels.")
+               "Error: You have more than 2 levels in your Y. OPLS-DA requires exactly 2 levels.")
 
   #if there are more than 2 levels in your Y, but one has no values, the empty one is removed, a model still built and a warning telling you the change in levels
   mtcars$paint <- rep(c("red", "green"), length.out = nrow(mtcars))
@@ -43,7 +43,7 @@ test_that("When performing PLS, if number of levels is not 2, the correct action
   #if there are less than 2 levels in your Y, it stops
   mtcars$paint <- factor("red")
   expect_error(oplsda(X = mtcars[,1:5], Y = mtcars$paint, type = "PLS"),
-               "Error: You have less than 2 levels in your Y. O-PLS requires exactly 2 levels.")
+               "Error: You have less than 2 levels in your Y. DA requires at least 2 levels.")
 
   #if there are more than 2 levels in your Y, it doesn't stop
   mtcars$paint <- factor(rep(c("red", "green", "blue"), length.out = nrow(mtcars)))

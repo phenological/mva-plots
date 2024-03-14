@@ -6,6 +6,12 @@
 \usage{
 symmetricLimits(x)
 }
-\description{
-Shell function for loadings with text points for the plotLoadingsGrid function. Any aesthetic parameters are included in the plotlLoadingsGrid function.
+\arguments{
+\item{x}{x coordinates used to map where ellipses are placed}
 }
+\description{
+Shell function for loadings with text points for the plotLoadingsGrid
+function. Any aesthetic parameters are included in the plotlLoadingsGrid
+function. Alternative function for symmetric_limits from the ggpmisc package.
+}
+\keyword{internal}

@@ -16,6 +16,10 @@
 #' @param threshold numeric, add horizontal dash line to the plot. If
 #' log_scaling = TRUE then threshold value is automatically log scaled.
 #' @param interactive Boolean, to make the plot interactive. default is FALSE.
+#' @param xlab The x-axis title.
+#' @param ylab The y-axis title.
+#' @param main_title A character argument for the title of the plot.
+#' @param optns An empty list for additional options.
 #' @return a ggplot2 object.
 #' @importFrom plotly ggplotly
 #' @importFrom crayon red
@@ -27,8 +31,8 @@ manhattanPlot<-function(data,
                         point_shape = 1,
                         point_size = 2,
                         point_alpha = 1,
-                        show_legend=FALSE,
-                        log_scaling=TRUE,
+                        show_legend = FALSE,
+                        log_scaling = TRUE,
                         threshold = NA,
                         xlab = "",
                         ylab = "",

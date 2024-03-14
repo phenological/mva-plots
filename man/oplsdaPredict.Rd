@@ -9,23 +9,37 @@ oplsdaPredict(model, newdata, optns = list())
 \arguments{
 \item{model}{oplsda model (or ropls built model).}
 
-\item{newdata}{Matrix or data frame of the same X variables as the model (O-PLS-DA).}
+\item{newdata}{Matrix or data frame of the same X variables as the model
+(O-PLS-DA).}
 
-\item{optns}{An empty list for confusion matrix addition.}
-
-\item{real}{A parameter for the \code{optns} list. The "real" classifications for the newdata as a factor. If supplied, a confusion matrix will be calculated. Only available for DA.}
+\item{optns}{An empty list for confusion matrix addition.
+\itemize{
+\item{real}{The "real" classifications for the newdata as a factor. If
+supplied, a confusion matrix will be calculated. Only available for DA.}
+}}
 }
 \value{
-The prediction model including the predictive scores and orthogonal scores.
+The prediction model including the predictive scores and orthogonal
+scores.
 }
 \description{
-Function that uses ropls::opls model to make predictions on a new data set. Only the first opls predicitve and orthogonal component used currently.
+Function that uses ropls::opls model to make predictions on a new data set.
+Only the first opls predicitve and orthogonal component used currently.
 }
 \examples{
 data(mtcars)
-a <- oplsda(X = mtcars[,1:5], Y = mtcars[,8], type = "OPLS", optns = list(permI = 50))
-columns_to_jitter <- c("mpg", "cyl", "disp", "hp", "drat")
-exampleData <- mtcars
-exampleData[, columns_to_jitter] <- lapply(exampleData[, columns_to_jitter], function(x) jitter(x, factor = 0.1))
-b <- oplsdaPredict(model = a, newdata = exampleData[,1:5])
+a <- oplsda(X = mtcars[,1:5],
+            Y = mtcars[,8],
+            type = "OPLS",
+            optns = list(permI = 50))
+
+jitterCol <- c("mpg", "cyl", "disp", "hp", "drat")
+
+egData <- mtcars
+
+egData[, jitterCol] <- lapply(X = egData[, jitterCol],
+                              FUN = function(x) jitter(x, factor = 0.1))
+
+b <- oplsdaPredict(model = a,
+                   newdata = egData[,1:5])
 }

@@ -3,30 +3,98 @@
 #' Grid of the score plots using GGally::ggpairs up to a threshold number.
 #'
 #' @param model A PCA or oplsda model.
-#' @param optns An empty list for aesthetic options.
-#' @param plotTitle A parameter for the \code{optns} list. A character for the title of the plot.
-#' @param thresh A parameter for the \code{optns} list. A numeric for the number of PCAs to display in the grid. The default is calculated in the PCA function.
-#' @param color A parameter for the \code{optns} list. Either a column from the data frame or a character of the color desired (example "blue"). Default color is "black". When using on a ropls object, it must match the quantitative data type (discrete or continuous).
-#' @param shape A parameter for the \code{optns} list. Either a column from the data frame (must be discrete) or a character of the shape desired. Default shape is "circle".
-#' @param size A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the size desired. Default size is 3.
-#' @param alpha A parameter for the \code{optns} list. Either a column from the data frame or a numeric of the alpha desired. Default size is 0.5.
-#' @param discretePalette A parameter for the \code{optns} list. Color palette for discrete values, you can assign colors to specific factors, example: discretePalette = c("control" = "purple", "treatment" = "orange"). Or supply a concatenated list, example (and the default): discretePalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC"). Hexadecimal or color names accepted.
-#' @param continuousPalette A parameter for the \code{optns} list. Color palette for continuous values, use hexadecimal values (example and default: continuousPalette =c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF","#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00","#FF5500","#FF0000","#CC0000")), grDevices names (example: continousPalette = rainbow(4)) or color names (example : continuousPalette =c("purple", "orange")).
-#' @param theme A parameter for the \code{optns} list. Personalize the plot theme you would like applied as you would using theme() in ggplot. Example set theme = theme(legend.position = "left", text=element_text(size=5)) in optns.
-#' @param colorTitle A parameter for the \code{optns} list. A character of the desired color legend title when \code{color} is a variable. No color legend will appear if \code{color} is set to a simple aesthetic such as "green". Default "color".
-#' @param shapeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{shape} is a variable. No shape legend will appear if \code{shape} is set to a simple aesthetic such as "square". Default "Shape".
-#' @param sizeTitle A parameter for the \code{optns} list. A character of the desired shape legend title when \code{size} is a variable. No size legend will appear if \code{size} is set to a simple aesthetic such as 2. Default "Size".
-#' @param alphaTitle A parameter for the \code{optns} list. A character of the desired alpha legend title when \code{alpha} is a variable. No size legend will appear if \code{alpha} is set to a simple aesthetic such as 0.3. Default "Alpha".
-#' @param ellipse A parameter for the \code{optns} list. A character or either "color", "hotellings", "t", or "normal" depending on desired method of calculation. If using color, a discrete variable must be supplied to color.
-#' @param ci A parameter for the \code{optns} list. Set your own limit for ellipses drawn. The default is ci = 0.95 (95% confidence interval).
-#' @param outlierLabels A parameter for the \code{optns} list. Only compatible with ellipse set to hotellings, T or normal. For ropls object, supply "outlierLabels" and rownames will appear. For PCA modek, supply a column from the data frame to label outliers. You can set it to, for example, outlierLabels=row.names(iris) to identify the outlier position in your dataframe.
-#' @param annotation A parameter for the \code{optns} list when supplying PCA object. Supply the columns you'd like listed for the outliers, otherwise only that listed for outlierLabels will be listed.
+#' @param flat A logical for a flat O-PLS(DA) scores plot. Only applicable to
+#' oplsda models with an orthogonal component. Default is FALSE. Outliers and
+#' ellipse are not available for a flat plotscore.
+#' @param optns An empty list for additional options:
+#'  \itemize{
+#'    \item{PCi} {A numeric for the x axis pricipal component for a single plot.}
+#'    \item{PCj} {A numeric for the y axis pricipal component for a single plot.}
+#'    \item{plotTitle} {A character for the title of the plot.}
+#'    \item{thresh} {A numeric for the number of PCAs to display in the grid. The
+#'    default is calculated in the PCA function.}
+#'    \item{color} {Either a column from the data frame or a character of the
+#'    color desired (example "blue"). Default color is "black". When using on a
+#'    ropls object, it must match the quantitative data type (discrete or continuous).}
+#'    \item{shape} {Either a column from the data frame (must be discrete) or a
+#'    character of the shape desired. Default shape is "circle".}
+#'    \item{size} {Either a column from the data frame or a numeric of the size
+#'    desired. Default size is 3.}
+#'    \item{alpha} {Either a column from the data frame or a numeric of the alpha
+#'    desired. Default size is 0.5.}
+#'    \item{discretePalette} {Color palette for discrete values, you can assign
+#'    colors to specific factors, example:
+#'    discretePalette = c("control" = "purple", "treatment" = "orange").
+#'    Or supply a concatenated list, example (and the default):
+#'    discretePalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC").
+#'    Hexadecimal or color names accepted.}
+#'    \item{continuousPalette} {Color palette for continuous values, use
+#'    hexadecimal values (example and default:
+#'    continuousPalette =c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF",
+#'    "#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00",
+#'    "#FF5500","#FF0000","#CC0000")), grDevices names (example:
+#'    continousPalette = rainbow(4)) or color names (example :
+#'    continuousPalette =c("purple", "orange")).}
+#'    \item{theme} {Personalize the plot theme you would like applied as you
+#'    would using theme() in ggplot. Example set
+#'    theme = theme(legend.position = "left", text=element_text(size=5)).}
+#'    \item{ellipse} {A character or either "color", "hotellings", "t", or "normal"
+#'    depending on desired method of calculation. If using color, a discrete variable
+#'    must be supplied to color.}
+#'    \item{ci} {Set your own limit for ellipses drawn. The default is ci = 0.95
+#'    (95 percent confidence interval).}
+#'    \item{outlierLabels} {Only compatible with ellipse set to hotellings, T or
+#'    normal. For ropls object, supply "outlierLabels" and rownames will appear.
+#'    For PCA model, supply a column from the data frame to label outliers. You
+#'    can set it to, for example, outlierLabels = row.names(iris) to identify the
+#'    outlier position in your dataframe.}
+#'    \item{annotation} {When supplying PCA object. Supply the columns you'd like
+#'    listed for the outliers, otherwise only that listed for outlierLabels will
+#'    be listed.}
+#'    \item {colorTitle} {A character of the desired color legend title when \code{color}
+#'    is a variable. No color legend will appear if \code{color} is set to a simple
+#'    aesthetic such as "green". Default "color".}
+#'    \item {shapeTitle} {A character of the desired shape legend title when \code{shape}
+#'    is a variable. No shape legend will appear if \code{shape} is set to a simple
+#'    aesthetic such as "square". Default "Shape".}
+#'    \item {sizeTitle} {A character of the desired shape legend title when \code{size}
+#'    is a variable. No size legend will appear if \code{size} is set to a simple
+#'    aesthetic such as 2. Default "Size".}
+#'    \item {alphaTitle} {A character of the desired alpha legend title when \code{alpha}
+#'    is a variable. No size legend will appear if \code{alpha} is set to a simple
+#'    aesthetic such as 0.3. Default "Alpha".}
+#' }
+#'
 #' @return The model list appended with the grid of loadings under plots.
+#'
 #' @examples
 #' data(iris)
 #' a <- PCA(data = iris[,1:4], center = TRUE, scale. = TRUE)
-#' b <- plotScores(model = a, optns=list(color = iris[,"Species"], discretePalette = c("setosa" = "purple", "versicolor" = "orange", "virginica" = "steelblue"), colorTitle = "Flower Species", gridTitle = "Iris PCA grid", thresh = 3, alpha = 0.7))
-#' #To access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i], where j is the vertical and i is the horizontal position of the specific plot in the grid.
+#' b <- plotScores(model = a,
+#'                 optns = list(color = iris[,"Species"],
+#'                              discretePalette = c("setosa" = "purple",
+#'                                                  "versicolor" = "orange",
+#'                                                  "virginica" = "steelblue"),
+#'                               colorTitle = "Flower Species",
+#'                               gridTitle = "Iris PCA grid",
+#'                               thresh = 3,
+#'                               alpha = 0.7))
+#'
+#' #for a signle plot istead of a grid:
+#'
+#' b <- plotScores(model = a,
+#'                 optns = list(color = iris[,"Species"],
+#'                               PCi = 2,
+#'                               PCj = 3,
+#'                               discretePalette = c("setosa" = "purple",
+#'                                                  "versicolor" = "orange",
+#'                                                  "virginica" = "steelblue"),
+#'                               colorTitle = "Flower Species",
+#'                               gridTitle = "Iris PCA grid",
+#'                               alpha = 0.7))
+#' #Alternatively, to access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i],
+#' #where j is the vertical and i is the horizontal position of the specific
+#' #plot in the grid.
 #' @import methods
 #' @import ggplot2
 #' @import GGally
@@ -34,7 +102,7 @@
 
 
 
-plotScores<-function(model, optns=list()){
+plotScores<-function(model, flat = FALSE,  optns=list()){
 
   #outlier annotation
   if("annotation" %in% names(optns)){
@@ -287,13 +355,14 @@ plotScores<-function(model, optns=list()){
   if(is(model)[1]=="opls"){
 
     if(grepl("O", model@typeC) == TRUE){
-      df <- as.data.frame(cbind(model@scoreMN, model@orthoScoreMN))
-      df2 <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN))
+      df <- as.data.frame(cbind(model@scoreMN, model@orthoScoreMN), check.names = F)
+      df2 <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN), check.names = F)
       gl <- labs(x = paste0('tp1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('to1'))
     }else{
-      df <- as.data.frame(model@scoreMN)
-      df2 <- as.data.frame(model@loadingMN)
+      #flat <- FALSE
+      df <- as.data.frame(model@scoreMN, check.names = F)
+      df2 <- as.data.frame(model@loadingMN, check.names = F)
       gl <- labs(x = paste0('t1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('t2 (', round(model@modelDF[["R2X"]][2]*100, 1), '%)'))
     }
@@ -317,6 +386,7 @@ if("outlierLabels" %in% names(optns)){
 #########PCA objects##################
   if(is(model)[1]=="list"){
 
+    #flat <- FALSE
     df <- model$data$pcdf
 
     gc <- if(is(optns$color)[1] == "numeric" | is(optns$color)[1] == "integer" | is(optns$color)[1] == "double"){
@@ -372,6 +442,44 @@ if("outlierLabels" %in% names(optns)){
           geom_vline(xintercept = 0, colour = "gray70") +
           theme_bw() +
           theme
+
+  onePlot[["data"]]$assignment <- optns$color
+
+#########flat O-PLS(DA)##########
+  if(flat == TRUE) {
+    if ("OPLS-DA" %in% model@typeC) {
+      unique_y1 <- unique(df$y1)
+      df$y <-  ifelse(df$y1 == unique_y1[1], 0.02, 0.04)
+      y <- df$y
+    } else {
+      y <- 0.002
+    }
+    onePlot <- ggplot(data = df,
+                      aes(x = df[, PCi], y = y)) +
+      ggtitle(plotTitle) +
+      gl +
+      gc +
+      gp +
+      gu +
+      labs(color = optns$colorTitle,
+           shape = optns$shapeTitle,
+           size = optns$sizeTitle,
+           alpha = optns$alphaTitle ) +
+      scale_y_continuous(limits = c(0, 0.1),
+                         expand = c(0, 0)) +  # Set limits and remove expansion
+      theme_bw() +
+      theme +
+      theme(
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.line.y = element_blank()
+      )
+    print(onePlot)
+
+    model@suppLs[["ScoresPlot"]] <- onePlot
+    return(model)
+  }
 
 #########ellipse & outliers########
 if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
@@ -512,6 +620,8 @@ if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
   pcaGridPlot <- gPairsLower(plotGT$pcaGridPlot)
 
   model$plots <- append(model$plots, list(pcaGrid = pcaGridPlot))
+
+  model[["plots"]][["pcaGrid"]][["data"]]$assignment <- optns$color
 
   model$data <- append(model$data, list(outliers = plotGT$outliers))
 
