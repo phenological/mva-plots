@@ -121,9 +121,12 @@ eruptionPlot <- function(model, optns = list()){
   }
 
   if(is(model)[1] == "opls"){
-    id <- as.data.frame(colnames(as.data.frame(model@suppLs[["x"]], check.names = F)))
     df <- as.data.frame(model@suppLs[["x"]], check.names = F)
-    df[,"factor"] <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
+    id <- as.data.frame(colnames(df))
+    if (!("factor" %in% optns)){
+      optns[["factor"]] <- relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control)
+    }
+    df[,"factor"] <- as.numeric(optns$factor)
     pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]), check.names = F)
   }
 
@@ -298,6 +301,6 @@ if(is(model)[1] == "opls"){
 }
 
 invisible(model)
-#print(eruptionPlot)
+print(eruptionPlot)
 }
 
