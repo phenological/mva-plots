@@ -1,97 +1,102 @@
 
-#' Subset Optimization by reference matching (STORM)
+#' @title Subset Optimization by reference matching (STORM)
 #'
-#'
-#' Step 1 Subset selection
-#' Step 2 STOCSY of subset
+#' Summary of STORM workflow
+#' Step 1: Subset selection
+#' 
+#' Step 2: STOCSY of subset
 #'   - Pearson correlation of each subset spectrum with the reference (reference a.k.a driver, chemical shift)
 #'   - calculate corresponding p-value by transforming the correlation into the t-statistics with n-2 degrees of freedoms
 #'   - exclude spectra subsets that have negative correlation with the reference
 #'   - from the remaining spectra subset with the lowest p-values are chosen to be in the subset
-#' Step 3) reference updating
-#'
-#' @param n expected number of spectra subset with hidden signal (signal of interest)
-#' @param b expected half signal width data points
-#' @param q predefined p-value threshold for refernce selection (0<q<=1, q<0.05 is significant).
-#'
-#'
+#'   
+#' Step 3: Reference updating
+#' 
 #' Iteratively learns the true reference by repeating a procedure to find the most highly correlated spectra
 #' and updating the reference multiple times.
-#' It converges when a subset of samples has been found twice.
+#' It converges when a subset of samples has been found twice (subset==subset1).
 #'
-#' @references Posma et.al (2012) dx.doi.org/10.1021/ac302360v| Anal.Chem. 2012, 84, 10694−10701
-#'
+#' @param X  Numeric matrix of spectra data where each row represents samples and column a chemical shift variable (ppm)
+#' @param ppm numeric array of chemical shift variables. The length must match the number of columns in X.
+#' @param r_idx int Reference spectra index.
+#' @param roi numeric array, chemical shift ranges where the signal of interest would be the highest intensity
+#' @param b expected half signal width data points (default is 20). Slightly larger values are recomended 
+#' @param q predefined p-value threshold for reference selection (0<q<=1, q<0.05 is significant).
 #' @examples
-#' #storm(X = Xb, ppm = ppm_bin,roi = c(7.52,7.58),calibrate = TRUE)  # hippurate
-#' #storm(X = Xb, ppm = ppm_bin,  b=5, q=0.01, idx_ref=NULL,roi = c(4.02,4.04),calibrate = FALSE)
-#' #storm(X = Xb, ppm = ppm_bin,roi = c(1.13,1.16),calibrate = FALSE)
+#' devtools::load_all("../nmr-spectra-processing/")
+#' load("../mva-plots/data/NMR_1D_rat_urine_spectra.rda")
+#' X_cal<-calibrateSpectra(ppm,X,ref = c("tsp"),rOref = c(0.92,0.94),cshift = 0.93)
+#' s1<-storm(X = X_cal, ppm = ppm, refSpec_idx = 5,b = 10,q = 0.001,roi = c(0.878,0.883))
+#' s0<-stocsy(ppm,Xcal[s1,],driver = 0.881)
+#' stocsy(ppm,X_cal[s1,],driver = 0.881,roi = c(0.7,1.8))
+#' matspec(X,ppm,roi = c(0.85,0.89),interactive = F)
+#' matspec(X_cal[s1,],ppm,roi = c(0.85,0.89),interactive = F)
+#' @return Vector of row indices that define the optimal subset.
+#' @importFrom stats pt cor cov
+#' @references Posma et.al (2012) dx.doi.org/10.1021/ac302360v| Anal.Chem. 2012, 84, 10694−10701
+#' @export
 
-
-storm<-function(X, ppm, b=5, q=0.01, idx_ref=NULL, roi=NULL,calibrate = FALSE,message = TRUE,plot = TRUE){
-
-  if(is.null(roi)){
-    roi = c(1.13,1.16)
+storm<-function(X = NA,ppm = NA,refSpec_idx = NA,b = 20, q = 0.05, method = c("pearson"),roi = c(7.52,7.58)){
+  
+  if (is.null(ppm)) {
+    ppm <- as.numeric(colnames(X))
+  } else {
+    if (length(ppm)!=ncol(X))
+      stop("length of ppm and column length of X does not match")
   }
-  if(calibrate==TRUE){
-    X <- calibrateSpectra(x = ppm, Y = X, rOref = roi, using = c(9.4,9.5))
+  
+  if (is.na(refSpec_idx) |nrow(X)<refSpec_idx) {
+    stop("Please define the reference spectra index that are within the X row range")
   }
-  # Xc : center Xb
-  Xc <- scale(X,center = TRUE,scale = FALSE)
-  #roi: pick the chemical shift range where you want to run STOCSY for (e.g., doublet ppm range)
-  # roi<-c(1.13,1.16)
-
-  #roi_idx: index of the ppm_bin that is close to the roi
-  roi_idx <- which(ppm>roi[1] & ppm<roi[2])
-  #idx_ref: reference spectra index
-  idx_ref <- which.max(apply(Xc[,roi_idx],1,max))
-  # reference spectra of the roi
-  ref <- Xc[idx_ref,roi_idx]
-  #Note: make sure the maximum of the ref is the driver you want to use for the STOCSY driver
-  # b = 5  # b is number of point from the Stocsy driver to the base of the lorentzian fit
-  # q = 0.05 # p-val threshold
-  subset = 0
-  subset1 = 1:nrow(Xc)
-  i = 0
+  
+  # extract reference spectra at ppm range of interest
+  ppm_idx=which(ppm>roi[1] & ppm<roi[2])
+  if (length(ppm_idx)==0) {
+    stop("Please defind the roi that is within the ppm you have provided")
+  }
+  refSpec=X[refSpec_idx, ppm_idx]
+  
+  # Step 1: initialize the subsets
+  subset=0
+  subset1=1:nrow(X)
+  i=1
+  
+  # iteration of step 1 ~ 3 until the number of subset reach the minimum
   while(length(which(!subset %in% subset1))>0){
-    i<-i+1
-    if(message==TRUE){
-      cat("\n","Iteration",i,"\n","N = ",length(subset1),"\n")
-    }
-
-    subset = subset1
-    Xr = Xc[subset,roi_idx] # create a subset of centered scale data
-    r = cor(t(Xr),ref) # pearson correlation of the subset data with ref
-    a = -abs(r * sqrt((length(r)-2)/(1-r^2)))
-    pval = 2 * pt(q = a,df = (length(r)-2))  # pt()The Student t Distribution from {stats}
-    subset1 = subset[r>0]
-    pval = pval[r>0]
-    index = order(pval)
-    subset1 = subset1[index]
-
-    # stocsy with new subset1
-    index = which.max(ref) #stocsy driver
-    r = cor(Xc[subset1,(roi_idx[index]-(b+1)):(roi_idx[index]+(b+1))],Xc[subset1,roi_idx[index]])
-    co = cov(Xc[subset1,(roi_idx[index]-(b+1)):(roi_idx[index]+(b+1))],Xc[subset1,roi_idx[index]])
-
-    # update ref (reference spectrum) and roi_idx(reference index)
-    a = -abs(r * sqrt((length(r)-2)/(1-r^2)))
-    pval = 2*pt(a,(length(r)-2))
-
-    ref = co[c(r>0 & pval<q)]
-    roi_idx = (roi_idx[index]-(b+1)):(roi_idx[index]+(b+1))
-    roi_idx = roi_idx[c(r>0 & pval<q)]
-
-    if(plot == TRUE){
-      index = which.max(ref) #stocsy driver
-      s0 <- stocsy(x = ppm, Y = Xc[subset1,], driver = ppm[roi_idx[index]])
-      plot(s0)
-    }
-
-    # stocsy(x = ppm,Y = Xc[subset1,],roi = roi,driver = ppm_bin[roi_idx[index]])
-    # stocsy(x = ppm,Y = Xc[subset1,],roi = c(3.5,4.6),driver = ppm_bin[roi_idx[index]])
-    # stocsy(x = ppm,Y = Xc[subset1,],roi = c(7.0,8.5),driver = ppm_bin[roi_idx[index]])
+    
+    print(length(subset1))
+    
+    # Step 2a: calculate the Pearson correlation of each subset spectra (Xr) with reference (refSpec)
+    subset=subset1
+    Xr=X[subset, ppm_idx]
+    r=cor(t(Xr), refSpec,method = method)
+    
+    # Step 2b: transform the correlation (r) into the t-statistic with length(subset)-2 degrees of freedom
+    a=-abs(r * sqrt((length(r)-2)/(1-r^2)))
+    pval=2*pt(a, (length(r)-2))
+    
+    # Step 2c: exclude the subset and p-valus that have negative correlation(r)
+    subset1=subset[r>0]
+    pval=pval[r>0]
+    
+    # Step 2d: selecting the subset with the lowest p-value 
+    index=order(pval)
+    subset1=subset1[index]
+    
+    # Step 2e: Stocsy of the subset using ppm that are maximum intensity in chosen reference spectra within the roi as a driver
+    index=which.max(refSpec)
+    r=cor(X[subset1, (ppm_idx[index]-(b+1)):(ppm_idx[index]+(b+1))], X[subset1,ppm_idx[index]])
+    co=cov(X[subset1, (ppm_idx[index]-(b+1)):(ppm_idx[index]+(b+1))], X[subset1,ppm_idx[index]])
+    
+    a=-abs(r * sqrt((length(r)-2)/(1-r^2)))
+    pval=2*pt(a,(length(r)-2))
+    
+    # Step 3: updating reference spectrum and reference index
+    refSpec=co[pval<q & r>0]
+    ppm_idx=(ppm_idx[index]-(b+1)):(ppm_idx[index]+(b+1))
+    ppm_idx=ppm_idx[pval<q & r>0]
+    
   }
+  
   return(subset1)
 }
-
-
