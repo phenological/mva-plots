@@ -124,6 +124,9 @@ eruptionPlot <- function(model, optns = list()){
     id <- as.data.frame(colnames(as.data.frame(model@suppLs[["x"]], check.names = F)))
     df <- as.data.frame(model@suppLs[["x"]], check.names = F)
     df[,"factor"] <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
+    if(!"factor" %in% names(optns)){
+      optns[["factor"]] <- df[,"factor"]
+    }
     pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]), check.names = F)
   }
 
@@ -180,11 +183,14 @@ ed<-cbind(cd, fc, pvalRescaled, pvalUnadjusted, pcLoadings, id, corr)
 colnames(ed)<-c("cd", "fc", "pval", "pvalRaw", "loadings", "id", "corr")
 
 #for graph labs
-labels<-list("Cliff's Delta", "Log2FC", "|log10pval|", "|loadings|", "id", "|corr|")
+labels <- list("Cliff's Delta", "Log2FC", "|log10pval|", "Loadings", "id", "corr")
 names(labels)<-c("cd", "fc", "pval", "loadings", "id", "corr")
 
+colorLabels <- list("|Cliff's Delta|", "|Log2FC|", "|log10pval|", "|Loadings|", "id", "|corr|")
+names(colorLabels)<-c("cd", "fc", "pval", "loadings", "id", "corr")
+
 if("color" %in% names(optns)) {
-  color <- ed[, optns$color]
+  color <- abs(ed[, optns$color])
 
 } else{
   color <- ed$corr
@@ -224,7 +230,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
                                       color = color)) +
   labs(x = labels[optns$x],
        y = labels[optns$y],
-       color = labels[optns$color]) +
+       color = colorLabels[optns$color]) +
   geom_label_repel(aes(label = id),
                    colour = "black",
                    min.segment.length = 0.001) +
@@ -293,7 +299,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
 
 
 #########append#############
-
+print(eruptionPlot)
 #append to data and plots
 if(is(model)[1] == "list"){
   model$plots <- append(model$plots, list(eruptionPlot = eruptionPlot))
@@ -306,6 +312,6 @@ if(is(model)[1] == "opls"){
 }
 
 invisible(model)
-#print(eruptionPlot)
+
 }
 
