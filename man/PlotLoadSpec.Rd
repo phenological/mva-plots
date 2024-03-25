@@ -10,6 +10,7 @@ PlotLoadSpec(
   roi = c(0.5, 9.5),
   type = "Backscaled",
   X = NULL,
+  Median = FALSE,
   optns = list()
 )
 }
@@ -34,6 +35,11 @@ but for PLS and OPLS "Backscaling" method is recommended.}
 \item{X}{spectral data matrix used for the model.
 This is needed for PCA with prcomp package, or
 (O)PLS with type = "Statistical reconstruction".}
+
+\item{Median}{only works for OPLS-DA model using mva.plot().
+Default is FALSE.
+When Median = True
+Median spectra of each groups will be added on the top of loading plot showing the same direction as score plot}
 
 \item{optns}{An empty list for additional options.}
 }
