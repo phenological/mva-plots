@@ -1,4 +1,3 @@
-# PlotLoadSpec
 
 test_that("PCA loading using prcomp", {
   # load data
