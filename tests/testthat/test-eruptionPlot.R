@@ -123,3 +123,24 @@ test_that("externally provided pvalue works", {
                expected = max(abs(log10(pvalExternal$matrix.NA..nrow...ncol.df....1..ncol...1.))))
 })
 
+
+test_that("fold change and others aren't limited to -1 to 1 scale", {
+  a <- oplsda(X=mtcars[,1:5], Y = mtcars$vs, type = "OPLS")
+
+  #eruption
+  p <- suppressWarnings(eruptionPlot(model = a, optns = list(factor = mtcars[ ,"vs"],
+                                                             x = "fc")))
+ maximum <- p@suppLs[["eruptionPlot"]][["scales"]][["scales"]][[2]][["limits"]][2]
+
+ #is the max range larger than the max x value so it isn't cut off?
+ expect_true(object = maximum > max(abs(p@suppLs[["eruptionData"]][["fc"]])))
+
+ p <- suppressWarnings(eruptionPlot(model = a, optns = list(factor = mtcars[ ,"vs"],
+                                                            x = "pval")))
+
+ maximum <- p@suppLs[["eruptionPlot"]][["scales"]][["scales"]][[2]][["limits"]][2]
+
+ #is the max range larger than the max x value so it isn't cut off?
+ expect_true(object = maximum > max(abs(p@suppLs[["eruptionData"]][["pval"]])))
+
+})
