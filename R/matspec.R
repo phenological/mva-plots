@@ -84,17 +84,30 @@ matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
     p <- suppressWarnings(add_lines(p = p))
 
     return(p)
+  } else {
+    ####non-interactive plot####
+    # We can re-sample to have 1 data point by pixel and get the result faster.
+    figSizeInPx <- dev.size(units = "px")# width, height
+    if(all(is.na(figSizeInPx))) {
+      figSizeInPx <- c(600, 400)
+    }
+    # We can suppose that all the pixels are used for data points. That is not completely true, but it is a good guess
+    pointsPerPixel <- ceiling(length(fi) / figSizeInPx[[1]])
+    # Simple re-sampling function.
+    for (i in 1:length(fi)) {
+      if ((i %% pointsPerPixel) != 0) {
+        fi[[i]] <- FALSE
+      }
+    }
+
+    matplot(ppm[fi],
+            t(X[, fi]),
+            type = "l",
+            xlim = rev(range(ppm[fi])),
+            xlab = "ppm",
+            ylab = "Intensity",
+            ...)
   }
-
-####non-interactive plot####
-  matplot(ppm[fi],
-          t(X[, fi]),
-          type = "l",
-          xlim = rev(range(ppm[fi])),
-          xlab = "ppm",
-          ylab = "Intensity",
-          ...)
-
 }
 
 

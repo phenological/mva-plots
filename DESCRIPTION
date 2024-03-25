@@ -1,6 +1,6 @@
 Package: mva.plots
 Title: Add visualisation capabilities to multivariate analysis
-Version: 0.0.6
+Version: 0.0.7
 Authors@R: 
     person("Lucy", "Grigoroff", , "Lucy.Grigoroff@murdoch.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "o"))
@@ -10,6 +10,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
+biocViews:
 Imports:
     caret,
     crayon,
@@ -25,8 +26,7 @@ Imports:
     scales,
     BiocManager (>= 1.30.16),
     stats,
-    sf
-biocViews:
+    sf,
     ropls
 Suggests: 
     knitr,
