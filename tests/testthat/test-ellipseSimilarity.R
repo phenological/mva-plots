@@ -136,7 +136,38 @@ t <- ellipseSimilarity(ps = psg, type = "coefficient")
 expect_equal(object = t[["PC1 vs PC3"]][1,3], expected = 1)
 })
 
+load("~/Downloads/missForest_imputed_clinchem_ntree10 (1).rda")
 
+replacements <- c('F' = 'Pfizer - La Jolla',
+                  'L' = 'Eli Lilly & Co.',
+                  'N' = 'NovoNordisk',
+                  'R' = 'Hoffmann–La Roche',
+                  'S' = 'The Pharmacia Corporation',
+                  'D' = 'Bristol-Myers-Squibb')
 
+## Perform replacements
+clinchem_df$Company <- replacements[clinchem_df$Company]
+
+#PCA
+pca <- PCA(data = clinchem_df[sapply(clinchem_df, is.double)])
+
+companyPalette <- c("Bristol-Myers-Squibb" = "#0000FF",
+                    "Eli Lilly & Co." = "#00FFFF",
+                    "Pfizer - La Jolla" = "#9633FF",
+                    "NovoNordisk" = "#AAFF55",
+                    "Hoffmann–La Roche" = "#FFAA00",
+                    "The Pharmacia Corporation" = "#CC0000")
+
+companyPCA <- plotScores(model = pca,
+                         optns = list(plotTitle = "a) PCA plot(n = 1114)",
+                                      size = 1,
+                                      alpha = 0.8,
+                                      PCi = 1,
+                                      PCj = 2,
+                                      ellipse = "color",
+                                      color = clinchem_df$Company,
+                                      colorTitle = "Company",
+                                      discretePalette = companyPalette,
+                                      theme = theme(legend.position = "bottom")))
 
 
