@@ -91,9 +91,11 @@ ellipseSimilarity<- function(ps, type = "jaccard"){
 
       #create an empty matrix with the size depending on the number of ellipses present
       if(length(unique_factors)>2){
-        n <- length(unique_factors) -1
-        m <- (n * (n + 1) / 2)
-        ratio <- matrix(NA, nrow = m, ncol = m)
+        n <- length(unique_factors)
+        ratio <- matrix(NA, nrow = n, ncol = n)
+        # n <- length(unique_factors) -1
+        # m <- (n * (n + 1) / 2)
+        # ratio <- matrix(NA, nrow = m, ncol = m)
       } else{ratio <- matrix(NA, nrow = 2, ncol = 2)
 
       }
