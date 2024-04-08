@@ -1,4 +1,5 @@
 
+
 test_that("PCA loading using prcomp", {
   # load data
   data("NMR_1D_rat_urine_spectra")
@@ -55,16 +56,11 @@ test_that("PCA loadings using mva.plots PCA",{
 
 
 test_that("OPLS-DA loadings using mva.plots oplsda no median trace",{
-  #use smaller subset of data for roi from 2 to 4
-  start <- which(as.numeric(colnames(X)) > 2)
-  end <- which(as.numeric(colnames(X)) < 4)
 
-  Xsample <- X[c(1:30, 300:330), start[1]:length(end)]
-  Ysample <- Y[c(1:30, 300:330) ]
 
   #build model
-  model = oplsda(X = Xsample,
-                 Y = Ysample,
+  model = oplsda(X = X,
+                 Y = Y,
                  type = "OPLS")
 
   # check the class and type of the model
@@ -80,16 +76,10 @@ test_that("OPLS-DA loadings using mva.plots oplsda no median trace",{
 
 
 test_that("OPLS-DA loadings using mva.plots oplsda with median trace",{
-  #use smaller subset of data for roi from 2 to 4
-  start <- which(as.numeric(colnames(X)) > 2)
-  end <- which(as.numeric(colnames(X)) < 4)
-
-  Xsample <- X[c(1:30, 300:330), start[1]:length(end)]
-  Ysample <- Y[c(1:30, 300:330) ]
 
   #build model
-  model = oplsda(X = Xsample,
-                 Y = Ysample,
+  model = oplsda(X = X,
+                 Y = Y,
                  type = "OPLS")
 
   # check the class and type of the model
