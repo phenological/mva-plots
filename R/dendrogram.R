@@ -195,7 +195,7 @@ dendrogram <- function(ps, p = 2, breaks = 1){
 
   #assign the same colours as the plotscores
   geo <- factor(colorAssignment[,2])
-  mycol <- colorAssignment[,1][geo]
+  mycol <- colorAssignment[,1]
 
   # ggtree_obj <- ggtree(phylo) +
   #               geom_tiplab(align = TRUE,
