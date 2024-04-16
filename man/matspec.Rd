@@ -4,7 +4,14 @@
 \alias{matspec}
 \title{matspec}
 \usage{
-matspec(X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
+matspec(
+  X,
+  ppm,
+  roi = c(0.5, 9.5),
+  interactive = TRUE,
+  resolution = "full",
+  ...
+)
 }
 \arguments{
 \item{X}{is a spectra matrix (colnames(X) <- ppm, and
@@ -17,6 +24,10 @@ rownames(X) <- Annotation$sampleID is recommended to do so before plotting)}
 \item{interactive}{default is True which allow you to zoom in and select
 which spectra to show}
 
+\item{resolution}{character argument for resolution of non-interactive plots.
+The default is "full", "partial" will result in lower resolution but faster
+plotting.}
+
 \item{...}{extra arguments.}
 }
 \value{
@@ -26,10 +37,19 @@ Interactive/non-interactive spectra plot
 Plot multiple spectra plot that can be interactive (default)
 }
 \examples{
-# this cannot be we don't publish path to our data
-# !nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/
-# DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
+ \dontrun{
+data("NMR_1D_rat_urine_spectra")
+#use first 10 samples, note the spectra is only the region 2 to 4 ppm
+Xsample <- X[1:10,]
+matspec(X = Xsample,
+        ppm = ppm,
+        interactive = T)
+
+# If using a dae
+#nmr<-local(get(load("path to dae")))
 #ppm<-as.numeric(nmr@varName)
 #X<-nmr@.Data
-#matspec(X[1:3,],ppm,roi = c(3.0,4.5),interactive = T)
+#the first three samples
+#matspec(X[1:3,], ppm, roi = c(3.0,4.5), interactive = T)
+}
 }
