@@ -37,7 +37,9 @@
 #'    continuousPalette =c("purple", "orange")).}
 #'    \item{theme} {Personalize the plot theme you would like applied as you
 #'    would using theme() in ggplot. Example set
-#'    theme = theme(legend.position = "left", text=element_text(size=5)).}
+#'    theme = theme(legend.position = "left", text = element_text(size=5)).}
+#'    \item{extra} {Add extra ggplot arguments that are not for theme(), example
+#'    extra = scale_shape_manual(labels = c("A", "B", "C"),values = c(8, 17, 2))}
 #'    \item{ellipse} {A character or either "color", "hotellings", "t", or "normal"
 #'    depending on desired method of calculation. If using color, a discrete variable
 #'    must be supplied to color.}
@@ -130,6 +132,11 @@ plotScores<-function(model, flat = FALSE,  optns=list()){
   if(!("theme" %in% names(optns))){
    theme <- theme()
   } else{theme <- optns$theme}
+
+  #extra
+  if(!("extra" %in% names(optns))){
+    extra <- theme()
+  } else{extra <- optns$extra}
 
   #plot title
   if("plotTitle" %in% names(optns)){
@@ -441,7 +448,8 @@ if("outlierLabels" %in% names(optns)){
           geom_hline(yintercept = 0, colour = "gray70") +
           geom_vline(xintercept = 0, colour = "gray70") +
           theme_bw() +
-          theme
+          theme +
+    extra
 
   onePlot[["data"]]$assignment <- optns$color
 
@@ -469,12 +477,15 @@ if("outlierLabels" %in% names(optns)){
                          expand = c(0, 0)) +  # Set limits and remove expansion
       theme_bw() +
       theme +
+      extra +
       theme(
         axis.title.y = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
         axis.line.y = element_blank()
-      )
+      ) +
+      scale_x_continuous(limits = symmetricLimits(df[,PCi])) +
+      scale_y_continuous(limits = symmetricLimits(df[,PCj]))
     print(onePlot)
 
     model@suppLs[["ScoresPlot"]] <- onePlot
@@ -485,12 +496,16 @@ if("outlierLabels" %in% names(optns)){
 if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
 
   #make ellipse
-  output <- singleEllipseOptions(model = model, df = df, PCi = PCi, PCj = PCj, plot = onePlot, optns = optns)
+  output <- singleEllipseOptions(model = model,
+                                 df = df,
+                                 PCi = PCi,
+                                 PCj = PCj,
+                                 plot = onePlot,
+                                 optns = optns)
 
   #idx <- 1
   idx <- output$outliers
   onePlot <- output$plot
-
 
   #add labels
   if("outlierLabels" %in% names(optns)){
@@ -524,6 +539,15 @@ if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
 
   }
 
+  #axis fix
+  b <- ggplot_build(onePlot)
+  maxx <- max(abs(b$layout$panel_params[[1]]$x.range))
+  maxy <- max(abs(b$layout$panel_params[[1]]$y.range))
+
+  onePlot <- onePlot +
+    scale_x_continuous(limits = c(-maxx, maxx)) +
+    scale_y_continuous(limits = c(-maxy, maxy))
+
   print(onePlot)
 
   model@suppLs[["outlierID"]] <- df[idx, "outlierID"]
@@ -535,6 +559,14 @@ if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
 
   if (is(model)[1] == "opls" & !("ellipse" %in% names(optns)))
   {
+    #axis fix
+    b <- ggplot_build(onePlot)
+    maxx <- max(abs(b$layout$panel_params[[1]]$x.range))
+    maxy <- max(abs(b$layout$panel_params[[1]]$y.range))
+
+    onePlot <- onePlot +
+      scale_x_continuous(limits = c(-maxx, maxx)) +
+      scale_y_continuous(limits = c(-maxy, maxy))
 
     print(onePlot)
 
@@ -563,7 +595,16 @@ if(is(model)[1] == "list"){
                               vjust = 0,
                               label.size = NA,
                               fill = NA)
-    }
+      }
+
+      #axis fix
+      b <- ggplot_build(onePlot)
+      maxx <- max(abs(b$layout$panel_params[[1]]$x.range))
+      maxy <- max(abs(b$layout$panel_params[[1]]$y.range))
+
+      onePlot <- onePlot +
+        scale_x_continuous(limits = c(-maxx, maxx)) +
+        scale_y_continuous(limits = c(-maxy, maxy))
     }
     model$plots <- append(model$plots, list(pcaSingle = onePlot))
     invisible(model)
@@ -608,7 +649,8 @@ if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
           panel.grid.minor = element_blank(),
           panel.border = element_rect(fill = NA,
                                       color = "grey35")) +
-    theme
+    theme +
+    extra
 
 
   plotGT <- gridEllipseOptions (model = model,
