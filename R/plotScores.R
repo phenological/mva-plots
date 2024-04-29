@@ -596,16 +596,16 @@ if(is(model)[1] == "list"){
                               label.size = NA,
                               fill = NA)
       }
-
-      #axis fix
-      b <- ggplot_build(onePlot)
-      maxx <- max(abs(b$layout$panel_params[[1]]$x.range))
-      maxy <- max(abs(b$layout$panel_params[[1]]$y.range))
-
-      onePlot <- onePlot +
-        scale_x_continuous(limits = c(-maxx, maxx)) +
-        scale_y_continuous(limits = c(-maxy, maxy))
     }
+    #axis fix
+    b <- ggplot_build(onePlot)
+    maxx <- max(abs(b$layout$panel_params[[1]]$x.range))
+    maxy <- max(abs(b$layout$panel_params[[1]]$y.range))
+
+    onePlot <- onePlot +
+      scale_x_continuous(limits = c(-maxx, maxx)) +
+      scale_y_continuous(limits = c(-maxy, maxy))
+
     model$plots <- append(model$plots, list(pcaSingle = onePlot))
     invisible(model)
     return(onePlot)
