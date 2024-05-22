@@ -173,10 +173,11 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
       spec_df <- data.frame(t(do.call("rbind",model@suppLs$x)))
       x = as.numeric(gsub("X","",colnames(spec_df)))
       # y_groups<-unique(model@suppLs$y)
-      data.frame(y = model@suppLs$y, model@scoreMN) -> y_groups
-      y_groups$p1[which(y_groups$p1>0)] <- 1
-      y_groups$p1[which(y_groups$p1<0)] <- -1
-      y_groups<-unique(y_groups)
+      data.frame(y = model@suppLs$y, model@scoreMN) %>%
+        mutate(p1 = ifelse(p1 < 0, -1, 1)) %>%
+        dplyr::group_by(y)%>%
+        mutate(p1 = ifelse(sum(p1)>0,1,-1))%>%
+        distinct(y, .keep_all = T)->y_groups
       idx =  which(x>roi[1] & x<roi[2])
       median_spectra_df<-list()
       for (i in 1:nrow(y_groups)) {
