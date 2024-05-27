@@ -169,15 +169,51 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
              y = "") +
         theme_bw()
   }else{
-    if( is(model)[1] == "opls" &  model@typeC=="OPLS-DA" & Median =="TRUE"){
+    if( is(model)[1] == "opls" & model@typeC=="OPLS-DA" & Median =="TRUE"){
       spec_df <- data.frame(t(do.call("rbind",model@suppLs$x)))
       x = as.numeric(gsub("X","",colnames(spec_df)))
       # y_groups<-unique(model@suppLs$y)
-      data.frame(y = model@suppLs$y, model@scoreMN) %>%
-        mutate(p1 = ifelse(p1 < 0, -1, 1)) %>%
-        dplyr::group_by(y)%>%
-        mutate(p1 = ifelse(sum(p1)>0,1,-1))%>%
-        distinct(y, .keep_all = T)->y_groups
+
+
+      #DPLYR removal
+      # Create the initial data frame
+      y_groups <- data.frame(y = model@suppLs$y, model@scoreMN)
+
+      # Apply the first mutation: ifelse(p1 < 0, -1, 1)
+      y_groups$p1 <- ifelse(y_groups$p1 < 0, -1, 1)
+
+      # Unique values of y
+      unique_y <- unique(y_groups$y)
+
+      # Apply the second mutation to each group of y
+      for (yval in unique_y) {
+        y_rows <- which(y_groups$y == yval)
+        if (sum(y_groups$p1[y_rows]) > 0) {
+          y_groups$p1[y_rows] <- 1
+        } else {
+          y_groups$p1[y_rows] <- -1
+        }
+      }
+
+      # Select distinct rows based on y
+      y_groups <- y_groups[!duplicated(y_groups$y), ]
+
+      # Add class attributes to match the 'grouped_df', 'tbl_df', etc.
+      class(y_groups) <- c("grouped_df", "tbl_df", "tbl", "data.frame")
+
+      # Ensure the 'groups' attribute is a data frame
+      attr(y_groups, "groups") <- data.frame(y = unique(y_groups$y), .rows = I(split(seq_len(nrow(y_groups)), y_groups$y)))
+
+
+
+      # data.frame(y = model@suppLs$y, model@scoreMN) %>%
+      #   mutate(p1 = ifelse(p1 < 0, -1, 1)) %>%
+      #   dplyr::group_by(y)%>%
+      #   mutate(p1 = ifelse(sum(p1)>0,1,-1))%>%
+      #   distinct(y, .keep_all = T)->y_groups
+
+
+
       idx =  which(x>roi[1] & x<roi[2])
       median_spectra_df<-list()
       for (i in 1:nrow(y_groups)) {
