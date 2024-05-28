@@ -28,6 +28,7 @@ test_that("PCA loading using prcomp", {
 
 })
 
+
 test_that("PCA loadings using mva.plots PCA",{
 
   #use small sample of data
@@ -103,3 +104,5 @@ test_that("OPLS-DA loadings using mva.plots oplsda with median trace",{
   expect_true(object = ncol(model_loadings_plot$data) == 5, "With Median trace, the data should have five columns")
 
 })
+
+

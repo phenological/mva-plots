@@ -56,3 +56,4 @@ test_that("When performing PLS, if number of levels is not 2, the correct action
   expect_warning(object = oplsda(X = mtcars[, 1:5], Y = mtcars$paint, type = "PLS"), "Your levels in Y have been changed from 3 to 2. Old levels are red, blue, green. Your new levels are green, red")
 
 })
+

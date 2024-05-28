@@ -172,7 +172,7 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
     if( is(model)[1] == "opls" & model@typeC=="OPLS-DA" & Median =="TRUE"){
       spec_df <- data.frame(t(do.call("rbind",model@suppLs$x)))
       x = as.numeric(gsub("X","",colnames(spec_df)))
-      # y_groups<-unique(model@suppLs$y)
+       # y_groups<-unique(model@suppLs$y)
 
 
       #DPLYR removal

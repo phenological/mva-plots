@@ -2,46 +2,65 @@
 % Please edit documentation in R/Storm.R
 \name{storm}
 \alias{storm}
-\title{Subset Optimization by reference matching (STORM)}
+\title{STORM}
 \usage{
 storm(
-  X,
-  ppm,
-  b = 5,
-  q = 0.01,
-  idx_ref = NULL,
-  roi = NULL,
-  calibrate = FALSE,
-  message = TRUE,
-  plot = TRUE
+  X = NA,
+  ppm = NA,
+  refSpec_idx = NA,
+  b = 20,
+  q = 0.05,
+  method = c("pearson"),
+  roi = c(7.52, 7.58)
 )
 }
 \arguments{
-\item{b}{expected half signal width data points}
+\item{X}{Numeric matrix of spectra data where each row represents samples and column a chemical shift variable (ppm)}
 
-\item{q}{predefined p-value threshold for refernce selection (0<q<=1, q<0.05 is significant).
+\item{ppm}{numeric array of chemical shift variables. The length must match the number of columns in X.}
 
-Iteratively learns the true reference by repeating a procedure to find the most highly correlated spectra
-and updating the reference multiple times.
-It converges when a subset of samples has been found twice.}
+\item{b}{expected half signal width data points (default is 20). Slightly larger values are recommended}
 
-\item{n}{expected number of spectra subset with hidden signal (signal of interest)}
+\item{q}{predefined p-value threshold for reference selection (0<q<=1, q<0.05 is significant).}
+
+\item{roi}{numeric array, chemical shift ranges where the signal of interest would be the highest intensity}
+
+\item{r_idx}{int Reference spectra index.}
+}
+\value{
+Vector of row indices that define the optimal subset.
 }
 \description{
-Step 1 Subset selection
-Step 2 STOCSY of subset
+Subset Optimization by reference matching
+Summary of STORM workflow
+Step 1: Subset selection
+}
+\details{
+Step 2: STOCSY of subset
 \itemize{
 \item Pearson correlation of each subset spectrum with the reference (reference a.k.a driver, chemical shift)
 \item calculate corresponding p-value by transforming the correlation into the t-statistics with n-2 degrees of freedoms
 \item exclude spectra subsets that have negative correlation with the reference
 \item from the remaining spectra subset with the lowest p-values are chosen to be in the subset
-Step 3) reference updating
 }
+
+Step 3: Reference updating
+
+Iteratively learns the true reference by repeating a procedure to find the most highly correlated spectra
+and updating the reference multiple times.
+It converges when a subset of samples has been found twice (subset==subset1).
 }
 \examples{
-#storm(X = Xb, ppm = ppm_bin,roi = c(7.52,7.58),calibrate = TRUE)  # hippurate
-#storm(X = Xb, ppm = ppm_bin,  b=5, q=0.01, idx_ref=NULL,roi = c(4.02,4.04),calibrate = FALSE)
-#storm(X = Xb, ppm = ppm_bin,roi = c(1.13,1.16),calibrate = FALSE)
+\dontrun{
+devtools::load_all("../nmr-spectra-processing/")
+load("../mva-plots/data/NMR_1D_rat_urine_spectra.rda")
+X_cal<-calibrateSpectra(ppm,X,ref = c("tsp"),rOref = c(0.92,0.94),cshift = 0.93)
+s1<-storm(X = X_cal, ppm = ppm, refSpec_idx = 5,b = 10,q = 0.001,roi = c(0.878,0.883))
+s0<-stocsy(ppm,Xcal[s1,],driver = 0.881)
+stocsy(ppm,X_cal[s1,],driver = 0.881,roi = c(0.7,1.8))
+matspec(X,ppm,roi = c(0.85,0.89),interactive = F)
+matspec(X_cal[s1,],ppm,roi = c(0.85,0.89),interactive = F)
+}
 }
 \references{
 Posma et.al (2012) dx.doi.org/10.1021/ac302360v| Anal.Chem. 2012, 84, 10694−10701
