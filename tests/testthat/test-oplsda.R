@@ -56,3 +56,22 @@ test_that("When performing PLS, if number of levels is not 2, the correct action
   expect_warning(object = oplsda(X = mtcars[, 1:5], Y = mtcars$paint, type = "PLS"), "Your levels in Y have been changed from 3 to 2. Old levels are red, blue, green. Your new levels are green, red")
 
 })
+
+
+#Model will build with metabom8 but not ropls without added code
+test_that("OPLS models build even when o1 is not R1 significance", {
+
+  X <- lipoData[,1:112]
+  Y <- lipoData[,113:114]
+
+  #oplsda
+  model <- oplsda(X = X, Y = Y$category, type = "OPLS")
+  test <- capture.output(model)
+  expect_false(object = any(grepl("Empty 'opls' object", test)))
+
+ #opls
+  model <- oplsda(X = X, Y = Y$continuous, type = "OPLS")
+  test <- capture.output(model)
+  expect_false(object = any(grepl("Empty 'opls' object", test)))
+
+})

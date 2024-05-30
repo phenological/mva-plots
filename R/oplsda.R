@@ -163,6 +163,51 @@ if("permI" %in% names(optns)){
                         permI = permI,
                         fig.pdfC = "none")
 
+  #ropls package requires significance of "R1" for the first two components.
+  #If the number of components is set manually the model will build. However
+  #if not using the automatically determined number of components, it should
+  #stop once the cumulative Q2 goes down. After this overfitting occurs.
+  test <- capture.output(model)
+
+  o <- c(1:10)
+
+  if (any(grepl("Empty 'opls' object", test)) & is.na(orthoI)) {
+    summarydf <- list()
+    previous_q2 <- 0
+    for (i in 1:length(o)) {
+      model1 <- ropls::opls(x = X,
+                            y = Y,
+                            predI = predI,
+                            orthoI = i,
+                            crossvalI = crossvalI,
+                            scaleC = scaleC,
+                            log10L = log10L,
+                            subset = subset,
+                            permI = permI,
+                            fig.pdfC = "none")
+
+      current_q2 <- model1@summaryDF[["Q2(cum)"]]
+      summarydf[[i]] <- model1@summaryDF
+
+      if (current_q2 < previous_q2) {
+        break
+      }
+
+      previous_q2 <- current_q2
+      saved_orthoI <- i
+    }
+    model <- ropls::opls(x = X,
+                         y = Y,
+                         predI = predI,
+                         orthoI = saved_orthoI,
+                         crossvalI = crossvalI,
+                         scaleC = scaleC,
+                         log10L = log10L,
+                         subset = subset,
+                         permI = permI,
+                         fig.pdfC = "none")
+  }
+
 
   model@suppLs[["x"]] <-append(x = data.frame(), values = X)
 
