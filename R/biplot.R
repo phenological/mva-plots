@@ -1,11 +1,22 @@
 #still requires a legend and refine how the zoom input works, put limit on number of features back in.
 
-biplot1 <- function(model, zoom = 1, PCi = 1, PCj = 2, optns = list()){
+biplot <- function(model, zoom = 1, PCi = 1, PCj = 2, optns = list()){
+
+  if(zoom > 1){
+    stop("Zoom must be between 0 and 1, set as the desired maximum of the loadings axis")
+  }
+  if(zoom != 1){
+    zoom <- (1/zoom)
+  }
 
   if("plotTitle" %in% names(optns)){
     plotTitle <- optns$plotTitle
   }else{optns[["plotTitle"]] <- "Biplot"
   plotTitle <- "Biplot"}
+
+  if("theme" %in% names(optns)){
+    theme <- optns$theme
+  }else{theme = theme(legend.position = "bottom")}
 
   #PCA
   if(is(model)[1] == "list"){
@@ -24,15 +35,17 @@ biplot1 <- function(model, zoom = 1, PCi = 1, PCj = 2, optns = list()){
    if(grepl("O", model@typeC) == TRUE){
      scores <- as.data.frame(cbind(model@scoreMN, model@orthoScoreMN), check.names = F)
      loadings <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN), check.names = F)
+     PCi = 1
+     PCj = 2
    }
-    optns[["PCi"]] <- NULL
-    optns[["PCj"]] <- NULL
+    optns[["PCi"]] <- PCi
+    optns[["PCj"]] <- PCj
   }
 
-  # #if the number of loadings is too high, stop
-  # if(nrow(loadings) > 50){
-  #   stop("Max of 50 variables allowed for a biplot")
-  # }
+  #if the number of loadings is too high, stop
+  if(nrow(loadings) > 50){
+    stop("Max of 50 variables allowed for a biplot")
+  }
 
   ps <-
   plotScores(model = model,
@@ -45,10 +58,12 @@ biplot1 <- function(model, zoom = 1, PCi = 1, PCj = 2, optns = list()){
   # Plots
   scalef <- max(abs(scores)) + 0.1
 
+
+
   # scalef <- scale
   # Get arrow end point locations (loadings*scaling for correct scale)
-  l.x <- loadings[,1]*scalef*zoom
-  l.y <- loadings[,2]*scalef*zoom
+  l.x <- loadings[,PCi]*scalef*zoom
+  l.y <- loadings[,PCj]*scalef*zoom
 
   # Get label positions (%15 further than end of arrows)
   l.posx <- l.x*1.15
@@ -61,7 +76,8 @@ biplot1 <- function(model, zoom = 1, PCi = 1, PCj = 2, optns = list()){
   secondary_limits <- c(-lim, lim) * scalef
 
 
-  #
+
+  #biplot
   bp <- ps +
     geom_segment(data = loadings,
                  aes(x = 0,
@@ -79,16 +95,16 @@ biplot1 <- function(model, zoom = 1, PCi = 1, PCj = 2, optns = list()){
                     size = 3,
                     hjust = 0) +
     scale_x_continuous(sec.axis = sec_axis(transform = ~ . / (scalef*zoom),
-                                           breaks = c(-1, 0, 1),
-                                           name = paste0(colnames(loadings)[1]," Loadings")),
+                                           breaks = round(c(-1, -0.5, 0, 0.5, 1)/zoom, digits = 2),
+                                           name = paste0(colnames(loadings)[PCi]," Loadings")),
                        limits = secondary_limits,
                        expand = c(0, 0)) +
     scale_y_continuous(sec.axis = sec_axis(transform = ~ . / (scalef*zoom),
-                                           breaks = c(-1, 0, 1),
-                                           name = paste0(colnames(loadings)[2]," Loadings")),
+                                           breaks = round(c(-1, -0.5, 0, 0.5, 1)/zoom, digits = 2),
+                                           name = paste0(colnames(loadings)[PCj]," Loadings")),
                        limits = secondary_limits,
                        expand = c(0, 0)) +
-    theme(legend.position = "none") +
+    theme +
     labs(title = plotTitle)
 
   print(bp)

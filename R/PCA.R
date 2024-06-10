@@ -92,7 +92,7 @@ PCA <- function(data, center = TRUE, scale. = TRUE, rank = 5, plot = TRUE, optns
 
  if("cutoff" %in% optns){
    cutoff = optns$cutoff
- }else{cutoff = 99}
+ }else{cutoff = 99.9}
 
   t <- length(which(pcSum$`Cumulative Proportion` < cutoff))
 

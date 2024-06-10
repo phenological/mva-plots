@@ -15,8 +15,12 @@ ellipse are not available for a flat plotscore.}
 
 \item{optns}{An empty list for additional options:
 \itemize{
-\item{PCi} {A numeric for the x axis pricipal component for a single plot.}
-\item{PCj} {A numeric for the y axis pricipal component for a single plot.}
+\item{PCi} {A numeric for the x axis principal component for a single plot.
+Available for PCA and PLS(DA). O-PLS(DA) is always the first predictive
+component}
+\item{PCj} {A numeric for the y axis pricipal component for a single plot.
+Available for PCA and PLS(DA). O-PLS(DA) is always the first orthogonal
+component}
 \item{plotTitle} {A character for the title of the plot.}
 \item{thresh} {A numeric for the number of PCAs to display in the grid. The
 default is calculated in the PCA function.}
@@ -78,7 +82,10 @@ aesthetic such as 0.3. Default "Alpha".}
 The model list appended with the grid of loadings under plots.
 }
 \description{
-Grid of the score plots using GGally::ggpairs up to a threshold number.
+The scores plot for an O-PLS(DA) or PCA model. PCA models may be displayed as
+a grid up to a threshold number set when building the model. O-PLS is only
+available for the first predictive and first orthogonal component. Displayed
+PLS components may be changed.
 }
 \examples{
 data(iris)
@@ -89,11 +96,11 @@ b <- plotScores(model = a,
                                                  "versicolor" = "orange",
                                                  "virginica" = "steelblue"),
                               colorTitle = "Flower Species",
-                              gridTitle = "Iris PCA grid",
+                              plotTitle = "Iris PCA grid",
                               thresh = 3,
                               alpha = 0.7))
 
-#for a signle plot istead of a grid:
+#for a single plot instead of a grid:
 
 b <- plotScores(model = a,
                 optns = list(color = iris[,"Species"],
@@ -103,7 +110,7 @@ b <- plotScores(model = a,
                                                  "versicolor" = "orange",
                                                  "virginica" = "steelblue"),
                               colorTitle = "Flower Species",
-                              gridTitle = "Iris PCA grid",
+                              plotTitle = "Iris PCA grid",
                               alpha = 0.7))
 #Alternatively, to access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i],
 #where j is the vertical and i is the horizontal position of the specific

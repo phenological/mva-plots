@@ -1,6 +1,9 @@
 #' Plot Scores.
 #'
-#' Grid of the score plots using GGally::ggpairs up to a threshold number.
+#' The scores plot for an O-PLS(DA) or PCA model. PCA models may be displayed as
+#' a grid up to a threshold number set when building the model. O-PLS is only
+#' available for the first predictive and first orthogonal component. Displayed
+#' PLS components may be changed.
 #'
 #' @param model A PCA or oplsda model.
 #' @param flat A logical for a flat O-PLS(DA) scores plot. Only applicable to
@@ -8,8 +11,12 @@
 #' ellipse are not available for a flat plotscore.
 #' @param optns An empty list for additional options:
 #'  \itemize{
-#'    \item{PCi} {A numeric for the x axis pricipal component for a single plot.}
-#'    \item{PCj} {A numeric for the y axis pricipal component for a single plot.}
+#'    \item{PCi} {A numeric for the x axis principal component for a single plot.
+#'    Available for PCA and PLS(DA). O-PLS(DA) is always the first predictive
+#'    component}
+#'    \item{PCj} {A numeric for the y axis pricipal component for a single plot.
+#'    Available for PCA and PLS(DA). O-PLS(DA) is always the first orthogonal
+#'    component}
 #'    \item{plotTitle} {A character for the title of the plot.}
 #'    \item{thresh} {A numeric for the number of PCAs to display in the grid. The
 #'    default is calculated in the PCA function.}
@@ -78,11 +85,11 @@
 #'                                                  "versicolor" = "orange",
 #'                                                  "virginica" = "steelblue"),
 #'                               colorTitle = "Flower Species",
-#'                               gridTitle = "Iris PCA grid",
+#'                               plotTitle = "Iris PCA grid",
 #'                               thresh = 3,
 #'                               alpha = 0.7))
 #'
-#' #for a signle plot istead of a grid:
+#' #for a single plot instead of a grid:
 #'
 #' b <- plotScores(model = a,
 #'                 optns = list(color = iris[,"Species"],
@@ -92,7 +99,7 @@
 #'                                                  "versicolor" = "orange",
 #'                                                  "virginica" = "steelblue"),
 #'                               colorTitle = "Flower Species",
-#'                               gridTitle = "Iris PCA grid",
+#'                               plotTitle = "Iris PCA grid",
 #'                               alpha = 0.7))
 #' #Alternatively, to access a single plot from the grid: b[["plots]][["pcaGrid"]][j,i],
 #' #where j is the vertical and i is the horizontal position of the specific
@@ -156,15 +163,15 @@ plotScores<-function(model, flat = FALSE,  optns=list()){
 
   #shape
   if(!("shape" %in% names(optns))){
-    optns$shape="circle"}
+    optns$shape = "circle"}
 
   #size
   if(!("size" %in% names(optns))){
-    optns$size=3}
+    optns$size = 3}
 
   #alpha
   if(!("alpha" %in% names(optns))){
-    optns$alpha=0.5}
+    optns$alpha = 0.5}
 
   #legend titles
   if(!("colorTitle" %in% names(optns))){
@@ -355,24 +362,35 @@ plotScores<-function(model, flat = FALSE,  optns=list()){
     guides(color = "none")
   }
 
+  if("PCi" %in% names(optns)){
+  PCi <- optns$PCi
+  PCj <- optns$PCj
+  }
 
   ##########ropls objects############
 
   #ropls score plots
-  if(is(model)[1]=="opls"){
+  if(is(model)[1] == "opls"){
 
+    if(!("PCi" %in% names(optns))){
+      PCi <- 1
+      PCj <- 2
+    }
     if(grepl("O", model@typeC) == TRUE){
       df <- as.data.frame(cbind(model@scoreMN, model@orthoScoreMN), check.names = F)
       df2 <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN), check.names = F)
       gl <- labs(x = paste0('tp1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('to1'))
+      PCi <- 1
+      PCj <- 2
     }else{
       #flat <- FALSE
       df <- as.data.frame(model@scoreMN, check.names = F)
       df2 <- as.data.frame(model@loadingMN, check.names = F)
-      gl <- labs(x = paste0('t1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
-                 y = paste0('t2 (', round(model@modelDF[["R2X"]][2]*100, 1), '%)'))
-    }
+      gl <- labs(x = paste0('t',PCi, '(', round(model@modelDF[["R2X"]][PCi]*100, 1), '%)'),
+                 y = paste0('t',PCj, '(', round(model@modelDF[["R2X"]][PCj]*100, 1), '%)'))
+
+      }
 
     df <- cbind(df, model@suppLs[["yMCN"]])
     df$rownames <- rownames(df)
@@ -401,8 +419,7 @@ if("outlierLabels" %in% names(optns)){
         colors = optns$continuousPalette,
         na.value = "grey50",
         guide = "colorbar"
-      )}
-    else{scale_colour_manual(values = optns$discretePalette)}
+      )}else{scale_colour_manual(values = optns$discretePalette)}
 
     #number of pcas (working)
     if("thresh" %in% names(optns)){
@@ -417,8 +434,8 @@ if("outlierLabels" %in% names(optns)){
     title<-unlist(title)
 
     if("PCi" %in% names(optns)){
-      PCi <- optns$PCi
-      PCj <- optns$PCj
+      # PCi <- optns$PCi
+      # PCj <- optns$PCj
       gl <- labs(x = title[PCi], y = title[PCj])
     }
   }
@@ -430,7 +447,7 @@ if("outlierLabels" %in% names(optns)){
       if(is(model)[1]=="list"){
         gl <- labs()
       }
-      }
+    }
 
 ########ALL (base plot)##############
   onePlot <- ggplot(data = df,
@@ -523,11 +540,12 @@ if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
                    fill = NA)
     }
 
-    if(!(grepl("O", model@typeC) == TRUE)){
+    if(!(grepl("O", model@typeC)) == TRUE){
+      df3 <- df[idx,]
       onePlot <- onePlot +
-        geom_label(data = df[idx,],
-                   aes(x = p1,
-                       y = p2,
+        geom_label(data = df3,
+                   aes(x = df3[,PCi],
+                       y = df3[,PCj],
                        label = outlierID),
                    size = 2,
                    hjust = 0,
