@@ -173,7 +173,7 @@ if("permI" %in% names(optns)){
 
   if (any(grepl("Empty 'opls' object", test)) & is.na(orthoI)) {
     summarydf <- list()
-    previous_q2 <- 0
+    previous_q2 <- -1
     for (i in 1:length(o)) {
       model1 <- ropls::opls(x = X,
                             y = Y,
@@ -194,7 +194,7 @@ if("permI" %in% names(optns)){
       }
 
       previous_q2 <- current_q2
-      saved_orthoI <- i
+      saved_orthoI <- i-1
     }
     model <- ropls::opls(x = X,
                          y = Y,
