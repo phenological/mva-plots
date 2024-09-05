@@ -13,3 +13,4 @@ test_that("test if the function can handle NA", {
   expect_no_error(plotSplitCor(corList = corList,type = "full"))
 
 })
+

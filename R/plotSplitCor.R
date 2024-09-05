@@ -18,17 +18,19 @@
 #'    }
 #'    
 #' @return plot of the two split correlation matrix
-#' @import scales
-#' @example
-#' corList<-list()
-#' corList[[1]]<-cor(tdf[idx_healthy,])
-#' corList[[2]]<-cor(tdf[idx_nonhealthy,])
-#' plotSplitCor(corList = corList,type = "lower")
-#' plotSplitCor(corList = corList,type = "upper",optns = list(plotTitle = "Healthy vs non-Healthy",
-#'                                                               c1Name = "Healthy",
-#'                                                               c2Name = "NonHealthy"))
+#' @example 
+#'  \dontrun{
+#' data(mtcars)
+#' X<-mtcars[,1:5]
+#' Y<-mtcars[,8]
+#' corList<-list(cor(X[which(Y==0),]),cor(X[which(Y==1),]))
+#' plotSplitCor(corList = corList,type = "upper")
+#' }
+#' #' @importFrom scales rescale
+#' @importFrom grDevices rgb  dev.size colorRamp colorRampPalette
+#' @import grid
 #' 
-#'  @export
+#' @export
 
 
 plotSplitCor <- function(corList,
