@@ -18,7 +18,7 @@
 #'    }
 #'    
 #' @return plot of the two split correlation matrix
-#' 
+#' @import scales
 #' @example
 #' corList<-list()
 #' corList[[1]]<-cor(tdf[idx_healthy,])
@@ -130,8 +130,6 @@ plotSplitCor <- function(corList,
             (plot_type == "lower" && j <= i)) {
           x <- (j - 0.5) / cols + x_offset
           y <- (rows - i + 0.5) / rows + y_offset
-          fill1 <- rgb(colorRamp(c("blue", "white", "red"))(c1[i, j]) / 255)
-          fill2 <- rgb(colorRamp(c("blue", "white", "red"))(c2[i, j]) / 255)
           
           grid.rect(
             x = x,
@@ -141,18 +139,25 @@ plotSplitCor <- function(corList,
             gp = gpar(col = "black", fill = NA)
           )
           
-          hc_left <- half_circle(x + 0.01 / cols, y, 0.45 / cols, "left")
-          grid.polygon(
-            x = hc_left$x,
-            y = hc_left$y,
-            gp = gpar(fill = fill1, col = "black")
-          )
-          hc_right <- half_circle(x + 0.01 / cols, y, 0.45 / cols, "right")
-          grid.polygon(
-            x = hc_right$x,
-            y = hc_right$y,
-            gp = gpar(fill = fill2, col = "black")
-          )
+          if(!is.na(c1[i,j])){
+            fill1 <- rgb(colorRamp(c("blue", "white", "red"))(c1[i, j]) / 255)
+            hc_left <- half_circle(x + 0.01 / cols, y, 0.45 / cols, "left")
+            grid.polygon(
+              x = hc_left$x,
+              y = hc_left$y,
+              gp = gpar(fill = fill1, col = "black")
+            )
+          }
+          if(!is.na(c2[i,j])){
+            fill2 <- rgb(colorRamp(c("blue", "white", "red"))(c2[i, j]) / 255)
+            hc_right <- half_circle(x + 0.01 / cols, y, 0.45 / cols, "right")
+            grid.polygon(
+              x = hc_right$x,
+              y = hc_right$y,
+              gp = gpar(fill = fill2, col = "black")
+            )
+          }
+        
         }
       }
     }
