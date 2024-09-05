@@ -29,8 +29,7 @@ test_that("O-PLS-DA model works with predictions", {
 
   #predict
   predictModel <- oplsdaPredict(model = oplsdaModel,
-                                newdata = exampleData2[,1:5]
-                                ,
+                                newdata = exampleData2[,1:5],
                                 optns = list(real = exampleData2$status)
   )
 
@@ -162,5 +161,50 @@ expect_warning({
 })
 
 })
+
+
+
+test_that("can define the number of orth comp used", {
+  new_lipidData_jittered <- new_lipidData
+
+  # Define the amount of jittering
+  jitter_amount <- 0.01  # Adjust as needed
+
+  # Apply jitter to numeric columns (excluding factors and characters)
+  numeric_cols <- sapply(new_lipidData_jittered, is.numeric)
+  new_lipidData_jittered[numeric_cols] <- lapply(new_lipidData_jittered[numeric_cols], jitter, amount = jitter_amount)
+  new_lipidData_jittered <- abs(new_lipidData_jittered)
+
+  op<- oplsda(X = new_lipidData, Y = new_lipidMetadata$sample_batch, type = "OPLS")
+  predictModel <- oplsdaPredict(model = op,
+                                newdata = new_lipidData_jittered,
+                                optns = list(orthoI = 1))
+  predictModel3 <- oplsdaPredict(model = op,
+                                 newdata = new_lipidData_jittered)
+
+  expect_false(object = predictModel[["orthoScoreMN"]][1] == predictModel3[["orthoScoreMN"]][1])
+
+  oplsdaModel <- oplsda(Y = (exampleData[, "status"]),
+                        X = exampleData[,1:5],
+                        type = "OPLS",
+                        optns = list(orthoI = 3))
+
+  predictModel1 <- oplsdaPredict(model = oplsdaModel,
+                                 newdata = exampleData2[,1:5],
+                                 optns = list(
+                                   orthoI = 1))
+
+  predictModel3 <- oplsdaPredict(model = oplsdaModel,
+                                 newdata = exampleData2[,1:5],
+                                 optns = list(orthoI = 3))
+
+  expect_false(object = predictModel1[["orthoScoreMN"]][1] == predictModel3[["orthoScoreMN"]][1])
+})
+
+
+
+
+
+
 
 

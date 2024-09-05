@@ -138,5 +138,3 @@ expect_equal(object = t[["PC1 vs PC3"]][1,3], expected = 1)
 
 
 
-
-

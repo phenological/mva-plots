@@ -5,12 +5,22 @@
 #' @param model A PCA, oplsda or ropls object.
 #' @param flat A logical for a flat O-PLS(DA) loadings plot. Only applicable to
 #' oplsda models with an orthogonal component. Default is FALSE.
-#' @param optns An empty list for addtional options:
+#' @param optns An empty list for additional options:
 #'    \itemize{
 #'     \item{plotTitle}{A character for the title of the grid.}
 #'     \item{theme}{Personalize the plot theme you would like applied as you
 #'     would using theme() in ggplot. Example set
-#'     theme = theme(legend.position = "left", text=element_text(size=5)) in optns.}
+#'     theme = theme(legend.position = "left", text=element_text(size = 5)) in
+#'     optns.}
+#'     \item{color} {A character of the color desired (default "blue"), you may
+#'     use hexadecimals.}
+#'     \item{shape} {A character or appropriate number of the shape desired.
+#'     Default shape is "circle".}
+#'     \item{size} {Either a column from the data frame or a numeric of the size
+#'     desired. Default size is 3.}
+#'     \item{alpha} {A numeric of the alpha desired. Default size is 0.5.}
+#'     \item{extra} {Add extra ggplot arguments that are not for theme(), example
+#'     extra = labs(caption = "*can you see it")}
 #'     \item{thresh}{A numeric for the number of PCAs to display in the grid.
 #'     The default is calculated in the PCA function.}
 #' }
@@ -27,7 +37,7 @@
 
 
 plotLoadings <- function(model, flat = FALSE, optns=list()){
-  #plot title (working)
+  #plot title
   if("plotTitle" %in% names(optns)){
     plotTitle = optns$plotTitle
   }else{
@@ -38,6 +48,27 @@ plotLoadings <- function(model, flat = FALSE, optns=list()){
   if(!("theme" %in% names(optns))){
     theme <- theme()
   } else{theme <- optns$theme}
+
+  #extra
+  if(!("extra" %in% names(optns))){
+    extra <- theme()
+  } else{extra <- optns$extra}
+
+  #color
+  if(!("color" %in% names(optns))) {
+      optns$color = "blue"}
+
+  #shape
+  if(!("shape" %in% names(optns))){
+    optns$shape = "circle"}
+
+  #size
+  if(!("size" %in% names(optns))){
+    optns$size = 1}
+
+  #alpha
+  if(!("alpha" %in% names(optns))){
+    optns$alpha = 1}
 
   #########ropls objects##################
   if(is(model)[1]=="opls"){
@@ -59,22 +90,36 @@ plotLoadings <- function(model, flat = FALSE, optns=list()){
                         aes(x = df[,PCi], y = df[,PCj])) +
         ggtitle(plotTitle) +
         gl +
-        geom_point(color= "blue",
-                   size = 1) +
+        geom_point(color = optns$color,
+                   size = optns$size,
+                   shape = optns$shape,
+                   alpha = optns$alpha) +
         geom_text_repel(aes(label = rownames(df)),
                         size = 3.5) +
         geom_hline(yintercept = 0, colour = "gray70") +
         geom_vline(xintercept = 0, colour = "gray70") +
         theme_bw() +
-        theme
+        theme +
+        extra
+
+      #axis fix
+      b <- ggplot_build(onePlot)
+      maxx <- max(abs(b$layout$panel_params[[1]]$x.range))
+      maxy <- max(abs(b$layout$panel_params[[1]]$y.range))
+
+      onePlot <- onePlot +
+        scale_x_continuous(limits = c(-maxx, maxx)) +
+        scale_y_continuous(limits = c(-maxy, maxy))
 
       if(flat == TRUE){
         onePlot <- ggplot(data = df,
                           aes(x = df[,PCi], y = 0.001)) +
           ggtitle(plotTitle) +
           gl +
-          geom_point(color= "blue",
-                     size = 1) +
+          geom_point(color = optns$color,
+                     size = optns$size,
+                     shape = optns$shape,
+                     alpha = optns$alpha) +
           scale_y_continuous(limits = c(0, 0.1),
                              expand = c(0, 0)) +  # Set limits and remove expansion
           geom_text_repel(
@@ -89,13 +134,15 @@ plotLoadings <- function(model, flat = FALSE, optns=list()){
             vjust = -1,
             box.padding = 0.05) +       # Move the label above the point
           theme_bw() +
-          theme+
+          theme +
+          extra +
           theme(axis.title.y=element_blank(),
                 axis.text.y=element_blank(),
                 axis.ticks.y=element_blank(),
                 axis.line.y=element_blank())
 
       }
+
 
 
       print(onePlot)
@@ -130,14 +177,26 @@ plotLoadings <- function(model, flat = FALSE, optns=list()){
                       aes(x = df[,PCi], y = df[,PCj])) +
       ggtitle(plotTitle) +
       gl +
-      geom_point(color= "blue",
-                 size = 1) +
+      geom_point(color = optns$color,
+                 size = optns$size,
+                 shape = optns$shape,
+                 alpha = optns$alpha) +
       geom_text_repel(aes(label = rownames(df)),
                       size = 3.5) +
       geom_hline(yintercept = 0, colour = "gray70") +
       geom_vline(xintercept = 0, colour = "gray70") +
       theme_bw() +
-      theme
+      theme +
+      extra
+
+    #axis fix
+    b <- ggplot_build(onePlot)
+    maxx <- max(abs(b$layout$panel_params[[1]]$x.range))
+    maxy <- max(abs(b$layout$panel_params[[1]]$y.range))
+
+    onePlot <- onePlot +
+      scale_x_continuous(limits = c(-maxx, maxx)) +
+      scale_y_continuous(limits = c(-maxy, maxy))
 
     return(onePlot)
     }
@@ -152,8 +211,10 @@ plotLoadings <- function(model, flat = FALSE, optns=list()){
                                        lower=list(continuous =myFn2),
                                        progress = F,
                                        switch="both") +
-      geom_point(color= "blue",
-                 size = 1) +
+      geom_point(color = optns$color,
+                 size = optns$size,
+                 shape = optns$shape,
+                 alpha = optns$alpha) +
       geom_text_repel(aes(label = rownames(df)),
                       size = 3.5) +
       theme_bw() +
@@ -166,7 +227,8 @@ plotLoadings <- function(model, flat = FALSE, optns=list()){
             panel.grid.minor = element_blank(),
             panel.border = element_rect(fill = NA,
                                         colour = "grey35")) +
-      theme
+      theme +
+      extra
 
     plotLoadingGrid <- gPairsLower(plotLoadingGrid)
 

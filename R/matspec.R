@@ -8,21 +8,33 @@
 #' @param roi region of interest if not defined default is set as c(0.0 , 9.5)
 #' @param interactive default is True which allow you to zoom in and select
 #' which spectra to show
+#' @param resolution character argument for resolution of non-interactive plots.
+#' The default is "full", "partial" will result in lower resolution but faster
+#' plotting.
 #' @param ... extra arguments.
 #' @return Interactive/non-interactive spectra plot
 #' @importFrom plotly plot_ly add_lines layout
 #' @importFrom reshape2 melt
 #'
 #' @examples
-#' # this cannot be we don't publish path to our data
-#' # !nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/
-#' # DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
+#'  \dontrun{
+#' data("NMR_1D_rat_urine_spectra")
+#' #use first 10 samples, note the spectra is only the region 2 to 4 ppm
+#' Xsample <- X[1:10,]
+#' matspec(X = Xsample,
+#'         ppm = ppm,
+#'         interactive = T)
+#'
+#' # If using a dae
+#' #nmr<-local(get(load("path to dae")))
 #' #ppm<-as.numeric(nmr@varName)
 #' #X<-nmr@.Data
-#' #matspec(X[1:3,],ppm,roi = c(3.0,4.5),interactive = T)
+#' #the first three samples
+#' #matspec(X[1:3,], ppm, roi = c(3.0,4.5), interactive = T)
+#' }
 #' @export
 
-matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
+matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, resolution = "full", ...)
 {
 ####ppm####
 #if ppm is not provided, create it using the column names of X
@@ -84,17 +96,33 @@ matspec<-function (X, ppm, roi = c(0.5, 9.5), interactive = TRUE, ...)
     p <- suppressWarnings(add_lines(p = p))
 
     return(p)
+  } else {
+    ####non-interactive plot####
+
+    if(resolution == "partial"){
+      # We can re-sample to have 1 data point by pixel and get the result faster.
+      figSizeInPx <- dev.size(units = "px")# width, height
+      if(all(is.na(figSizeInPx))) {
+        figSizeInPx <- c(600, 400)
+      }
+      # We can suppose that all the pixels are used for data points. That is not completely true, but it is a good guess
+      pointsPerPixel <- ceiling(length(fi) / figSizeInPx[[1]])
+      # Simple re-sampling function.
+      for (i in 1:length(fi)) {
+        if ((i %% pointsPerPixel) != 0) {
+          fi[[i]] <- FALSE
+        }
+      }
+    }
+
+    p <- matplot(ppm[fi],
+            t(X[, fi]),
+            type = "l",
+            xlim = rev(range(ppm[fi])),
+            xlab = "ppm",
+            ylab = "Intensity",
+            ...)
   }
-
-####non-interactive plot####
-  matplot(ppm[fi],
-          t(X[, fi]),
-          type = "l",
-          xlim = rev(range(ppm[fi])),
-          xlab = "ppm",
-          ylab = "Intensity",
-          ...)
-
 }
 
 

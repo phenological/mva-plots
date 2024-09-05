@@ -124,6 +124,9 @@ eruptionPlot <- function(model, optns = list()){
     id <- as.data.frame(colnames(as.data.frame(model@suppLs[["x"]], check.names = F)))
     df <- as.data.frame(model@suppLs[["x"]], check.names = F)
     df[,"factor"] <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
+    if(!"factor" %in% names(optns)){
+      optns[["factor"]] <- df[,"factor"]
+    }
     pcLoadings<-as.data.frame(abs(model@loadingMN[,PC]), check.names = F)
   }
 
@@ -180,11 +183,14 @@ ed<-cbind(cd, fc, pvalRescaled, pvalUnadjusted, pcLoadings, id, corr)
 colnames(ed)<-c("cd", "fc", "pval", "pvalRaw", "loadings", "id", "corr")
 
 #for graph labs
-labels<-list("Cliff's Delta", "Log2FC", "|log10pval|", "|loadings|", "id", "|corr|")
+labels <- list("Cliff's Delta", "Log2FC", "|log10pval|", "Loadings", "id", "corr")
 names(labels)<-c("cd", "fc", "pval", "loadings", "id", "corr")
 
+colorLabels <- list("|Cliff's Delta|", "|Log2FC|", "|log10pval|", "|Loadings|", "id", "|corr|")
+names(colorLabels)<-c("cd", "fc", "pval", "loadings", "id", "corr")
+
 if("color" %in% names(optns)) {
-  color <- ed[, optns$color]
+  color <- abs(ed[, optns$color])
 
 } else{
   color <- ed$corr
@@ -195,8 +201,7 @@ if (optns$color == "pval") {
   color_breaks <- c(0, 1.3, max(ed[,"pval"]))
   values <- rescale(c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.3, 1.5, 2, max(ed[,"pval"])))
   limits <- c(0, max(ed[,"pval"]))
-}
-else{
+}else{
   color_breaks <- c(0, 0.5, 1)
   values <- NULL
   limits <- c(0, 1)
@@ -207,10 +212,17 @@ if("x" %in% names(optns)){
 }else{x <- ed$cd
 optns$x <-"cd"}
 
+if(max(abs(x)) > 1){
+  sc <- scale_x_continuous(limits = c(-(round(max(abs(x)), 2) + 0.01), round(max(abs(x)), 2) + 0.01))
+  #sc <- scale_x_continuous(limits = c(-(as.integer(max(abs(x))), as.integer(max(abs(x))))
+}else{sc <- scale_x_continuous(limits = c(-1, 1))}
+
 if("y" %in% names(optns)){
   y <- ed[,optns$y]
 }else{y <- ed$loadings
 optns$y <- "loadings"}
+
+
 
 ############plot#########
 eruptionPlot <- ggplot(data = ed, aes(x = x,
@@ -218,7 +230,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
                                       color = color)) +
   labs(x = labels[optns$x],
        y = labels[optns$y],
-       color = labels[optns$color]) +
+       color = colorLabels[optns$color]) +
   geom_label_repel(aes(label = id),
                    colour = "black",
                    min.segment.length = 0.001) +
@@ -226,7 +238,6 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
              shape = 16,
              alpha = 0.3) +
   theme_bw() +
-  scale_x_continuous(limits = c(-1, 1)) +
   scale_color_gradientn(
     values = values,
     colours = optns$continuousPalette,  # Use the custom color palette,
@@ -242,7 +253,10 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
         plot.tag = element_text(face = "bold",
                                 size = 25),
         legend.position = "right",
-        legend.direction = "vertical")
+        legend.direction = "vertical") +
+  sc
+
+
 
 ########p-value legend##########
 #makes a separate plot with evenly spread colourbar
@@ -285,7 +299,7 @@ eruptionPlot <- ggplot(data = ed, aes(x = x,
 
 
 #########append#############
-
+print(eruptionPlot)
 #append to data and plots
 if(is(model)[1] == "list"){
   model$plots <- append(model$plots, list(eruptionPlot = eruptionPlot))
@@ -298,6 +312,6 @@ if(is(model)[1] == "opls"){
 }
 
 invisible(model)
-#print(eruptionPlot)
+
 }
 

@@ -10,6 +10,7 @@ PlotLoadSpec(
   roi = c(0.5, 9.5),
   type = "Backscaled",
   X = NULL,
+  Median = FALSE,
   optns = list()
 )
 }
@@ -35,6 +36,11 @@ but for PLS and OPLS "Backscaling" method is recommended.}
 This is needed for PCA with prcomp package, or
 (O)PLS with type = "Statistical reconstruction".}
 
+\item{Median}{only works for OPLS-DA model using mva.plot().
+Default is FALSE.
+When Median = True
+Median spectra of each groups will be added on the top of loading plot showing the same direction as score plot}
+
 \item{optns}{An empty list for additional options.}
 }
 \value{
@@ -44,17 +50,18 @@ plot of the loadings
 Allow to plot loadings of PCA, PLS, OPLS,PLS-DA and OPLS-DA
 }
 \examples{
-# PCA model,the loading will always use type = "Statistical reconstruction".
-#PCA_pca_model <- PCA(NOESY, annotation = ANN$COVID)  # PCA
-#prcomp_pca_model<-prcomp(NOESY,scale. = T,rank. = 2) # PCA
+\dontrun{
+data("NMR_1D_rat_urine_spectra")
+#PCA
+model <- PCA(data = X,
+             rank. = 2)
+#oplsda
+model <- oplsda(X = Xsample,
+                Y = Ysample,
+                type = "OPLS")
 
-#Y <- ANN$COVID
-#Y<-as.numeric(gsub("preCOVID",1,gsub("COVID-pos",2,Y))) for (pls-da)
-#Y1<-as.factor(ANN$COVID)  # for OPLS-DA
-#ropls_pls_model<-ropls::opls(NOESY,y = Y)
-#ropls_plsda_model<-ropls::opls(NOESY,y = ANN$COVID)
-#ropls_opls_model<-ropls::opls(NOESY,y = Y,predI = 1, orthoI = NA)
-#ropls_oplsda_model<-ropls::opls(NOESY,y = Y1,predI = 1, orthoI = NA)
-
-#PlotLoadSpec(model = prcomp_pca_model)
+model_loadings_plot <- PlotLoadSpec(model = model,
+                                    X = X,
+                                    PC = 2)
+}
 }

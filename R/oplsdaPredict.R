@@ -8,8 +8,12 @@
 #' (O-PLS-DA).
 #' @param optns An empty list for confusion matrix addition.
 #'    \itemize{
-#'     \item{real}{The "real" classifications for the newdata as a factor. If
+#'     \item{real} {The "real" classifications for the newdata as a factor. If
 #'      supplied, a confusion matrix will be calculated. Only available for DA.}
+#'      \item{orthoI} {If you have an OPLS with more than one orthogonal
+#'      component, you can specify how many you would like used in the
+#'      predictive calculation. If not specified, all available orthogonal
+#'      components will be used.}
 #'      }
 #'
 #' @returns The prediction model including the predictive scores and orthogonal
@@ -41,8 +45,13 @@ oplsdaPredict <- function (model, newdata, optns=list()){
 #check there is an orthogonal component
   if(model@summaryDF[, "ort"] > 0) {
 
+    #allow user to specify how many orthogonal components should be removed.
+    if("orthoI" %in% names(optns)){
+      components <- optns$orthoI
+    }else{ components <- model@summaryDF[, "ort"]}
+
     #can only use the first orthogonal component hence model@summaryDF[,1] not model@summaryDF[,"ort"] in for statement
-    for(noN in 1:model@summaryDF[, 1]) {
+    for(noN in 1:components) {
       if(model@suppLs[["naxL"]]) {
 
         #make empty matrix
@@ -55,16 +64,16 @@ oplsdaPredict <- function (model, newdata, optns=list()){
         #calculate
         xtoMN[i, ] <- crossprod(xteMN[i, comVl], model@orthoWeightMN[comVl, noN]) / drop(crossprod(model@orthoWeightMN[comVl, noN]))
         }
-      } else
-
+      } else{
+        #Do a loop where xteMN gets regenerated after removing each orthogonal component (xtoMN). Below the loop already exists and doesn't need modification. If noN is 1 then only 1st ortho component is used.
         #calculate the orthogonal scores
         xtoMN <- xteMN %*% model@orthoWeightMN[, noN]
-        #calculate the predictive scores
-        t_pred <- xteMN %*% model@weightMN[, noN]
         #take out the orthogonal components from newdata X
         xteMN <- xteMN - tcrossprod(xtoMN, model@orthoLoadingMN[, noN])
-}
-
+      }
+    }
+    #calculate the predictive scores, can only use the first predictive component since that's all there is for and OPLS, hence model@weightMN[,1] not model@sweightMN[,noN]
+    t_pred <- xteMN %*% model@weightMN[, 1]
   }
 
 #if there's no orthogonal component
@@ -167,8 +176,5 @@ invisible(prediction)
 
 
 #caret::confusionMatrix(data = lot2[["predY"]], reference = lot@suppLs[["y"]])
-
-
-
 
 

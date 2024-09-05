@@ -1,3 +1,32 @@
+
+test_that("interactive t and F work", {
+  data("NMR_1D_rat_urine_spectra")
+
+  # use small sample, note the spectra is only the region 2 to 4 ppm
+  Xsample <- X[1:10,]
+
+  expect_no_error(object = matspec(X = Xsample,
+                                   ppm = ppm,
+                                   interactive = T))
+
+  expect_no_error(object = matspec(X = Xsample,
+                                   ppm = ppm,
+                                   interactive = F))
+})
+
+test_that("non-interactive lower resolution works", {
+  data("NMR_1D_rat_urine_spectra")
+
+  # use small sample, note the spectra is only the region 2 to 4 ppm
+  Xsample <- X[1:10,]
+
+  expect_no_error(object = matspec(X = Xsample,
+                                   ppm = ppm,
+                                   interactive = F,
+                                   resolution = "partial"))
+
+})
+
 # #spectra simulation
 #
 # # Function to simulate a Gaussian peak

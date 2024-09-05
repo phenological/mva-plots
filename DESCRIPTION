@@ -1,6 +1,6 @@
 Package: mva.plots
 Title: Add visualisation capabilities to multivariate analysis
-Version: 0.0.6
+Version: 0.0.8
 Authors@R: 
     person("Lucy", "Grigoroff", , "Lucy.Grigoroff@murdoch.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "o"))
@@ -8,8 +8,9 @@ Description: What the package does (one paragraph). Multivariate plots.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Config/testthat/edition: 3
+biocViews:
 Imports:
     caret,
     crayon,
@@ -25,8 +26,9 @@ Imports:
     scales,
     BiocManager (>= 1.30.16),
     stats,
-    sf
-biocViews:
+    sf,
+    ape,
+    dendextend,
     ropls
 Suggests: 
     knitr,
