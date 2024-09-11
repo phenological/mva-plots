@@ -194,11 +194,11 @@ if("permI" %in% names(optns)){
       }
 
       previous_q2 <- current_q2
-      saved_orthoI <- i-1
+      saved_orthoI <- i
     }
     model <- ropls::opls(x = X,
                          y = Y,
-                         predI = predI,
+                         predI = 1,
                          orthoI = saved_orthoI,
                          crossvalI = crossvalI,
                          scaleC = scaleC,
@@ -209,7 +209,7 @@ if("permI" %in% names(optns)){
   }
 
 
-  model@suppLs[["x"]] <-append(x = data.frame(), values = X)
+  model@suppLs[["x"]] <- append(x = data.frame(), values = X)
 
 invisible(model)
 }
