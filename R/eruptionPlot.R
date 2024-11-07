@@ -121,8 +121,8 @@ eruptionPlot <- function(model, optns = list()){
   }
 
   if(is(model)[1] == "opls"){
-    id <- as.data.frame(colnames(as.data.frame(model@suppLs[["x"]], check.names = F)))
     df <- as.data.frame(model@suppLs[["x"]], check.names = F)
+
     df[,"factor"] <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
     if(!"factor" %in% names(optns)){
       optns[["factor"]] <- df[,"factor"]
