@@ -11,9 +11,12 @@ eruptionPlot(model, optns = list())
 
 \item{optns}{A list for additional options:
 \itemize{
-\item{factor} {Used when supplying a PCA object. An object the same
-length as the data used to build the PCA model that must be a two
-factor variable such as treatment and control.}
+\item{factor} {An object the same length as the data used to build the
+model that must be a two factor variable such as treatment and control.
+Mandatory when supplying a PCA object. For oplsda the response
+variable is used by default.}
+\item{control} {Factor level to be interpreted as control. Defaults
+to the first level.}
 \item{external} {Must be a numeric vector. An externally derived
 p-value. If you do not wish to use the automatically calculated
 p-value, which uses the non-parametric Kruskal-Wallis, provide your
@@ -44,6 +47,8 @@ color names (example : continuousPalette =c("purple", "orange")).}
 The default is cliff's delta.}
 \item{y} {Choose your y-axis using the same options stated for color.
 The default is loadings.}
+\item{significance} {Points with p < significance are left unlabeled.
+If not provided, all points are labeled.}
 }}
 }
 \value{

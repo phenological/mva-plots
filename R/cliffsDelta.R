@@ -32,21 +32,21 @@ cliffsDelta <- function(model, optns = optns) {
   if(is(model)[1] == "list"){
 
     #model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
-    df <- model$data$rawData
-    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
-    cd_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
+    dF <- as.data.frame(model$data$rawData,check.names=F)
+    dF$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
+    cd_df <- data.frame(matrix(NA, nrow = ncol(dF)-1, ncol = 1))
   }
 
   if(is(model)[1] == "opls"){
-    df <- as.data.frame(model@suppLs[["x"]], check.names = F)
+    dF <- as.data.frame(model@suppLs[["x"]], check.names = F)
     #df[,"factor"] <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
-    df$factor <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
-    cd_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
+    dF$factor <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
+    cd_df <- data.frame(matrix(NA, nrow = ncol(dF)-1, ncol = 1))
   }
 
   if(is(model)[1] == "data.frame"){
-    df <- model
-    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
+    dF <- model
+    dF$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
     # Initialize an empty data frame to store cd values
     cd_df <- data.frame(matrix(NA, nrow = ncol(model), ncol = 1))
   }
@@ -55,15 +55,15 @@ cliffsDelta <- function(model, optns = optns) {
     optns$factor <- unlist(optns$factor)
   }
 
-  if(is(df)[1] == "data.table" | is(df)[1] == "tbl_df"){
-    df <- as.data.frame(df, check.names = F)
+  if(is(dF)[1] == "data.table" | is(dF)[1] == "tbl_df"){
+    dF <- as.data.frame(dF, check.names = F)
   }
 
   # ##cliffs delta manually
 
   #control
-  idx<- which(df[,"factor"] == 1)
-  control <- df[idx,]
+  idx<- which(dF[,"factor"] == 1)
+  control <- dF[idx,]
   c<-list()
   for(i in 1:(ncol(control)-1)){
     c[[i]] <- sort(control[,i])
@@ -71,13 +71,13 @@ cliffsDelta <- function(model, optns = optns) {
 
 
   # Dynamically assigning factors for one to one calculations
-  unique_factors <- unique(df[,"factor"])
+  unique_factors <- unique(dF[,"factor"])
 
   for(j in 2:length(unique_factors)){
 
     #treatment
-    idx<- which(df[,"factor"] == j)
-    treatment <- df[idx,]
+    idx<- which(dF[,"factor"] == j)
+    treatment <- dF[idx,]
     t<-list()
     for(i in 1:(ncol(treatment)-1)){
       t[[i]] <- sort(treatment[,i])
@@ -85,25 +85,25 @@ cliffsDelta <- function(model, optns = optns) {
 
     #dominance matrix
     d<-list()
-    for(i in 1:(ncol(df)-1)){
+    for(i in 1:(ncol(dF)-1)){
       d[[i]] <-sign(outer(t[[i]], c[[i]], FUN="-"))
     }
 
     #cliffs delta
     cd<-list()
-    for(i in 1:(ncol(df)-1)){
+    for(i in 1:(ncol(dF)-1)){
       cd[[i]]<-mean(d[[i]])
     }
 
     #if rescale is required
-    n <- length(which(df[,"factor"]==1))
-    m <- length(which(df[,"factor"]==j))
+    n <- length(which(dF[,"factor"]==1))
+    m <- length(which(dF[,"factor"]==j))
     # n <- table(df[,"factor"])[1]
     # m <- table(df[,"factor"])[j]
     rescale.factor = (n*m-1)/(n*m)
 
 
-    for (i in 1:(ncol(df) - 1)) {
+    for (i in 1:(ncol(dF) - 1)) {
       cd[[i]] <- ifelse(abs(cd[[i]]) == 1,
                         cd[[i]] * rescale.factor,
                         cd[[i]])
@@ -129,7 +129,7 @@ cliffsDelta <- function(model, optns = optns) {
   }
 
   # Create a mapping between numbers and words, rename cd dataframe columns
-  mapping <- setNames(unique(optns$factor), unique(df[,"factor"]))
+  mapping <- setNames(unique(optns$factor), unique(dF[,"factor"]))
 
   testnames<- as.data.frame(mapping, check.names = F)
   testnames$rowName <- rownames(testnames)

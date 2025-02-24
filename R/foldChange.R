@@ -36,41 +36,41 @@ foldChange <- function(model = model, optns = optns){
 
   if(is(model)[1] == "list"){
     #model$data$rawData$factor <- as.numeric(as.factor(optns$factor))
-    df <- model$data$rawData
-    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
+    dF <- as.data.frame(model$data$rawData, check.names=F)
+    dF$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
     # Initialize an empty data frame to store log2fc values
-    log2fc_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
+    log2fc_df <- data.frame(matrix(NA, nrow = ncol(dF)-1, ncol = 1))
   }
 
   if(is(model)[1] == "opls"){
-    df <- as.data.frame(model@suppLs[["x"]], check.names = F)
+    dF <- as.data.frame(model@suppLs[["x"]], check.names = F)
     #df$factor <- as.numeric(as.factor(model@suppLs[["yMCN"]]))
-    df$factor <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
+    dF$factor <- as.numeric(relevel(as.factor(model@suppLs[["yMCN"]]), ref = optns$control))
     # Initialize an empty data frame to store log2fc values
-    log2fc_df <- data.frame(matrix(NA, nrow = ncol(df)-1, ncol = 1))
+    log2fc_df <- data.frame(matrix(NA, nrow = ncol(dF)-1, ncol = 1))
   }
 
   if(is(model)[1] == "data.frame"){
-    df <- model
-    df$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
+    dF <- model
+    dF$factor <- as.numeric(relevel(as.factor(optns$factor), ref = optns$control))
     # Initialize an empty data frame to store log2fc values
     log2fc_df <- data.frame(matrix(NA, nrow = ncol(model), ncol = 1))
   }
 
   # logmean for control
-  idx<- which(df$factor == 1)
-  control <- df[idx,]
+  idx<- which(dF$factor == 1)
+  control <- dF[idx,]
   c <- log2(apply(X = control, MARGIN = 2, FUN = optns$fun))
 
   # Dynamically assigning factors for one to one calculations
-  unique_factors <- unique(df$factor)
+  unique_factors <- unique(dF$factor)
 
   # Calculate log2fc, including for one to one calculations
   for (i in 2:length(unique_factors)) {
 
     # logmean treatment
-    idx <- which(df[,"factor"] == i)
-    treatment <- df[idx, ]
+    idx <- which(dF[,"factor"] == i)
+    treatment <- dF[idx, ]
     t <- log2(apply(X = treatment, MARGIN = 2, FUN = optns$fun))
 
     # log2 fold change
@@ -82,10 +82,10 @@ foldChange <- function(model = model, optns = optns){
     log2fc_df[, col_name] <- log2fc
   }
 
-  #track the variable to the assigned factor, use optns$factor and df$factor to make the list
+  #track the variable to the assigned factor, use optns$factor and dF$factor to make the list
 
   # Create a mapping between numbers and words, rename log2fc dataframe columns
-  mapping <- setNames(unique(optns$factor), unique(df$factor))
+  mapping <- setNames(unique(optns$factor), unique(dF$factor))
 
   testnames<- as.data.frame(mapping)
   testnames$rowName <- rownames(testnames)
