@@ -12,7 +12,7 @@ plotSplitCor(corList, type = c("full", "lower", "upper"), optns = list())
 \item{type}{A type of plotting format, the choice is full, lower and upper only}
 
 \item{optns}{An empty list for additional options:
-\itemize{
+\desribe{
 \item{plotTitle} {A character for the title of the plot. default is "Split Correlation Plot"}
 \item{sizeTitle} {A numeric for the font size of the title. default is 12}
 \item{sizeLabel} {A numeric for the font size of the row/column label default is 8}
@@ -29,4 +29,14 @@ plot of the two split correlation matrix
 }
 \description{
 Plot split correlation plot
+}
+\examples{
+ \dontrun{
+data(mtcars)
+X<-mtcars[,1:5]
+Y<-mtcars[,8]
+corList<-list(cor(X[which(Y==0),]),cor(X[which(Y==1),]))
+plotSplitCor(corList = corList,type = "upper")
+}
+#' @importFrom scales rescale
 }

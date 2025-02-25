@@ -15,50 +15,50 @@
 #' @param zoom A double from 0 to 1 for the maximum of the loadings axis. The
 #' default is 1.
 #' @param optns An empty list for additional options:
-#'  \itemize{
-#'    \item{plotTitle} {A character for the title of the plot.}
-#'    \item{color} {Either a column from the data frame or a character of the
+#'  \describe{
+#'    \item{plotTitle}{A character for the title of the plot.}
+#'    \item{color}{Either a column from the data frame or a character of the
 #'    color desired (example "blue"). Default color is "black". When using on a
 #'    ropls object, it must match the quantitative data type (discrete or continuous).}
-#'    \item{shape} {Either a column from the data frame (must be discrete) or a
+#'    \item{shape}{Either a column from the data frame (must be discrete) or a
 #'    character of the shape desired. Default shape is "circle".}
-#'    \item{size} {Either a column from the data frame or a numeric of the size
+#'    \item{size}{Either a column from the data frame or a numeric of the size
 #'    desired. Default size is 3.}
-#'    \item{alpha} {Either a column from the data frame or a numeric of the alpha
+#'    \item{alpha}{Either a column from the data frame or a numeric of the alpha
 #'    desired. Default size is 0.5.}
-#'    \item{discretePalette} {Color palette for discrete values, you can assign
+#'    \item{discretePalette}{Color palette for discrete values, you can assign
 #'    colors to specific factors, example:
 #'    discretePalette = c("control" = "purple", "treatment" = "orange").
 #'    Or supply a concatenated list, example (and the default):
 #'    discretePalette = c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC").
 #'    Hexadecimal or color names accepted.}
-#'    \item{continuousPalette} {Color palette for continuous values, use
+#'    \item{continuousPalette}{Color palette for continuous values, use
 #'    hexadecimal values (example and default:
 #'    continuousPalette =c("#0000CC","#0000FF","#0055FF","#00AAFF","#00FFFF",
 #'    "#2BFFD5","#55FFAA","#80FF80","#AAFF55","#D4FF2B","#FFFF00","#FFAA00",
 #'    "#FF5500","#FF0000","#CC0000")), grDevices names (example:
 #'    continousPalette = rainbow(4)) or color names (example :
 #'    continuousPalette =c("purple", "orange")).}
-#'    \item{theme} {Personalize the plot theme you would like applied as you
+#'    \item{theme}{Personalize the plot theme you would like applied as you
 #'    would using theme() in ggplot. Example set
 #'    theme = theme(legend.position = "left", text = element_text(size=5)).}
-#'    \item{extra} {Add extra ggplot arguments that are not for theme(), example
+#'    \item{extra}{Add extra ggplot arguments that are not for theme(), example
 #'    extra = scale_shape_manual(labels = c("A", "B", "C"),values = c(8, 17, 2))}
-#'    \item{ellipse} {A character or either "color", "hotellings", "t", or "normal"
+#'    \item{ellipse}{A character or either "color", "hotellings", "t", or "normal"
 #'    depending on desired method of calculation. If using color, a discrete variable
 #'    must be supplied to color.}
-#'    \item{ci} {Set your own limit for ellipses drawn. The default is ci = 0.95
+#'    \item{ci}{Set your own limit for ellipses drawn. The default is ci = 0.95
 #'    (95 percent confidence interval).}
-#'    \item {colorTitle} {A character of the desired color legend title when \code{color}
+#'    \item{colorTitle}{A character of the desired color legend title when \code{color}
 #'    is a variable. No color legend will appear if \code{color} is set to a simple
 #'    aesthetic such as "green". Default "color".}
-#'    \item {shapeTitle} {A character of the desired shape legend title when \code{shape}
+#'    \item{shapeTitle}{A character of the desired shape legend title when \code{shape}
 #'    is a variable. No shape legend will appear if \code{shape} is set to a simple
 #'    aesthetic such as "square". Default "Shape".}
-#'    \item {sizeTitle} {A character of the desired shape legend title when \code{size}
+#'    \item{sizeTitle}{A character of the desired shape legend title when \code{size}
 #'    is a variable. No size legend will appear if \code{size} is set to a simple
 #'    aesthetic such as 2. Default "Size".}
-#'    \item {alphaTitle} {A character of the desired alpha legend title when \code{alpha}
+#'    \item{alphaTitle}{A character of the desired alpha legend title when \code{alpha}
 #'    is a variable. No size legend will appear if \code{alpha} is set to a simple
 #'    aesthetic such as 0.3. Default "Alpha".}
 #' }

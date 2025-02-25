@@ -10,7 +10,7 @@
 #' @param type Specify the type of analysis "PLS" or "OPLS". Discriminant
 #' analysis will automatically occur when character/factor is supplied to Y.
 #' @param optns A list for additional options:
-#'   \itemize{
+#'   \describe{
 #'    \item{predI}{Default NA (ropls will automatically set the number) for PLS,
 #'    default 1 for OPLS. If \code{type} is PLS, you may set your own.}
 #'    \item{orthoI}{Default NA (ropls will automatically set the number) for

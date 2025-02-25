@@ -12,15 +12,16 @@
 #' @return matspec non-interactive version separated by assigned column factor (i.e., Groups) and within the each plot that can have different color or linetype to differentiate further by sub-categories (i.e., timepoints, class)
 #' @importFrom reshape2 melt
 #' @importFrom scales breaks_pretty
-#' @examples
-#' # this cannot be we don't publish path to our data !nmr<-local(get(load("~/OneDrive - Murdoch University/datasets/Colchicin/DataElements/hims_colchicin_PLA_HIMr02_PROF.PLASMA.CPMG.daE")))
-#' # ppm<-as.numeric(nmr@varName)
-#' # X<-nmr@.Data
-#' # an<-nmr@obsDescr[[1]]
-#' # Y<-factor(c(rep("A",28),rep("B",28)))
-#' # specOverlay(X,ppm,roi = c(3.0,4.5),alp = 0.3,optns = list(Y, factor(an$sampleType)))
 #' @export
-#' 
+
+
+#@examples
+# this cannot be we don't publish path to our data !nmr<-local(get(load(etc.
+# ppm<-as.numeric(nmr@varName)
+# X<-nmr@.Data
+# an<-nmr@obsDescr[[1]]
+# Y<-factor(c(rep("A",28),rep("B",28)))
+# specOverlay(X,ppm,roi = c(3.0,4.5),alp = 0.3,optns = list(Y, factor(an$sampleType)))
 
 specOverlay <- function(X, ppm = NULL, roi = c(-0.01, 0.01), alp = 0.7, size = 0.5, title = "", optns=list(),...) {
   

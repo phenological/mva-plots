@@ -5,7 +5,7 @@
 #' @param corList A list of 2 correlation matrices. The first list will be presented on the left hand side of the circle.
 #' @param type A type of plotting format, the choice is full, lower and upper only
 #' @param optns An empty list for additional options:
-#'  \itemize{
+#'  \desribe{
 #'    \item{plotTitle} {A character for the title of the plot. default is "Split Correlation Plot"}
 #'    \item{sizeTitle} {A numeric for the font size of the title. default is 12}
 #'    \item{sizeLabel} {A numeric for the font size of the row/column label default is 8}
@@ -18,7 +18,7 @@
 #'    }
 #'    
 #' @return plot of the two split correlation matrix
-#' @example 
+#' @examples 
 #'  \dontrun{
 #' data(mtcars)
 #' X<-mtcars[,1:5]
