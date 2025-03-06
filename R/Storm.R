@@ -131,7 +131,7 @@ storm<-function(X, ppm, b=5, q=0.01, idx_ref=NULL, roi=NULL,calibrate = FALSE,me
 #' @references \href{https://doi.org/10.1021/ac302360v}{Posma et.al (2012) dx.doi.org/10.1021/ac302360v| Anal.Chem. 2012, 84, 10694−10701}
 #' @importFrom signal interp1
 
-storm2 <- function(ppm,Y,reference,rOref,s=1/nrow(Y),q=0.05,b=diff(rOref) * 1.5){
+storm2 <- function(ppm,Y,reference,rOref,s=1/nrow(Y),q=0.05,b=diff(rOref) * 1.5,maxIt=100){
   fi <- crop(ppm,roi=rOref)
   ppmr <- ppm[fi]
   Yr <- Y[,fi]
@@ -172,16 +172,18 @@ storm2 <- function(ppm,Y,reference,rOref,s=1/nrow(Y),q=0.05,b=diff(rOref) * 1.5)
     fi <- ssy$p < q
     reference <- ssy$covar[fi]
     ppmr_gaps <- ssy$ppm[fi]
-    rOref <- range(ppmr)
+    rOref <- range(ppmr_gaps)
     #Step 3a: interpolate to fill gaps in the reference
     fi <- crop(ppm,roi=rOref)
     ppmr <- ppm[fi]
+    Yr <- Y[,fi]
+    # return(list(ppmr_gaps = ppmr_gaps,reference = reference,ppmr = ppmr))
     reference <- signal::interp1(ppmr_gaps,reference,ppmr,method="spline")
     
     print(subset_i)
     
     #Exit condition: subset previously observed
-    if (any(sapply(subsetl,function(x) setequal(subset_i,x)))){
+    if (i == maxIt | any(sapply(subsetl,function(x) setequal(subset_i,x)))){
       subsetl[[i]] <- subset_i
       refl[[i]] <- reference
       driverl[[i]] <- driver
