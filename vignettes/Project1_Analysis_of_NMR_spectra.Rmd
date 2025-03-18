@@ -1,0 +1,267 @@
+---
+title: "Introduction to Data pre-processing Part4: Paracetamol Study"
+author: "Reika Masuda"
+date: "13th Feb 2025"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    toc_depth: 4
+    number_sections: false
+    theme: lumen
+editor_options: 
+  chunk_output_type: inline
+---
+
+# load the required packages
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,results = 'asis')
+
+# if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# 
+# BiocManager::install("ropls")
+
+# 
+# devtools::load_all("C:Download/nmr-peaks/nmr-peaks")
+# devtools::load_all("C:Download/nmr-spectra-processing/nmr-spectra-processing")
+# devtools::load_all("C:Download/nmr-parser/nmr-parser")
+# devtools::load_all("C:Download/mva-plots/mva-plots")
+
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+
+## Dummy Metadata corresponding to the Urine NMR data
+
+```{r}
+MetaData<-data.frame(SourceID = c(1,2,3,4,5),
+                     Paracetamol = c(1,1,1,1,1),
+                     Sex = c("M","F","F","M","M"))
+```
+
+## load the Urine 1D spectra data
+
+```{r}
+# Set the folder location to where the Bruker NMR data is
+folder <- "D:/NMR Course 2025/NMR_short_course_Paracetamol/NMR_short_course_Paracetamol/"
+
+## load in the RunOrder
+RunOrder<-read.csv("D:/NMR Course 2025/NMR_short_course_Paracetamol/NMR_short_course_Paracetamol_RunOrder.csv")
+
+# find the expno that are corresponding to 1D spectra data
+expno<-RunOrder$EXPNO[which(RunOrder$EXPERIMENT=="PROF_URINE_NOESY")]
+
+# read the multiple 1D spectra data (with eretic factor correction)
+for (i in 1:length(expno)) {
+  # cat("\n", "reading the spectra data of: ", expno[i], "\n")
+  test_spec <- readSpectrum(paste0(folder, expno[i]))
+  test_eretic <- readEretic(paste0(folder, expno[i], "/QuantFactorSample.xml"))
+  
+  # cat("\n", "eretic factor of: ", test_eretic$ereticFactor, "\n")
+  if (i == 1) {
+    spec <- test_spec$spec$y / test_eretic$ereticFactor
+    ppm <- test_spec$spec$x
+    ID<-readTitle(paste0(folder, expno[i],"/pdata/1/title"))$value
+  } else{
+    spec <- rbind(spec, test_spec$spec$y / test_eretic$ereticFactor)
+    ID<-c(ID,readTitle(paste0(folder, expno[i],"/pdata/1/title"))$value)
+  }
+  rm(test_spec, test_eretic)
+}
+
+
+## clean up the ID names
+spec_anno<-data.frame(title=ID)%>%
+  mutate(title = gsub("TITLE ","",title),
+         sourceID = sapply(strsplit(title, "_"), "[", 2),
+         timepoint = sapply(strsplit(title, "_"), "[", 3))
+
+colnames(spec) <- ppm
+rownames(spec) <- spec_anno$title
+
+matspec(spec, ppm, roi = c(1.46,1.50),interactive = T)
+
+```
+
+## load the IVDr small molecule reports
+
+```{r}
+
+for (i in 1:length(expno)) {
+  # Read in the quant report xml
+  quant_data <- readQuant(paste0(folder, expno[i], "/pdata/1/urine_quant_report_e.xml"))$data
+  
+  if (i == 1) {
+    # Create a data frame to store the rowConc (row concentration values) and sigCorr (signal correction values)
+    quant <- data.frame(variable = quant_data$name, as.numeric(quant_data$rawConc))
+    sig <- data.frame(variable = quant_data$name, as.numeric(quant_data$sigCorr))
+    ID<-readTitle(paste0(folder, expno[i],"/pdata/1/title"))$value
+  } else {
+    # Append the quant, sig data to the data frame
+    quant <- cbind(quant, as.numeric(quant_data$rawConc))
+    sig <- cbind(sig, as.numeric(quant_data$sigCorr))
+    ID<-c(ID,readTitle(paste0(folder, expno[i],"/pdata/1/title"))$value)
+  }
+  
+  rm(quant_data)
+}
+
+
+# Transpose the data frame
+quant <- data.frame(t(quant))
+colnames(quant) <- quant[1, ]
+quant <- quant[-1, ]
+
+sig <- data.frame(t(sig))
+colnames(sig) <- sig[1, ]
+sig <- sig[-1, ]
+
+
+## clean up the ID names
+quant_anno<-data.frame(title=ID)%>%
+  mutate(title = gsub("TITLE ","",title),
+         sourceID = sapply(strsplit(title, "_"), "[", 2),
+         timepoint = sapply(strsplit(title, "_"), "[", 3))
+
+
+
+# Add the experiment number to the row names
+rownames(sig) <- quant_anno$title
+rownames(quant) <- quant_anno$title
+
+# Convert the data frame variables to numeric
+sig<-data.frame(apply(sig,2,as.numeric))
+quant<-data.frame(apply(quant,2,as.numeric))
+
+## Define the metabolites of interest
+metabolite = c("Paracetamol","Paracetamol.glucuronide","Caffeine","Trigonelline","Creatine","Creatinine","Alanine","D.Glucose"  )
+
+cat("\n", "we have selected following metabolites of interest: ",paste0(metabolite,collapse = ", "),"\n")
+
+
+## Subset the data to the metabolites of interest
+quant<-quant[,which(colnames(quant)%in%metabolite)]
+sig<-sig[,which(colnames(sig)%in%metabolite)]
+
+htmlTable::htmlTable(sig,caption = "The lineshpe fit correlation values of the metabolites of interest")
+```
+
+## Matching the NMR and IVDr data based on the Title, match with MetaData
+
+```{r}
+# Match the NMR and IVDr data based on the Title
+idx<-match(spec_anno$title,quant_anno$title)
+quant<-quant[idx,]
+quant_anno<-quant_anno[idx,]
+table(spec_anno$title == quant_anno$title)
+rm(idx)
+
+# we need to match the metadata with the NMR and IVDr data
+idx<-match(quant_anno$sourceID,MetaData$SourceID)
+MetaData<-MetaData[idx,]
+MetaData$timepoint<-quant_anno$timepoint
+cat("\n","The row number of MetaData increased from 5 to ", nrow(MetaData),"\n")
+rm(idx)
+
+```
+
+## PCA analysis of IVDr Data (targeted approach)
+
+```{r}
+mod_ivdr<-PCA(quant)
+
+plotScores(model = mod_ivdr,optns = list(color = MetaData$Sex,shape = MetaData$timepoint))
+plotScores(model = mod_ivdr,optns = list(color = factor(MetaData$SourceID),shape = MetaData$timepoint,colorTitle = "sourceID",shapeTitle = "timepoint"))
+
+```
+
+## track the longitudinal changes of the metabolites
+
+```{r}
+data.frame(MetaData%>%
+             mutate(timepoint = factor(timepoint,
+                                       levels = c("baseline","2hours","4hours","6hours"))),quant)%>%
+  pivot_longer(cols = Creatinine:D.Glucose,names_to = "metabolite",values_to = "val")%>%
+  ggplot(aes(x = timepoint, y = val, group = factor(SourceID), colour = factor(SourceID)))+
+  geom_point()+
+  geom_line()+
+  facet_wrap(~metabolite,scales = "free_y")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  labs(title = "Longitudinal changes of the metabolites",
+       x = "Timepoint",
+       y = "Concentration",
+       color = "SourceID")
+
+
+```
+
+
+## spectra pre-procssing
+
+```{r}
+spec_cal <- calibrateSpectra(
+  ppm,
+  spec,
+  ref = c("alanine"),
+  rOref = c(1.46, 1.50),
+  cshift = 1.485,
+  maxShift = 1.5
+)
+
+idx<-c(which(ppm<=0.5),which(ppm>=4.6 & ppm<=5.0),which(ppm>=9.5))
+
+spec_cal<-spec_cal[,-idx]
+ppm<-ppm[-idx]
+rm(idx)
+spec_bcor<-baselineCorrection(spec_cal)
+spec_pqn<-normalize(spec_bcor)
+colnames(spec_pqn) <- ppm
+rownames(spec_pqn) <- spec_anno$title
+
+```
+
+
+## PCA analysis of NMR Data (untargeted approach)
+```{r}
+mod_nmr<-PCA(spec_pqn)
+
+plotScores(model = mod_nmr,optns = list(color = factor(MetaData$SourceID),shape = MetaData$timepoint))
+
+PlotLoadSpec(model = mod_nmr,roi = c(0.5,4.6),PC = 1)
+PlotLoadSpec(model = mod_nmr,roi = c(5.0,9.5),PC = 1)
+
+PlotLoadSpec(model = mod_nmr,roi = c(0.5,4.6),PC = 2)
+PlotLoadSpec(model = mod_nmr,roi = c(5.0,9.5),PC = 2)
+
+PlotLoadSpec(model = mod_nmr,roi = c(0.5,4.6),PC = 3)
+PlotLoadSpec(model = mod_nmr,roi = c(5.0,9.5),PC = 3)
+```
+
+
+### APAP-Glucuronide
+
+```{r}
+matspec(spec_pqn,ppm,roi = c(7.12,7.17),interactive = T)
+```
+
+
+
+### APAP-Sulfate (and AS2)
+
+```{r}
+matspec(spec_pqn,ppm,roi = c(7.30,7.35),interactive = T) 
+```
+
+
+### APAP-Sulfate (and AS1)
+
+```{r}
+matspec(spec_pqn,ppm,roi = c(7.4,7.45),interactive = T) 
+```
+
