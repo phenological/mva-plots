@@ -10,7 +10,7 @@ permutationPlot(model, optns = list())
 \item{model}{An oplsda (ropls) model.}
 
 \item{optns}{An empty list for additional options.
-\itemize{
+\describe{
 \item{plotTitle}{A character for the title of the plot.}
 \item{colorQ}{A character of the color for Q2 (example "pink" or "#FF5500").
 Default color is "red".}

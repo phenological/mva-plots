@@ -7,7 +7,7 @@
 #'
 #' @param model A PCA or oplsda object from mva.plots or a data frame.
 #' @param optns A list passed to cliffsDelta with additional arguments.
-#'  \itemize{
+#'  \describ{
 #'    \item{factor} {An object the same length as the data in the model supplied
 #'    that must have at least 2 unique groups such as treatment and control. More
 #'    than 2 is allowable.}

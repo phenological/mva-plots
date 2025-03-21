@@ -10,7 +10,7 @@
 #' @param type Specify the type of analysis "PLS" or "OPLS". Discriminant
 #' analysis will automatically occur when character/factor is supplied to Y.
 #' @param optns A list for additional options:
-#'   \itemize{
+#'   \describe{
 #'    \item{predI}{Default NA (ropls will automatically set the number) for PLS,
 #'    default 1 for OPLS. If \code{type} is PLS, you may set your own.}
 #'    \item{orthoI}{Default NA (ropls will automatically set the number) for
@@ -173,7 +173,7 @@ if("permI" %in% names(optns)){
 
   if (any(grepl("Empty 'opls' object", test)) & is.na(orthoI)) {
     summarydf <- list()
-    previous_q2 <- 0
+    previous_q2 <- -1
     for (i in 1:length(o)) {
       model1 <- ropls::opls(x = X,
                             y = Y,
@@ -198,7 +198,7 @@ if("permI" %in% names(optns)){
     }
     model <- ropls::opls(x = X,
                          y = Y,
-                         predI = predI,
+                         predI = 1,
                          orthoI = saved_orthoI,
                          crossvalI = crossvalI,
                          scaleC = scaleC,
@@ -209,7 +209,7 @@ if("permI" %in% names(optns)){
   }
 
 
-  model@suppLs[["x"]] <-append(x = data.frame(), values = X)
+  model@suppLs[["x"]] <- append(x = data.frame(), values = X)
 
 invisible(model)
 }
