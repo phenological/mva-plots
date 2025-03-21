@@ -134,14 +134,13 @@ biplot <- function(model, zoom = 1, PCi = 1, PCj = 2, optns = list()){
   if(nrow(loadings) > 50){
     stop("Max of 50 variables allowed for a biplot")
   }
-
   ps <-
-  plotScores(model = model,
+  plotScores(model = model, show=FALSE,
              optns = optns)
 
   if(is(model)[1] == "opls"){
     ps <- ps@suppLs[["ScoresPlot"]]
-  }
+  } else ps <- ps$plots$pcaSingle
 
   # Plots
   scalef <- max(abs(scores)) + 0.1

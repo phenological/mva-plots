@@ -96,3 +96,117 @@ storm<-function(X, ppm, b=5, q=0.01, idx_ref=NULL, roi=NULL,calibrate = FALSE,me
 }
 
 
+#' Subset Optimization by Reference Matching
+#' 
+#' Identifies a subset of spectra presenting a feature, by iterative matching
+#' starting from an approximate reference
+#' 
+#' @param ppm numeric vector, chemical shift scale
+#' @param Y numeric matrix, spectra intensities
+#' @param reference numeric vector, initial guess of the feature. This may come 
+#' from a spectrum that presents the feature, a statistical model (e.g. loadings), 
+#' possibly a signal model...
+#' Note that only a small "fragment" containing the feature must be given
+#' @param rOref numeric vector, endpoints of the chemical shift region spanned
+#' by the reference
+#' @param s number, threshold parameter for selecting a subset of spectra that
+#' better matches the reference. This may be either a maximum number of spectra to select
+#' (known as ns, see References), or a minimum correlation with the reference
+#' @param q, number, significance threshold (p-value) to update the reference.
+#' See References
+#' @param b, broadness threshold for the reference, see References
+#' @plot logical, should a \link{\code{stocsy}} of the subset (aka relic, see References) be printed? Default=TRUE
+#' @details
+#' After filtering points with stocsy correlation < q, gaps may appear.
+#' In this implementation such gaps are filled by interpolation, to keep
+#' a consistent chemical shift scale throughout the whole process.
+#' @returns silently, a list containing: \describe{
+#' \item{subset}{indices of the subset of spectra containing the feature}
+#' \item{reference}{the optimized reference (intensities)}
+#' \item{rOref}{the optimized rOref (chemical shift endpoints)}
+#' \item{driver}{chemical shift of the summit of the optimized reference,
+#' used for the relic}
+#' 
+#' }
+#' @references \href{https://doi.org/10.1021/ac302360v}{Posma et.al (2012) dx.doi.org/10.1021/ac302360v| Anal.Chem. 2012, 84, 10694−10701}
+#' @importFrom signal interp1
+
+storm2 <- function(ppm,Y,reference,rOref,s=1/nrow(Y),q=0.05,b=diff(rOref) * 1.5,maxIt=100){
+  fi <- crop(ppm,roi=rOref)
+  ppmr <- ppm[fi]
+  Yr <- Y[,fi]
+  subsetl <- list()
+  refl <- list()
+  driverl <- list()
+  rOrefl <- list()
+  i <- 0
+  repeat{
+    i <- i + 1
+    #Step 1: subset by correlation with the reference
+    r <- apply(Yr,1,function(v) cor(v,reference,method="pearson"))
+    if (s < 1){
+      #Select r > s
+      subset_i <- which(r > s)
+    } else{
+      #Select the s highest
+      subset_i <- order(r,decreasing = TRUE)[1:s]
+      #Filter out r < 0
+      subset_i <- subset_i[r[subset_i] >= 0]
+      # print(sort(r[subset_i]))
+      # sort(r[-subset_i])
+      # print(subset_i)
+    }
+    
+    if (length(subset_i) == 0){
+      smatplot(ppmr,Reduce(rbind,refl),main="References",label=1:i,legend="toplef")
+      cat("Subset vanished")
+      return(NULL)
+    }
+    
+    #Step 2: stocsy the subset with the driver on the maximum of the reference
+    #and roi = driver +-b. Done with cor.test rather than stocsy because we want p
+    driver <- ppmr[which.max(reference)]
+    roRef <- driver + b/2 * c(-1,1)
+    ssy <- stocsy(ppm,Y[subset_i,],driver,roi=roRef,plot=F)
+    #Step 3: filter points with p.cor < q to get updated reference
+    fi <- ssy$p < q
+    reference <- ssy$covar[fi]
+    ppmr_gaps <- ssy$ppm[fi]
+    rOref <- range(ppmr_gaps)
+    #Step 3a: interpolate to fill gaps in the reference
+    fi <- crop(ppm,roi=rOref)
+    ppmr <- ppm[fi]
+    Yr <- Y[,fi]
+    # return(list(ppmr_gaps = ppmr_gaps,reference = reference,ppmr = ppmr))
+    reference <- signal::interp1(ppmr_gaps,reference,ppmr,method="spline")
+    
+    print(subset_i)
+    
+    #Exit condition: subset previously observed
+    if (i == maxIt | any(sapply(subsetl,function(x) setequal(subset_i,x)))){
+      subsetl[[i]] <- subset_i
+      refl[[i]] <- reference
+      driverl[[i]] <- driver
+      rOrefl[[i]] <- rOref
+      #Tracing plots (for development?)
+      smatplot(ppmr,Reduce(rbind,refl),main="References",label=1:i,legend="toplef")
+      print(stocsy(ppm,Y[subset_i,],driver))
+      # print(stocsy(ppm,Y[subset_i,],driver,roi=driver + b * c(-1,1)))
+      return(list(subset=subset_i, reference=reference, rOref = rOref, driver = driver))
+    }
+    subsetl[[i]] <- subset_i
+    refl[[i]] <- reference
+    driverl[[i]] <- driver
+    rOrefl[[i]] <- rOref
+  }
+}
+
+#' Plot the relic from a STORM
+#' 
+#' @param ppm, numeric vector, chemical shift scale
+#' @param Y, numeric matrix, spectra intensities
+#' @param storm, list, \link{\{storm}} results
+#' @returns A ggplot2 object
+showRelic <- function(ppm,Y,storm,...){
+  stocsy(ppm,Y[storm$subset,],storm$driver,...)
+}

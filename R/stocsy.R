@@ -1,3 +1,9 @@
+#cor.test inefficient, but I want my p values
+corp <- function(r,n){
+  a = -abs(r * sqrt(n-2)/sqrt(1-r^2))
+  2 * pt(q = a,df = n-2) 
+}
+
 
 
 #' Simple STOCSY visualization
@@ -33,7 +39,7 @@ plotStocsy <- function(aDF, breaks = 10){
   p <- ggplot(data = aDF,
               aes(x = ppm,
                   y = covar,
-                  colour = corr)) +
+                  colour = abs(corr))) +
         geom_line() +
         scale_x_reverse(n.breaks = breaks)
 
@@ -67,13 +73,15 @@ plotStocsy <- function(aDF, breaks = 10){
 #' correlated. The whole spectra range by default.
 #' @param plot, boolean, whether to return the plot of the STOCSY (TRUE,
 #' default) or the numbers
+#' @para p, should p values be produced? See \link[stats]{\code{cor.test}}. 
+#' Default FALSE
 #' @param breaks numeric, number of breaks in the x axis or the STOCSY plot
 #' @return if plot=TRUE, a ggplot2 object. Otherwise, a data.frame with the
-#' correlations and covariances of Y with the driver and the corresponding ppm
+#' correlations (column \code{corr}) and covariances (\code{covar}) of Y with the 
+#' driver, p values (\code{p}) if requested, and the corresponding ppm (\code{ppm})
 #' scale, restricted to the given roi. The "driver" (either a cshift or a vector
 #'  of intensities) is stored as an attribute of the data.frame.
 #' @export
-
 
 stocsy <- function(x, Y, driver, roi = range(x), plot = TRUE, breaks = 10){
   #Parse the driver, which may be a chem. shift, into a driver vector
@@ -100,11 +108,11 @@ stocsy <- function(x, Y, driver, roi = range(x), plot = TRUE, breaks = 10){
   x <- x[fi]
   Y <- Y[,fi]
   #Compute covariance and correlation
-  # cs <- which.min(abs(x-cshift))
-  cr <- abs(as.vector(cor(Y,driverV)))
+  cr <- as.vector(cor(Y,driverV))
   cv <- as.vector(cov(Y,driverV))
+  p <- corp(cr,nrow(Y))
   #Make return data.frame
-  aDF <- data.frame(ppm = x, corr = cr, covar = cv)
+  aDF <- data.frame(ppm = x, corr = cr, covar = cv, p = p)
   attr(aDF,"driver") <- driver
   #Plot if required
   if (plot){
