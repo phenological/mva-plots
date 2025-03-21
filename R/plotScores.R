@@ -9,6 +9,7 @@
 #' @param flat A logical for a flat O-PLS(DA) scores plot. Only applicable to
 #' oplsda models with an orthogonal component. Default is FALSE. Outliers and
 #' ellipse are not available for a flat plotscore.
+#' @param show logical, if TRUE (default) the scores plot is displayed
 #' @param optns An empty list for additional options:
 #'  \itemize{
 #'    \item{PCi} {A numeric for the x axis principal component for a single plot.
@@ -111,7 +112,7 @@
 
 
 
-plotScores<-function(model, flat = FALSE,  optns=list()){
+plotScores<-function(model, flat = FALSE, show = TRUE, optns=list()){
 
   #outlier annotation
   if("annotation" %in% names(optns)){
@@ -503,10 +504,10 @@ if("outlierLabels" %in% names(optns)){
       ) +
       scale_x_continuous(limits = symmetricLimits(df[,PCi])) +
       scale_y_continuous(limits = symmetricLimits(df[,PCj]))
-    print(onePlot)
+    if(show) print(onePlot)
 
     model@suppLs[["ScoresPlot"]] <- onePlot
-    return(model)
+    return(invisible(model))
   }
 
 #########ellipse & outliers########
@@ -566,11 +567,11 @@ if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
     scale_x_continuous(limits = c(-maxx, maxx)) +
     scale_y_continuous(limits = c(-maxy, maxy))
 
-  print(onePlot)
+  if(show) print(onePlot)
 
   model@suppLs[["outlierID"]] <- df[idx, "outlierID"]
   model@suppLs[["ScoresPlot"]] <- onePlot
-  return(model)
+  return(invisible(model))
 
 }
 
@@ -586,10 +587,10 @@ if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
       scale_x_continuous(limits = c(-maxx, maxx)) +
       scale_y_continuous(limits = c(-maxy, maxy))
 
-    print(onePlot)
+    if(show) print(onePlot)
 
     model@suppLs[["ScoresPlot"]] <- onePlot
-    return(model)
+    return(invisible(model))
 
   }
 
@@ -625,8 +626,8 @@ if(is(model)[1] == "list"){
       scale_y_continuous(limits = c(-maxy, maxy))
 
     model$plots <- append(model$plots, list(pcaSingle = onePlot))
-    invisible(model)
-    return(onePlot)
+    if(show) print(onePlot)
+    return(invisible(model))
   }
 
 }
@@ -685,7 +686,7 @@ if(is(model)[1] == "list" && !("PCi" %in% names(optns))){
 
   model$data <- append(model$data, list(outliers = plotGT$outliers))
 
-  print(pcaGridPlot)
+  if(show) print(pcaGridPlot)
   invisible(model)}
 
 
