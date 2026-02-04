@@ -18,6 +18,9 @@
 #' @param X spectral data matrix used for the model.
 #'        This is needed for PCA with prcomp package, or
 #'        (O)PLS with type = "Statistical reconstruction".
+#' @param ppm chemical shift scale. If NULL (default), it is read from the row names
+#'        of the loading matrix. If the rows are unnamed, row indices are
+#'        used instead with a warning.
 #' @param Median only works for OPLS-DA model using mva.plot().
 #'        Default is FALSE.
 #'        When Median = True
@@ -66,36 +69,59 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
 
 
   if(class(model)[1] == "prcomp"){
-    df <- data.frame(-model$rotation, check.names = F)
-    res <- summary(model)
-    res <- round(c(res$importance['Proportion of Variance',1:ncol(df)])*100,1)
-    x <- as.numeric(rownames(df))
+    #Either read ppm from argument or get from variable names
+    #If no variable names stored in the model, use ordinals with a warning
+    if (is.null(ppm)){
+      if (is.null(row.names(model$rotation))){
+        warning("No variable names provided, row indices will be used. Did you forget to input a chemical shift scale (ppm)?")
+      }
+      x <- as.numeric(rownames(data.frame(-model$rotation, check.names = F)))
+    }  else{
+      x <- as.numeric(ppm)
+      #Check x length is consistent with data
+      if (length(x) != nrow(model$rotation)) stop("Chemical shift scale length does not match the input model")
+    } 
+    #Check succsessful cast as.numeric
+    if (any(is.na(x))) stop("Non-numeric chemical shift scale (ppm)")
+    #Filter to roi
     idx <- which(x>roi[1] & x<roi[2])
-    if(ncol(df)< PC){
+    #Check that roi exists in the model
+    if (length(idx) == 0) stop("No model for the given roi")
+    #Ensure PC exists in the model
+    if(ncol(model$x)< PC){
       stop("PC selected is larger than the dimension of the model")
     }
-    df <- df[idx,PC]
     x <- x[idx]
     method = "PCA"
     if(is.null(X)){
-      stop("please defined X which is a spectra data matrix used for the PCA model using prcomp")
+      stop("please define X which is a spectra data matrix used for the PCA model using prcomp")
     }
     cc <- abs(cor(X[,idx],model$x[,PC]))
     cv <- cov(X[,idx],model$x[,PC])
     raCol <- c(0, max(cc))
     df <- data.frame(x = x,y = cv,col = cc)
-
   }
   if(is(model)[1] == "list" & length(model) == 2){  # need to change this, for now, PCA() using library(prcomp) return list of 2
-    res <- model$data$pcSum$`Proportion of Variance`
-    df <- as.data.frame(-model$data$loadings, check.names = F)
-    x <- as.numeric(rownames(df))
+    if (is.null(ppm)){
+      if (is.null(row.names(model$data$loadings))){
+        warning("Chemical shift values were not provided, neither explicitely (ppm) nor as stored variable names. Row indices will be used instead")
+      }
+      x <- as.numeric(rownames(as.data.frame(-model$data$loadings, check.names = F)))
+    }  else{
+      x <- as.numeric(ppm)
+      #Check x length is consistent with data
+      if (length(x) != nrow(model$data$loadings)) stop("Chemical shift scale length does not match the input model")
+    } 
+    #Check succsessful cast as.numeric
+    if (any(is.na(x))) stop("Non-numeric chemical shift scale (ppm)")
+    #Filter to roi
     idx <- which(x>roi[1] & x<roi[2])
-    # cen<-data.frame(model$data$center[idx])
-    if(ncol(df)< PC){
+    #Check that roi exists in the model
+    if (length(idx) == 0) stop("No model for the given roi")
+    #Ensure PC exists in the model
+    if(ncol(model$data$scores)< PC){
       stop("PC selected is larger than the dimension of the model")
     }
-    df <- df[idx,PC]
     x <- x[idx]
     method = "PCA"
     cc <- abs(cor(model$data$rawData[,idx],model$data$scores[,PC]))
@@ -105,21 +131,38 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
   }
   if(is(model)[1] == "opls"){
     method <- model@typeC
-    res <- model@summaryDF
-    if(type == "Backscaled"){
-      df <- data.frame(-model@loadingMN, check.names = F)
-      x <- as.numeric(rownames(df))
-      idx <- which(x>roi[1] & x<roi[2])
-      if(ncol(df)< PC){
-        stop("PC selected is larger than the dimension of the model")
+    if (is.null(ppm)){
+      if (is.null(row.names(model@loadingMN))){
+        warning("No variable names provided, row indices will be used. Did you forget to input a chemical shift scale (ppm)?")
       }
-      cen<--data.frame(model@xSdVn[idx], check.names = F)
-      df <- df[idx,PC]
-      x <- x[idx]
-      m <- abs(df)
-      y <- df*cen
-      names(y)[1] <- "y"
+      x <- as.numeric(rownames(data.frame(-model@loadingMN, check.names = F)))
+    }  else{
+      x <- as.numeric(ppm)
+      #Check x length is consistent with data
+      if (length(x) != nrow(model@loadingMN)) stop("Chemical shift scale length does not match the input model")
+    }
+    #Check succsessful cast as.numeric
+    if (any(is.na(x))) stop("Non-numeric chemical shift scale (ppm)")
+    #Filter to roi
+    idx <- which(x>roi[1] & x<roi[2])
+    #Check that roi exists in the model
+    if (length(idx) == 0) stop("No model for the given roi")
+    #Ensure PC exists in the model
+    if(ncol(model@loadingMN)< PC){
+      stop("PC selected is larger than the dimension of the model")
+    }
+    if(type == "Backscaled"){
+      ldng <- model@loadingMN[,PC]
+      m <- abs(ldng)
+      #The color min-max needs to be computed before filtering, else the scale
+      #re-adjust to the roi
       col <- (m - min(m))/(max(m) - min(m))
+      cen <- model@xSdVn[idx]
+      y <- ldng[idx]*cen
+      x <- x[idx]
+      m <- m[idx]
+      col <- col[idx]
+      # names(y)[1] <- "y"
       df <- data.frame(x = x, y = y, col = col)
       raCol = NULL
     }
@@ -127,32 +170,19 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
       if(is.null(X)){
         stop("please defined X which is a spectra data matrix used for the PCA model using prcomp")
       }
-
       if(grepl("O",method)){ # for opls use scores
         df <- data.frame(model@orthoScoreMN, check.names = F)
       }else{ # for pls use orthogonal
         df <- data.frame(model@scoreMN, check.names = F)
       }
-      x <- as.numeric(rownames(-model@loadingMN))
-      idx <- which(x>roi[1] & x<roi[2])
-      if(ncol(df)< PC){
-        stop("PC selected is larger than the dimension of the model")
-      }
-      df <- df[,PC]
+      df <- df[idx,PC]
       x <- x[idx]
       cc <- abs(cor(X[,idx],df))
       cv <- cov(X[,idx],df)
       raCol <- c(0, max(cc))
       df <- data.frame(x = x, y = cv, col = cc)
     }
-    if(type != "Backscaled" & type !="Statistical reconstruction"){
-      stop("Name for the visualization type must be 'Backscaled' or 'Statistical reconstruction'. ")
-    }
   }
-  if(!class(model)[1]%in%c("opls","list","prcomp")){
-    stop("Check the Model class: must be prcomp,opls, or the results from PCA")
-  }
-
   if(method == "PCA"){
     p1 <- ggplot(df,
                  aes(x = x,
@@ -172,7 +202,7 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
   }else{
     if( is(model)[1] == "opls" & model@typeC=="OPLS-DA" & Median =="TRUE"){
       spec_df <- data.frame(t(do.call("rbind",model@suppLs$x)))
-      x = as.numeric(gsub("X","",colnames(spec_df)))
+      if (is.null(ppm))  x <- as.numeric(gsub("X","",colnames(spec_df))) else x <- ppm
       # y_groups<-unique(model@suppLs$y)
 
 
