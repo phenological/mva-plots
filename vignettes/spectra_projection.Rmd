@@ -1,0 +1,124 @@
+---
+title: "spectra_projection"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{spectra_projection}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message=FALSE,warning=FALSE}
+library(mva.plots)
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(tibble)
+```
+
+
+```{r, load the data }
+load(url("https://raw.githubusercontent.com/phenological/data-test/main/dataset/nmr-spectra/NMR_1D_Paracetamol_urine_spectra_pqn.rda"))
+
+```
+
+
+```{r set color pallets}
+continuousPalette<- c(
+    "#0000CC",
+    "#0000FF",
+    "#0055FF",
+    "#00AAFF",
+    "#00FFFF",
+    "#2BFFD5",
+    "#55FFAA",
+    "#80FF80",
+    "#AAFF55",
+    "#D4FF2B",
+    "#FFFF00",
+    "#FFAA00",
+    "#FF5500",
+    "#FF0000",
+    "#CC0000")
+```
+
+
+```{r set the projection variables Y in numeric}
+# set the projection variables Y in numeric
+Y = as.numeric(factor(an$timepoint))
+X = X_pqn
+```
+
+
+```{r calculate correlation}
+# calculate correlation
+cor1<-cor(X,Y,method = "spearman",use = "complete.obs")
+```
+
+## plot the correlation across the whole spectrum
+```{r,results='asis',fig.height=6,fig.width=10}
+data.frame(cor1) %>%
+  mutate_all(rescale, to = c(0, 1)) %>%
+  rownames_to_column("ppm") %>%
+  mutate(median_spec = apply(X, 2, median),
+         ppm = as.numeric(ppm)) %>% 
+  ggplot(aes(x = ppm, y = median_spec, color = cor1))+
+  geom_line()+scale_x_reverse(breaks = breaks_pretty(n = 10))+
+  scale_color_gradientn(colors = continuousPalette)+
+  theme_bw()
+
+```
+
+
+## plot the correlation that are cut into 0.5 ppm segments
+```{r, results='asis',fig.height=10,fig.width=15}
+
+data.frame(cor1) %>%
+  mutate_all(rescale, to = c(0, 1)) %>%
+  rownames_to_column("ppm") %>%
+  mutate(median_spec = apply(X, 2, median)) %>%
+  mutate(
+    ppm = as.numeric(ppm),
+    ppm_cut = cut(
+      ppm,
+      breaks = seq(0.5, 9.5, by = 0.5),
+      include.lowest = TRUE
+    ),
+    ppm_cut = factor(
+      ppm_cut,
+      levels = c(
+        "(4.5,5]",
+        "(4,4.5]",
+        "(3.5,4]",
+        "(3,3.5]",
+        "(2.5,3]",
+        "(2,2.5]",
+        "(1.5,2]",
+        "(1,1.5]",
+        "[0.5,1]",
+        "(9,9.5]",
+        "(8.5,9]",
+        "(8,8.5]",
+        "(7.5,8]",
+        "(7,7.5]",
+        "(6.5,7]",
+        "(6,6.5]",
+        "(5.5,6]",
+        "(5,5.5]"
+      )
+    )
+  ) %>% 
+  ggplot(aes(x = ppm, y = median_spec, color = cor1))+
+  geom_line()+scale_x_reverse(breaks = breaks_pretty(n = 5))+
+  scale_color_gradientn(colors = continuousPalette)+
+  facet_wrap(~ ppm_cut, scales = "free", nrow = 2, dir = "h")+
+  theme_bw()
+
+```
+

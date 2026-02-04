@@ -12,12 +12,22 @@ plotLoadings(model, flat = FALSE, optns = list())
 \item{flat}{A logical for a flat O-PLS(DA) loadings plot. Only applicable to
 oplsda models with an orthogonal component. Default is FALSE.}
 
-\item{optns}{An empty list for addtional options:
-\itemize{
+\item{optns}{An empty list for additional options:
+\describe{
 \item{plotTitle}{A character for the title of the grid.}
 \item{theme}{Personalize the plot theme you would like applied as you
 would using theme() in ggplot. Example set
-theme = theme(legend.position = "left", text=element_text(size=5)) in optns.}
+theme = theme(legend.position = "left", text=element_text(size = 5)) in
+optns.}
+\item{color}{A character of the color desired (default "blue"), you may
+use hexadecimals.}
+\item{shape}{A character or appropriate number of the shape desired.
+Default shape is "circle".}
+\item{size}{Either a column from the data frame or a numeric of the size
+desired. Default size is 3.}
+\item{alpha}{A numeric of the alpha desired. Default size is 0.5.}
+\item{extra}{Add extra ggplot arguments that are not for theme(), example
+extra = labs(caption = "*can you see it")}
 \item{thresh}{A numeric for the number of PCAs to display in the grid.
 The default is calculated in the PCA function.}
 }}

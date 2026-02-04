@@ -26,7 +26,7 @@ TRUE. Alternatively, a vector of length equal the number of columns of
 is TRUE.}
 
 \item{optns}{A list for additional options:
-\itemize{
+\describe{
 \item{cutoff}{The maximum percentage of cumulative variance you wish to
 explain. The default is 99 percent. for example, optns = list(cutoff = 90) to
 set a 90 percent cutoff. Set rank. = NULL if using this.}
@@ -53,11 +53,11 @@ eigenvectors). \cr
 square roots of the eigenvalues of the covariance/correlation matrix, though
 the calculation is actually done with the singular values of the data matrix). \cr
 \tab \cr
-\code{center} The centering used. \cr
+\code{center} \tab The centering used. \cr
 \tab \cr
-\code{scale} The scaling used. \cr
+\code{scale} \tab The scaling used. \cr
 \tab \cr
-\code{threshold} The number of principal components needed to explain the
+\code{threshold} \tab The number of principal components needed to explain the
 amount of cumulative variance specified (or the default of 99(in \%)). \cr
 }
 }

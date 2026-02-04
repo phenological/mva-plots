@@ -17,7 +17,7 @@ numeric (O-PLS) or character/factor (O-PLS-DA) response.}
 analysis will automatically occur when character/factor is supplied to Y.}
 
 \item{optns}{A list for additional options:
-\itemize{
+\describe{
 \item{predI}{Default NA (ropls will automatically set the number) for PLS,
 default 1 for OPLS. If \code{type} is PLS, you may set your own.}
 \item{orthoI}{Default NA (ropls will automatically set the number) for

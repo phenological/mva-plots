@@ -138,3 +138,58 @@ test_that("can have a flat plotscore for O-PLS(DA) model", {
   #is there only one height
 expect_true(object = length(unique(ps@suppLs[["ScoresPlot"]][["data"]][["y1"]])) > 2)
 })
+
+test_that("you can change things via extra in optns",{
+  # Generate some sample data
+  set.seed(123)
+  data <- as.data.frame(matrix(rnorm(100), ncol = 5))
+  data[data < 0] <- abs(data[data < 0])
+  data$fact <- sample(c("control", "treatment"), 20, replace = TRUE)
+  data$age = seq(from = 18, to = 60, length.out = 20)
+  data$sex <- sample(c("female", "male"), 20, replace = TRUE)
+
+  ##PCA object
+  ###grid of plots
+  a<- PCA(data = data[,1:5], rank = 5)
+
+                    pm<- plotScores(model = a,
+                              optns = list(color = data$sex,
+                                           shape = data$sex,
+                                           theme = theme(legend.position = "left"),
+                              extra = scale_shape_manual(labels = c("female", "male"),values = c(8, 17))
+                              )
+                                           )
+                    #did the correct shapes get used
+
+                    shapes <- unique(ggplot_build(pm[["plots"]][["pcaGrid"]][["plots"]][[1]])$data[[3]]$shape)
+                    expect_contains(object = shapes, expected = c(8,17))
+
+###single plot
+                    ps<- plotScores(model = a,
+                               optns = list(PCi = 1,
+                                            PCj = 2,
+                                            color = data$sex,
+                                            shape = data$sex,
+                                            theme = theme(legend.position = "left"),
+                                            extra = scale_shape_manual(labels = c("female", "male"),values = c(8, 17))
+                               )
+                    )
+                    #did the correct shapes get used
+
+                    shapes <- unique(ggplot_build(ps)$data[[1]]$shape)
+                    expect_contains(object = shapes, expected = c(8,17))
+
+#OPLSDA
+                    oplsda <- oplsda(X = new_lipidData, Y = new_lipidMetadata$sample_batch, type = "OPLS")
+                    ps<- plotScores(model = oplsda,
+                                    optns = list(color = new_lipidMetadata$sample_batch,
+                                                 shape = new_lipidMetadata$Timepoint,
+                                                 theme = theme(legend.position = "left"),
+                                                 extra = scale_shape_manual(labels = c("MISC", "COVID", "Control"),values = c(8, 17, 2))
+                                    )
+                    )
+
+                    shapes <- unique(ggplot_build(ps@suppLs[["ScoresPlot"]])$data[[1]]$shape)
+                    expect_contains(object = shapes, expected = c(8, 17, 2))
+})
+

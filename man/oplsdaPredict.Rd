@@ -13,10 +13,10 @@ oplsdaPredict(model, newdata, optns = list())
 (O-PLS-DA).}
 
 \item{optns}{An empty list for confusion matrix addition.
-\itemize{
-\item{real} {The "real" classifications for the newdata as a factor. If
+\describe{
+\item{real}{The "real" classifications for the newdata as a factor. If
 supplied, a confusion matrix will be calculated. Only available for DA.}
-\item{orthoI} {If you have an OPLS with more than one orthogonal
+\item{orthoI}{If you have an OPLS with more than one orthogonal
 component, you can specify how many you would like used in the
 predictive calculation. If not specified, all available orthogonal
 components will be used.}

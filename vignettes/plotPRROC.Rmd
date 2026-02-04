@@ -1,0 +1,93 @@
+---
+title: "plotPRROC"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{plotPRROC}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mva.plots)
+```
+
+
+```{r}
+data("mtcars")
+
+Y<-as.factor(mtcars$vs)  # for DA
+table(Y)
+```
+
+
+# PLS-DA
+## using mva.plots::oplsda()
+```{r}
+plsda_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "PLS")
+```
+
+*with caption*
+```{r}
+plotPRROC(plsda_model,caption = TRUE)
+```
+
+*without caption*
+```{r}
+plotPRROC(plsda_model, caption = FALSE)
+
+```
+
+## using ropls::opls()
+```{r}
+ropls_plsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = NA, orthoI = 0)
+```
+*with caption*
+```{r}
+plotPRROC(ropls_plsda_model, caption = TRUE)
+
+```
+
+*without caption*
+```{r}
+plotPRROC(ropls_plsda_model, caption = FALSE)
+
+```
+
+
+
+
+# O-PLS-DA
+## using mva.plots::oplsda()
+```{r}
+oplsda_model<-oplsda(X = mtcars[,1:5], Y = Y, type = "OPLS")
+```
+
+*with caption*
+```{r}
+plotPRROC(oplsda_model,caption = TRUE)
+```
+
+
+*manually selecting x and y axis values*
+```{r}
+plotPRROC(x = oplsda_model@scoreMN[which(Y == 1)], y = oplsda_model@scoreMN[which(Y == 0)])
+```
+
+## using ropls::opls()
+```{r}
+ropls_oplsda_model<-ropls::opls(x = mtcars[,1:5], y = Y, predI = 1, orthoI = NA)
+```
+
+
+*with caption*
+```{r}
+plotPRROC(ropls_oplsda_model,caption = TRUE)
+```
+

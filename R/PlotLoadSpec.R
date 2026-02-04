@@ -47,34 +47,25 @@
 #' @import methods
 #' @export
 
-PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X = NULL, ppm = NULL, Median = FALSE, optns = list()){
-  #Global argument checks (model independent)
-  if(!class(model)[1]%in%c("opls","list","prcomp")){
-    stop("Check the Model class: must be prcomp,opls, or the results from PCA")
-  }
-  if(type != "Backscaled" & type !="Statistical reconstruction"){
-    stop("Name for the visualization type must be 'Backscaled' or 'Statistical reconstruction'. ")
-  }
-  if(!is.numeric(roi) | length(roi) != 2){
-    stop("Invalid roi: must be numeric vector of length 2")
-  }
+
+PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X = NULL, Median = FALSE, optns = list()){
 
   continuousPalette<- c(
-                        "#0000CC",
-                        "#0000FF",
-                        "#0055FF",
-                        "#00AAFF",
-                        "#00FFFF",
-                        "#2BFFD5",
-                        "#55FFAA",
-                        "#80FF80",
-                        "#AAFF55",
-                        "#D4FF2B",
-                        "#FFFF00",
-                        "#FFAA00",
-                        "#FF5500",
-                        "#FF0000",
-                        "#CC0000")
+    "#0000CC",
+    "#0000FF",
+    "#0055FF",
+    "#00AAFF",
+    "#00FFFF",
+    "#2BFFD5",
+    "#55FFAA",
+    "#80FF80",
+    "#AAFF55",
+    "#D4FF2B",
+    "#FFFF00",
+    "#FFAA00",
+    "#FF5500",
+    "#FF0000",
+    "#CC0000")
 
 
   if(class(model)[1] == "prcomp"){
@@ -197,26 +188,63 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
                  aes(x = x,
                      y = y,
                      color = col)) +
-        geom_line() +
-        scale_x_reverse(breaks = breaks_pretty(n = 15)) +
-        scale_colour_gradientn(colors = continuousPalette,
-                               limits = raCol,
-                               name = expression("|p"["sc"] * "|")) +
-        labs(title = method,
-             subtitle = "Statistical reconstruction",
-             caption = paste0("PC: ", PC, " loadings"),
-             x = expression(delta ~ {}^1 * H ~ (ppm)),
-             y = "") +
-        theme_bw()
+      geom_line() +
+      scale_x_reverse(breaks = breaks_pretty(n = 15)) +
+      scale_colour_gradientn(colors = continuousPalette,
+                             limits = raCol,
+                             name = expression("|p"["sc"] * "|")) +
+      labs(title = method,
+           subtitle = "Statistical reconstruction",
+           caption = paste0("PC: ", PC, " loadings"),
+           x = expression(delta ~ {}^1 * H ~ (ppm)),
+           y = "") +
+      theme_bw()
   }else{
-    if( is(model)[1] == "opls" &  model@typeC=="OPLS-DA" & Median =="TRUE"){
+    if( is(model)[1] == "opls" & model@typeC=="OPLS-DA" & Median =="TRUE"){
       spec_df <- data.frame(t(do.call("rbind",model@suppLs$x)))
       if (is.null(ppm))  x <- as.numeric(gsub("X","",colnames(spec_df))) else x <- ppm
       # y_groups<-unique(model@suppLs$y)
-      data.frame(y = model@suppLs$y, model@scoreMN) -> y_groups
-      y_groups$p1[which(y_groups$p1>0)] <- 1
-      y_groups$p1[which(y_groups$p1<0)] <- -1
-      y_groups<-unique(y_groups)
+
+
+      #DPLYR removal
+      # Create the initial data frame
+      y_groups <- data.frame(y = model@suppLs$y, model@scoreMN)
+
+      # Apply the first mutation: ifelse(p1 < 0, -1, 1)
+      y_groups$p1 <- ifelse(y_groups$p1 < 0, -1, 1)
+
+      # Unique values of y
+      unique_y <- unique(y_groups$y)
+
+      # Apply the second mutation to each group of y
+      for (yval in unique_y) {
+        y_rows <- which(y_groups$y == yval)
+        if (sum(y_groups$p1[y_rows]) > 0) {
+          y_groups$p1[y_rows] <- 1
+        } else {
+          y_groups$p1[y_rows] <- -1
+        }
+      }
+
+      # Select distinct rows based on y
+      y_groups <- y_groups[!duplicated(y_groups$y), ]
+
+      # Add class attributes to match the 'grouped_df', 'tbl_df', etc.
+      class(y_groups) <- c("grouped_df", "tbl_df", "tbl", "data.frame")
+
+      # Ensure the 'groups' attribute is a data frame
+      attr(y_groups, "groups") <- data.frame(y = unique(y_groups$y), .rows = I(split(seq_len(nrow(y_groups)), y_groups$y)))
+
+
+
+      # data.frame(y = model@suppLs$y, model@scoreMN) %>%
+      #   mutate(p1 = ifelse(p1 < 0, -1, 1)) %>%
+      #   dplyr::group_by(y)%>%
+      #   mutate(p1 = ifelse(sum(p1)>0,1,-1))%>%
+      #   distinct(y, .keep_all = T)->y_groups
+
+
+
       idx =  which(x>roi[1] & x<roi[2])
       median_spectra_df<-list()
       for (i in 1:nrow(y_groups)) {
@@ -229,7 +257,7 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
         }
       }
       txt = paste0(as.character(y_groups$y[1])," = ", ifelse(y_groups$p1[1]>0,"Pos","Neg")," , ",
-                  as.character(y_groups$y[2])," = ", ifelse(y_groups$p1[2]>0,"Pos","Neg"))
+                   as.character(y_groups$y[2])," = ", ifelse(y_groups$p1[2]>0,"Pos","Neg"))
       df <- cbind(df, t(do.call("rbind",median_spectra_df)))
       coef =floor(c(max(abs(df$neg)),max(df$pos))[which.max(c(max(abs(df$neg)),max(df$pos)))]/max(abs(df$y)))
       p1 <- ggplot(df,
@@ -263,18 +291,18 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
                    aes(x = x,
                        y = y,
                        color = col)) +
-          geom_line() +
-          scale_x_reverse(breaks = breaks_pretty(n = 15)) +
-          scale_colour_gradientn(colors = continuousPalette,
-                                 na.value = "grey50",
-                                 limits = raCol,
-                                 name = expression("|p"["sc"] * "|")) +
-          labs(title = method,
-               subtitle = type,
-               caption = paste0("component: ", PC, " loadings"),
-               x = expression(delta ~ {}^1 * H ~ (ppm)),
-               y = "") +
-          theme_bw()
+        geom_line() +
+        scale_x_reverse(breaks = breaks_pretty(n = 15)) +
+        scale_colour_gradientn(colors = continuousPalette,
+                               na.value = "grey50",
+                               limits = raCol,
+                               name = expression("|p"["sc"] * "|")) +
+        labs(title = method,
+             subtitle = type,
+             caption = paste0("component: ", PC, " loadings"),
+             x = expression(delta ~ {}^1 * H ~ (ppm)),
+             y = "") +
+        theme_bw()
     }
 
 
@@ -283,3 +311,5 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
   return(p1)
 
 }
+
+

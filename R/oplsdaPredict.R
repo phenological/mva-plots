@@ -7,10 +7,10 @@
 #' @param newdata Matrix or data frame of the same X variables as the model
 #' (O-PLS-DA).
 #' @param optns An empty list for confusion matrix addition.
-#'    \itemize{
-#'     \item{real} {The "real" classifications for the newdata as a factor. If
+#'    \describe{
+#'     \item{real}{The "real" classifications for the newdata as a factor. If
 #'      supplied, a confusion matrix will be calculated. Only available for DA.}
-#'      \item{orthoI} {If you have an OPLS with more than one orthogonal
+#'      \item{orthoI}{If you have an OPLS with more than one orthogonal
 #'      component, you can specify how many you would like used in the
 #'      predictive calculation. If not specified, all available orthogonal
 #'      components will be used.}
@@ -38,13 +38,10 @@
 #' @export
 
 oplsdaPredict <- function (model, newdata, optns=list()){
-
   #center and scale new data
   xteMN <- scale(newdata, model@xMeanVn, model@xSdVn)
-
 #check there is an orthogonal component
   if(model@summaryDF[, "ort"] > 0) {
-
     #allow user to specify how many orthogonal components should be removed.
     if("orthoI" %in% names(optns)){
       components <- optns$orthoI
@@ -53,7 +50,6 @@ oplsdaPredict <- function (model, newdata, optns=list()){
     #can only use the first orthogonal component hence model@summaryDF[,1] not model@summaryDF[,"ort"] in for statement
     for(noN in 1:components) {
       if(model@suppLs[["naxL"]]) {
-
         #make empty matrix
         xtoMN <- matrix(0, nrow = nrow(xteMN), ncol = 1)
         for(i in 1:nrow(xtoMN)) {
@@ -162,6 +158,13 @@ prediction <- list(orthoScoreMN = xtoMN,
                    predY = predMCNFcVcn,
                    confusionMatrix = conf)
 
+sp <- plotScores(model)@suppLs$ScoresPlot
+#WARNING: this will break if you ever change the order of layers in plotScores
+sp <- sp + geom_point(data=data.frame(Pred = prediction$predScoreMN
+                                      ,Ortho = prediction$orthoScoreMN)
+                      ,aes(x=Pred,y=Ortho),shape=1,size=sp$layers[[1]]$aes_params$size,color="black"
+                      )
+print(sp)
 invisible(prediction)
 }
 

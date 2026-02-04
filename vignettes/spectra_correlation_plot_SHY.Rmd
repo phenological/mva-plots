@@ -1,0 +1,146 @@
+---
+title: "spectra_correlation_plot_SHY"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{spectra_correlation_plot_SHY}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mva.plots)
+library(reshape2) # melt()
+library(ggpubr) # get_legend()
+library(nmr.spectra.processing)
+library(scales) # rescale()
+```
+
+## function
+```{r}
+Stocsy_plot=function (x, y=NULL, 
+                        cor_method = c("pearson", "kendall", "spearman"),
+                        cor_use = c("everything", "all.obs", "complete.obs", "na.or.complete", "pairwise.complete.obs"),
+                        threshold, xlabel,ylabel) {
+   # tictoc::tic("init")
+  xtrace = apply(x,2,median)
+  xaxis = as.numeric(colnames(x))
+  if(missing(y)){
+    y=x   # for autocorrelation plot
+    ylabel=xlabel
+    ytrace=xtrace
+    yaxis=xaxis
+  }else{
+    ytrace=apply(y,2,median)
+    yaxis=as.numeric(colnames(y))
+  }
+  # colnames(x)=paste0("x_",colnames(x))
+  # if(nrow(x)!=nrow(y)|ncol(x)!=ncol(y)){
+  #   stop("dimension of the input must be the same")
+  # }
+  cor=cor(x,y, method = cor_method,use = cor_use)
+  if (max(cor, na.rm = TRUE) > 1 | min(cor, na.rm = TRUE) < -1) {
+    stop("correlation values should be between -1 and 1")
+  }
+  cor = round(rescale(cor, to = c(0, 1), from = c(-1,1)),2) # round up to 2 dec place
+  if(!missing(threshold)){
+    # cor=ifelse(abs(cor)>=threshold,cor,0)
+    cor=ifelse(cor>=threshold,cor,0)
+  }
+# cor=as.matrix(rev(as.data.frame(t(cor)))) # flip cor
+ggplot(melt(cor), aes(x = Var1, y = Var2,fill=value)) +
+  geom_raster(hjust = 0,
+  vjust = 0) +
+  scale_fill_gradient2(low="blue",mid = "white", high="red",midpoint = 0.5,name = "")+
+  scale_colour_manual(name = "NA", values = NA) +
+     theme(legend.key = element_rect(fill = "black"))+
+  scale_y_reverse(limits = c(max(as.numeric(colnames(cor))), min(as.numeric(colnames(cor)))),
+                  expand = c(0,0),
+                  breaks = round(seq(min(as.numeric(colnames(cor))), max(as.numeric(colnames(cor))), by = 0.01),3),
+                  position = "right")+
+  scale_x_reverse(limits = c(max(as.numeric(rownames(cor))), min(as.numeric(rownames(cor)))), 
+                  expand = c(0,0),
+                  breaks = round(seq(min(as.numeric(rownames(cor))), max(as.numeric(rownames(cor))), by = 0.01),3))+
+  labs(x = paste0(xlabel," (ppm)"),
+       y = paste0(ylabel," (ppm)"))+
+  geom_vline(xintercept = round(seq(min(as.numeric(rownames(cor))), max(as.numeric(rownames(cor))), by = 0.01),3), linetype = "dashed", color = "grey80",linewidth = 0.1)+
+  geom_hline(yintercept = round(seq(min(as.numeric(colnames(cor))), max(as.numeric(colnames(cor))), by = 0.01),3), linetype = "dashed", color = "grey80",linewidth = 0.1)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))->p1
+  lcoegend=get_legend(p1)
+  p1=p1+theme(legend.position = "none")
+  p2=data.frame(cbind(xaxis,xtrace))%>%
+    ggplot(aes(x = xaxis,y = xtrace))+
+    geom_line()+
+    theme_bw()+
+    labs(y = "Intensity")+
+    scale_x_reverse(limits = c(max(xaxis), min(xaxis)), expand = c(0,0))+
+    scale_y_continuous(position = "right")+
+    theme(plot.margin = margin(0, 0, 0, 0),
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank())
+  p3=data.frame(cbind(yaxis,ytrace))%>%
+    ggplot(aes(x = yaxis,y = ytrace))+
+    geom_line()+
+    theme_bw()+
+    labs(y = "Intensity")+
+    scale_x_reverse(limits = c(max(yaxis), min(yaxis)), expand = c(0,0))+
+    scale_y_reverse(limits = c(max(ytrace), min(ytrace)))+
+    theme(plot.margin = margin(0, -1, 0, -1),
+          axis.title.y = element_blank())+coord_flip()
+  
+  res=ggarrange(NULL,p2,p3,p1,ncol = 2,nrow = 2,align = "hv",widths = c(0.2,0.8), heights = c(0.2,0.8))
+
+  # tictoc::toc()
+  res
+}
+
+```
+
+## load dataset
+```{r}
+load(url("https://raw.githubusercontent.com/phenological/data-test/main/dataset/nmr-spectra/NMR_1D_Paracetamol_urine_spectra_pqn.rda"))
+X = X_pqn
+```
+
+
+## autocorrelation plot
+```{r,warning=FALSE}
+cor_method = c("spearman")
+cor_use = c("complete.obs")
+threshold = 0.9
+Stocsy_plot(
+  X[, which(ppm >= 1.2 &
+                 ppm <= 1.5)],
+  cor_method = cor_method,
+  cor_use = cor_use,
+  xlabel = "1D",
+  ylabel = "1D"
+)
+```
+
+
+## Trigonelline subset spectra correlation
+```{r,warning=FALSE}
+# matspec(X,ppm,roi = c(8.8,9.2))
+X<-calibrateSpectra(ppm = ppm,Y = X,ref = c("tsp"),rOref = c(9.1,9.15),cshift = 9.12)
+# matspec(X,ppm,roi = c(8.8,8.9))
+
+Stocsy_plot(
+  X[, which(ppm >= 9.0 &
+                 ppm <= 9.2)],
+  X[, which(ppm >= 8.8 &
+                 ppm <= 9.0)],
+  cor_method = cor_method,
+  cor_use = cor_use,
+  xlabel = "Trigonelline",
+  ylabel = "Trigonelline"
+)
+```
+

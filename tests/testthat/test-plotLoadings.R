@@ -45,7 +45,9 @@ test_that("can create flat loadings plot for O-PLS(DA)", {
                   type = "OPLS")
 
   test<- plotLoadings(model = model,
-                      flat =TRUE)
+                      flat = TRUE,
+                      optns = list(shape = 8))
+
   t <- ggplot_build(test@suppLs[["LoadingsPlot"]])
   first_entry <- t[["data"]][[1]][["y"]][1]
 
@@ -55,6 +57,55 @@ test_that("can create flat loadings plot for O-PLS(DA)", {
   # Assert that all entries are the same
   expect_true(all_same)
 })
+
+test_that("you can change things via extra in optns",{
+  # Generate some sample data
+  set.seed(123)
+  data <- as.data.frame(matrix(rnorm(100), ncol = 5))
+  data[data < 0] <- abs(data[data < 0])
+  data$fact <- sample(c("control", "treatment"), 20, replace = TRUE)
+  data$age = seq(from = 18, to = 60, length.out = 20)
+  data$sex <- sample(c("female", "male"), 20, replace = TRUE)
+
+  ##PCA object
+  ###grid of plots
+  a<- PCA(data = data[,1:5], rank = 5)
+
+  exp <- c("A", "A", "A", "B", "B")
+  pm<- plotLoadings(model = a,
+                    optns = list(color = "white",
+                                shape = 8,
+                                extra = geom_point(aes(color = exp))
+                  )
+  )
+
+  #did the new colors get used
+  newColors <- unique(ggplot_build(pm[["plots"]][["plotLoadingGrid"]][["plots"]][[1]])$data[[5]]$colour)
+  expect_equal(object = length(newColors),
+               expected = 2)
+
+  ###single plot
+  ##assign color using extra
+  ps<- plotLoadings(model = a,
+                    optns = list(color = "pink",
+                                 PCi = 1,
+                                 PCj = 2,
+                                 shape = 8,
+                                 extra = labs(caption = "*can you see it")
+                    )
+  )
+
+  #did the caption appear
+  expect_equal(object = ps[["labels"]][["caption"]],
+               expected = "*can you see it")
+
+  #did the right shape get used
+  expect_equal(object = unique(ggplot_build(ps)$data[[1]]$shape), expected = 8)
+  #was the right color used
+  expect_equal(object = unique(ggplot_build(ps)$data[[1]]$colour), expected = "pink")
+
+})
+
 
 
 #want flat plotloadings and plotscores for OPLS, since you don't want the orthogonal component graphed.

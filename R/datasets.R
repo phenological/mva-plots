@@ -26,3 +26,12 @@ NULL
 #' @format A data element.
 #' @usage load("../mva-plots/data/NMR_1D_rat_urine_spectra.rda")
 #' @seealso \code{\link{load}}, \code{\link{data}}, \code{\link{get}}
+
+#' Lipoprotein data stored as a data element file.
+#'
+#' This dataset contains lipoprotein and metadata for oplsda tests.
+#'
+#' @name lipoData
+#' @format A data element.
+#' @usage load("../mva-plots/data/lipoData.rda")
+#' @seealso \code{\link{load}}, \code{\link{data}}, \code{\link{get}}
