@@ -23,10 +23,14 @@ correlated. The whole spectra range by default.}
 default) or the numbers}
 
 \item{breaks}{numeric, number of breaks in the x axis or the STOCSY plot}
+
+\item{p, }{should p values be produced? See \link[stats]{\code{cor.test}}.
+Default FALSE}
 }
 \value{
 if plot=TRUE, a ggplot2 object. Otherwise, a data.frame with the
-correlations and covariances of Y with the driver and the corresponding ppm
+correlations (column \code{corr}) and covariances (\code{covar}) of Y with the
+driver, p values (\code{p}) if requested, and the corresponding ppm (\code{ppm})
 scale, restricted to the given roi. The "driver" (either a cshift or a vector
 of intensities) is stored as an attribute of the data.frame.
 }

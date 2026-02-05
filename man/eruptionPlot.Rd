@@ -44,8 +44,6 @@ color names (example : continuousPalette =c("purple", "orange")).}
 The default is cliff's delta.}
 \item{y}{Choose your y-axis using the same options stated for color.
 The default is loadings.}
-\item{significance} {Points with p < significance are left unlabeled.
-If not provided, all points are labeled.}
 }}
 }
 \value{

@@ -10,11 +10,11 @@ cliffsDelta(model, optns = optns)
 \item{model}{A PCA or oplsda object from mva.plots or a data frame.}
 
 \item{optns}{A list passed to cliffsDelta with additional arguments.
-\describ{
-\item{factor} {An object the same length as the data in the model supplied
+\describe{
+\item{factor}{An object the same length as the data in the model supplied
 that must have at least 2 unique groups such as treatment and control. More
 than 2 is allowable.}
-\item{control} {Character to set which group with the supplied factor you wish
+\item{control}{Character to set which group with the supplied factor you wish
 to set as the control for comparison to all other groups. If your factor is
 already numeric, when specifying the control, supply it as a character, for
 example, control = "0". If not manually set, the unique factor assigned one

@@ -10,7 +10,6 @@ PlotLoadSpec(
   roi = c(0.5, 9.5),
   type = "Backscaled",
   X = NULL,
-  ppm = NULL,
   Median = FALSE,
   optns = list()
 )
@@ -37,16 +36,16 @@ but for PLS and OPLS "Backscaling" method is recommended.}
 This is needed for PCA with prcomp package, or
 (O)PLS with type = "Statistical reconstruction".}
 
-\item{ppm}{chemical shift scale. If NULL (default), it is read from the row names
-of the loading matrix. If the rows are unnamed, row indices are
-used instead with a warning.}
-
 \item{Median}{only works for OPLS-DA model using mva.plot().
 Default is FALSE.
 When Median = True
 Median spectra of each groups will be added on the top of loading plot showing the same direction as score plot}
 
 \item{optns}{An empty list for additional options.}
+
+\item{ppm}{chemical shift scale. If NULL (default), it is read from the row names
+of the loading matrix. If the rows are unnamed, row indices are
+used instead with a warning.}
 }
 \value{
 plot of the loadings

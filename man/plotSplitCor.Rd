@@ -12,16 +12,16 @@ plotSplitCor(corList, type = c("full", "lower", "upper"), optns = list())
 \item{type}{A type of plotting format, the choice is full, lower and upper only}
 
 \item{optns}{An empty list for additional options:
-\desribe{
-\item{plotTitle} {A character for the title of the plot. default is "Split Correlation Plot"}
-\item{sizeTitle} {A numeric for the font size of the title. default is 12}
-\item{sizeLabel} {A numeric for the font size of the row/column label default is 8}
-\item{showLabelX} {A logical (TRUE/FALSE) to display the column label or not. default is TRUE}
-\item{showLabelY} {A logical (TRUE/FALSE) to display the raw label or not. default is TRUE}
-\item{showLegend} {A logical (TRUE/FALSE) to display the legend or not. default is TRUE}
-\item{c1Name} {A character to describe the first correlation matrix (= left circle). This name will go on the legend. default is "correlation 1"}
-\item{c2Name} {A character to describe the second correlation matrix (= right circle). This name will go on the legend. default is "correlation 2"}
-\item{showScaleLegend} {A logical (TRUE/FALSE) to display the color scale legend or not. default is TRUE}
+\describe{
+\item{plotTitle}{A character for the title of the plot. default is "Split Correlation Plot"}
+\item{sizeTitle}{A numeric for the font size of the title. default is 12}
+\item{sizeLabel}{A numeric for the font size of the row/column label default is 8}
+\item{showLabelX}{A logical (TRUE/FALSE) to display the column label or not. default is TRUE}
+\item{showLabelY}{A logical (TRUE/FALSE) to display the raw label or not. default is TRUE}
+\item{showLegend}{A logical (TRUE/FALSE) to display the legend or not. default is TRUE}
+\item{c1Name}{A character to describe the first correlation matrix (= left circle). This name will go on the legend. default is "correlation 1"}
+\item{c2Name}{A character to describe the second correlation matrix (= right circle). This name will go on the legend. default is "correlation 2"}
+\item{showScaleLegend}{A logical (TRUE/FALSE) to display the color scale legend or not. default is TRUE}
 }}
 }
 \value{

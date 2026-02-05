@@ -73,7 +73,7 @@ plotStocsy <- function(aDF, breaks = 10){
 #' correlated. The whole spectra range by default.
 #' @param plot, boolean, whether to return the plot of the STOCSY (TRUE,
 #' default) or the numbers
-#' @para p, should p values be produced? See \link[stats]{\code{cor.test}}. 
+#' @param p, should p values be produced? See \link[stats]{\code{cor.test}}. 
 #' Default FALSE
 #' @param breaks numeric, number of breaks in the x axis or the STOCSY plot
 #' @return if plot=TRUE, a ggplot2 object. Otherwise, a data.frame with the
