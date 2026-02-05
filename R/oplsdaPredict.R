@@ -158,13 +158,36 @@ prediction <- list(orthoScoreMN = xtoMN,
                    predY = predMCNFcVcn,
                    confusionMatrix = conf)
 
+#Plot the predictions projected in the scores plot
 sp <- plotScores(model)@suppLs$ScoresPlot
 #WARNING: this will break if you ever change the order of layers in plotScores
-sp <- sp + geom_point(data=data.frame(Pred = prediction$predScoreMN
-                                      ,Ortho = prediction$orthoScoreMN)
-                      ,aes(x=Pred,y=Ortho),shape=1,size=sp$layers[[1]]$aes_params$size,color="black"
-                      )
-print(sp)
+if(is.null(prediction$orthoScoreMN)){
+  if (ncol(prediction$predScoreMN) > 1){
+    sp <- sp + geom_point(data=data.frame(PC1 = prediction$predScoreMN[,1]
+                                          ,PC2 = prediction$predScoreMN[,2]
+                                          )
+                          ,mapping = aes(x=PC1,y=PC2)
+                          ,shape=1,size=sp$layers[[1]]$aes_params$size,color="black"
+    )
+    print(sp)
+  } else{
+    sp <- sp + geom_point(data=data.frame(pred = prediction$predScoreMN
+                                          ,y = prediction$predY
+                                          )
+                          ,mapping = aes(x=pred, y=y)
+                          ,shape=1,size=sp$layers[[1]]$aes_params$size,color="black"
+                          )
+    print(sp)
+  }
+} else{
+  sp <- sp + geom_point(data=data.frame(Pred = prediction$predScoreMN
+                                        ,Ortho = prediction$orthoScoreMN)
+                        ,mapping = aes(x=Pred,y=Ortho)
+                        ,shape=1,size=sp$layers[[1]]$aes_params$size,color="black"
+                        )
+  print(sp)
+}
+
 invisible(prediction)
 }
 

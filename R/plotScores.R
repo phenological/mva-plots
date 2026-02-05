@@ -6,9 +6,11 @@
 #' PLS components may be changed.
 #'
 #' @param model A PCA or oplsda model.
-#' @param flat A logical for a flat O-PLS(DA) scores plot. Only applicable to
-#' oplsda models with an orthogonal component. Default is FALSE. Outliers and
-#' ellipse are not available for a flat plotscore.
+#' @param flat A logical for a flat (O)PLS scores plot i.e. single predictive 
+#' component v. response variable. The name "flat" comes from its use for
+#' visualizing OPLS-DA, but it can be applied to any (O)PLS model.
+#'  Not applicable to PCA. Defaults to TRUE for single component PLS, FALSE otherwise.
+#'   Outliers and ellipse are not available for a flat plotscore.
 #' @param show logical, if TRUE (default) the scores plot is displayed
 #' @param optns An empty list for additional options:
 #'  \describe{
@@ -113,7 +115,7 @@
 
 
 plotScores<-function(model, flat = FALSE, show = TRUE, optns=list()){
-
+  
   #outlier annotation
   if("annotation" %in% names(optns)){
     if(is(model)[1] == "list"){
@@ -379,7 +381,8 @@ plotScores<-function(model, flat = FALSE, show = TRUE, optns=list()){
     }
     if(grepl("O", model@typeC) == TRUE){
       df <- as.data.frame(cbind(model@scoreMN, model@orthoScoreMN), check.names = F)
-      df2 <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN), check.names = F)
+      #Unused and unneede as far as I can see
+      # df2 <- as.data.frame(cbind(model@loadingMN, model@orthoLoadingMN), check.names = F)
       gl <- labs(x = paste0('tp1 (', round(model@modelDF[["R2X"]][1]*100, 1), '%)'),
                  y = paste0('to1'))
       PCi <- 1
@@ -387,10 +390,17 @@ plotScores<-function(model, flat = FALSE, show = TRUE, optns=list()){
     }else{
       #flat <- FALSE
       df <- as.data.frame(model@scoreMN, check.names = F)
-      df2 <- as.data.frame(model@loadingMN, check.names = F)
-      gl <- labs(x = paste0('t',PCi, '(', round(model@modelDF[["R2X"]][PCi]*100, 1), '%)'),
-                 y = paste0('t',PCj, '(', round(model@modelDF[["R2X"]][PCj]*100, 1), '%)'))
-
+      #Unused and unneede as far as I can see
+      # df2 <- as.data.frame(model@loadingMN, check.names = F)
+      #default to flat if single PC PLS-DA
+      if(grepl("^PLS", model@typeC) & ncol(model@scoreMN) == 1){
+        PCi <- 1 #Not sure it is needed  
+        flat <- TRUE
+        gl <- labs(x = paste0('t',PCi, '(', round(model@modelDF[["R2X"]][PCi]*100, 1), '%)'))
+      } else{
+        gl <- labs(x = paste0('t',PCi, '(', round(model@modelDF[["R2X"]][PCi]*100, 1), '%)'),
+                   y = paste0('t',PCj, '(', round(model@modelDF[["R2X"]][PCj]*100, 1), '%)'))  
+        }
       }
 
     df <- cbind(df, model@suppLs[["yMCN"]])
@@ -411,7 +421,6 @@ if("outlierLabels" %in% names(optns)){
 
 #########PCA objects##################
   if(is(model)[1]=="list"){
-
     #flat <- FALSE
     df <- model$data$pcdf
 
@@ -449,37 +458,19 @@ if("outlierLabels" %in% names(optns)){
         gl <- labs()
       }
     }
-
-########ALL (base plot)##############
-  onePlot <- ggplot(data = df,
-                    aes(x = df[,PCi], y = df[,PCj])) +
-          ggtitle(plotTitle) +
-          gl +
-          gc +
-          gp +
-          gu +
-          scale_alpha(range = c(0.1, 1)) +
-          labs(color = optns$colorTitle,
-               shape = optns$shapeTitle,
-               size = optns$sizeTitle,
-               alpha = optns$alphaTitle ) +
-          geom_hline(yintercept = 0, colour = "gray70") +
-          geom_vline(xintercept = 0, colour = "gray70") +
-          theme_bw() +
-          theme +
-    extra
-
-  onePlot[["data"]]$assignment <- optns$color
-
-#########flat O-PLS(DA)##########
+#########FLAT (O)-PLS-DA##########
   if(flat == TRUE) {
-    if ("OPLS-DA" %in% model@typeC) {
-      unique_y1 <- unique(df$y1)
-      df$y <-  ifelse(df$y1 == unique_y1[1], 0.02, 0.04)
-      y <- df$y
-    } else {
-      y <- 0.002
+    if (!is(model)[1] == "opls"){
+      stop("flat == TRUE not available for PCA")
     }
+    # if ("OPLS-DA" %in% model@typeC) {
+    #   unique_y1 <- unique(df$y1)
+    #   df$y <-  ifelse(df$y1 == unique_y1[1], 0.02, 0.04)
+    #   y <- df$y
+    # } else {
+    #   y <- 0.002
+    # }
+    df$y <- model@suppLs$y
     onePlot <- ggplot(data = df,
                       aes(x = df[, PCi], y = y)) +
       ggtitle(plotTitle) +
@@ -491,24 +482,44 @@ if("outlierLabels" %in% names(optns)){
            shape = optns$shapeTitle,
            size = optns$sizeTitle,
            alpha = optns$alphaTitle ) +
-      scale_y_continuous(limits = c(0, 0.1),
-                         expand = c(0, 0)) +  # Set limits and remove expansion
       theme_bw() +
-      theme +
-      extra +
       theme(
         axis.title.y = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
         axis.line.y = element_blank()
-      ) +
-      scale_x_continuous(limits = symmetricLimits(df[,PCi])) +
-      scale_y_continuous(limits = symmetricLimits(df[,PCj]))
+      ) + 
+      theme +
+      extra +
+      scale_x_continuous(limits = symmetricLimits(df[,PCi]))# +
+      # scale_y_continuous(limits = symmetricLimits(df[,PCj]))
+    
     if(show) print(onePlot)
 
     model@suppLs[["ScoresPlot"]] <- onePlot
     return(invisible(model))
   }
+  
+  ########ALL OTHERS (base plot)##############
+  onePlot <- ggplot(data = df,
+                    aes(x = df[,PCi], y = df[,PCj])) +
+    ggtitle(plotTitle) +
+    gl +
+    gc +
+    gp +
+    gu +
+    scale_alpha(range = c(0.1, 1)) +
+    labs(color = optns$colorTitle,
+         shape = optns$shapeTitle,
+         size = optns$sizeTitle,
+         alpha = optns$alphaTitle ) +
+    geom_hline(yintercept = 0, colour = "gray70") +
+    geom_vline(xintercept = 0, colour = "gray70") +
+    theme_bw() +
+    theme +
+    extra
+  
+  onePlot[["data"]]$assignment <- optns$color
 
 #########ellipse & outliers########
 if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){

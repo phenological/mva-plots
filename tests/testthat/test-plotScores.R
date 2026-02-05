@@ -176,7 +176,7 @@ test_that("you can change things via extra in optns",{
                     )
                     #did the correct shapes get used
 
-                    shapes <- unique(ggplot_build(ps)$data[[1]]$shape)
+                    shapes <- unique(ggplot_build(ps[["plots"]][["pcaSingle"]])$data[[1]]$shape)
                     expect_contains(object = shapes, expected = c(8,17))
 
 #OPLSDA

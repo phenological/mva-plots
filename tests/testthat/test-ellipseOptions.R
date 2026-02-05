@@ -41,7 +41,7 @@ test_that("PCA labels outliers", {
                                plotTitle = "Iris PCA grid",
                                alpha = 0.7))
 
-  expect_false(object = is.null(b[["data"]][["optns$outlierLabels"]]))
+  expect_false(object = is.null(b[["plots"]][["pcaSingle"]][["data"]][["optns$outlierLabels"]]))
 
 })
 

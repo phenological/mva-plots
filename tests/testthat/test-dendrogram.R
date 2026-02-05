@@ -33,7 +33,7 @@ test_that("ggplot works", {
                                 color = new_lipidMetadata$Timepoint,
                                 ellipse = "color"))
 
-  expect_no_error(object = dendrogram(ps = ps, p = 2))
+  expect_no_error(object = dendrogram(ps = ps[["plots"]][["pcaSingle"]], p = 2))
 
 })
 

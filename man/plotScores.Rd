@@ -9,9 +9,11 @@ plotScores(model, flat = FALSE, show = TRUE, optns = list())
 \arguments{
 \item{model}{A PCA or oplsda model.}
 
-\item{flat}{A logical for a flat O-PLS(DA) scores plot. Only applicable to
-oplsda models with an orthogonal component. Default is FALSE. Outliers and
-ellipse are not available for a flat plotscore.}
+\item{flat}{A logical for a flat (O)PLS scores plot i.e. single predictive
+component v. response variable. The name "flat" comes from its use for
+visualizing OPLS-DA, but it can be applied to any (O)PLS model.
+Not applicable to PCA. Defaults to TRUE for single component PLS, FALSE otherwise.
+Outliers and ellipse are not available for a flat plotscore.}
 
 \item{show}{logical, if TRUE (default) the scores plot is displayed}
 

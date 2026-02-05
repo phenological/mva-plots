@@ -43,35 +43,55 @@
 ellipseSimilarity<- function(ps, type = "jaccard"){
   # points representing two ellipses
 
-  #grid of PCA scores plots
+  #PCA
   if(is(ps)[1] == "list"){
-    plot<- ps[["plots"]][["pcaGrid"]][["plots"]]
+    if ("plots" %in% names(ps)){
+      if ("pcaGrid" %in% names(ps[["plots"]])){
+        scplots<- ps[["plots"]][["pcaGrid"]][["plots"]]
+      } else{
+        if ("pcaSingle" %in% names(ps[["plots"]])){
+          scplots <- list()
+          scplots[[1]] <- ps[["plots"]][["pcaSingle"]]
+        } else{
+          stop("No scores plot found in argument ps")
+        }
+      }
+    } else{
+      stop("No plots found in ps argument")
+    }
+  } else{
+    #OPLSDA
+    if(is(ps)[1] == "opls"){
+      scplots <- list()
+      if ("ScoresPlot" %in% names(ps@suppLs)){
+        scplots[[1]] <- ps@suppLs[["ScoresPlot"]]
+      } else{
+        stop("No scores plot found in argument ps")
+      }
+    } else{
+      #Neither
+      stop("Argument ps is not a valid model")
+    }
   }
 
-  #single PCA scores plot
-  if(is(ps)[1] == "gg"){
-    plot <- list()
-    plot[[1]] <- ps
-  }
-
-  #single oplsda scores plot
-  if(is(ps)[1] == "opls"){
-    plot <- list()
-    plot[[1]] <- ps@suppLs[["ScoresPlot"]]
-  }
+  # #single PCA scores plot
+  # if(is(ps)[1] == "gg"){
+  #   plot <- list()
+  #   plot[[1]] <- ps
+  # }
 
   test <- list()
 
-  for (k in 1:length(plot)){
-    #go through each plot, if class(plot) contains "ggmatrix_blank", exclude it from the process
-    if ("ggmatrix_blank" %in% class(plot[[k]])) {
+  for (k in 1:length(scplots)){
+    #go through each plot, if class(scplots) contains "ggmatrix_blank", exclude it from the process
+    if ("ggmatrix_blank" %in% class(scplots[[k]])) {
       # Ignore it or do nothing
       #ratio <- NULL
     } else {
 
-      x <- plot[[k]][["labels"]][["x"]]
-      y <- plot[[k]][["labels"]][["y"]]
-      df <- ggplot_build(plot[[k]])$data[[4]]
+      x <- scplots[[k]][["labels"]][["x"]]
+      y <- scplots[[k]][["labels"]][["y"]]
+      df <- ggplot_build(scplots[[k]])$data[[4]]
       df$colour <- as.factor(df$colour)
 
       unique_factors <- unique(df$colour)
@@ -105,23 +125,30 @@ ellipseSimilarity<- function(ps, type = "jaccard"){
       # Extract color and group information from the data
 
       #change depending on type
-      #grid of PCA scores plots
+      #PCA
       if(is(ps)[1] == "list"){
-        color_info <- ggplot_build(plot[[1]])$data[[3]]
-        color_info$assignment <- ps[["plots"]][["pcaGrid"]][["data"]][["assignment"]]
+        #No need to check again for "plots" existence
+        if ("pcaGrid" %in% names(ps[["plots"]])){
+          color_info <- ggplot_build(scplots[[1]])$data[[3]]
+          color_info$assignment <- ps[["plots"]][["pcaGrid"]][["data"]][["assignment"]]
+        } else{
+          #No need to check again for "pcaSingle" existence
+          color_info <- ggplot_build(scplots[[1]])$data[[1]]
+          color_info$assignment <- scplots[[1]][["data"]][["assignment"]]
+        }
+      } else{
+        #No need to check again for opls object
+        color_info <- ggplot_build(scplots[[1]])$data[[1]]
+        color_info$assignment <- scplots[[1]][["data"]][["y1"]]
       }
 
-      #single PCA scores plot
-      if(is(ps)[1] == "gg"){
-        color_info <- ggplot_build(plot[[1]])$data[[1]]
-        color_info$assignment <- plot[[1]][["data"]][["assignment"]]
-      }
+      # #single PCA scores plot
+      # if(is(ps)[1] == "gg"){
+      #   color_info <- ggplot_build(scplots[[1]])$data[[1]]
+      #   color_info$assignment <- scplots[[1]][["data"]][["assignment"]]
+      # }
 
-      #single oplsda scores plot
-      if(is(ps)[1] == "opls"){
-        color_info <- ggplot_build(plot[[1]])$data[[1]]
-        color_info$assignment <- plot[[1]][["data"]][["y1"]]
-      }
+      
 
       dup <- function(color_info) duplicated(cbind(pmin(color_info[,"colour"])))
       color_info <- (color_info[!dup(color_info),])

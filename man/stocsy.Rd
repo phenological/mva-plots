@@ -19,12 +19,12 @@ observations of the driver variable. Otherwise, the first element of driver
 \item{roi}{numeric, upper and lower limit of the Region Of Interest to be
 correlated. The whole spectra range by default.}
 
-\item{plot, }{boolean, whether to return the plot of the STOCSY (TRUE,
+\item{plot}{boolean, whether to return the plot of the STOCSY (TRUE,
 default) or the numbers}
 
 \item{breaks}{numeric, number of breaks in the x axis or the STOCSY plot}
 
-\item{p, }{should p values be produced? See \link[stats]{\code{cor.test}}.
+\item{p}{should p values be produced? See \code{\link[stats]{cor.test}}.
 Default FALSE}
 }
 \value{
