@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 ## Package installation
 ```{r echo = TRUE, results = 'hide'}
-devtools::install_github("phenological/mva-plots")
+# devtools::install_github("phenological/mva-plots")
 library(mva.plots)
 ```
 

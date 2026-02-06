@@ -470,7 +470,7 @@ if("outlierLabels" %in% names(optns)){
     # } else {
     #   y <- 0.002
     # }
-    df$y <- model@suppLs$y
+    df$y <- df$y1#model@suppLs$y
     onePlot <- ggplot(data = df,
                       aes(x = df[, PCi], y = y)) +
       ggtitle(plotTitle) +
@@ -548,7 +548,7 @@ if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
                    size = 2,
                    hjust = 0,
                    vjust = 0,
-                   label.size = NA,
+                   # label.size = NA,
                    fill = NA)
     }
 
@@ -562,7 +562,7 @@ if(is(model)[1] == "opls" && "ellipse" %in% names(optns)){
                    size = 2,
                    hjust = 0,
                    vjust = 0,
-                   label.size = NA,
+                   # label.size = NA,
                    fill = NA)
 
     }
@@ -623,7 +623,7 @@ if(is(model)[1] == "list"){
                               size = 2,
                               hjust = 0,
                               vjust = 0,
-                              label.size = NA,
+                              #label.size = NA,
                               fill = NA)
       }
     }

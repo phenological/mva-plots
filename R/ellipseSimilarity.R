@@ -57,7 +57,7 @@ ellipseSimilarity<- function(ps, type = "jaccard"){
         }
       }
     } else{
-      stop("No plots found in ps argument")
+      stop("No plots found in argument ps")
     }
   } else{
     #OPLSDA
@@ -84,13 +84,12 @@ ellipseSimilarity<- function(ps, type = "jaccard"){
 
   for (k in 1:length(scplots)){
     #go through each plot, if class(scplots) contains "ggmatrix_blank", exclude it from the process
-    if ("ggmatrix_blank" %in% class(scplots[[k]])) {
+    if (!("ggmatrix_blank" %in% class(scplots[[k]]))) {
       # Ignore it or do nothing
       #ratio <- NULL
-    } else {
-
-      x <- scplots[[k]][["labels"]][["x"]]
-      y <- scplots[[k]][["labels"]][["y"]]
+    # } else {
+      x <- ggplot_build(scplots[[k]])[["plot"]][["labels"]][["x"]]
+      y <- ggplot_build(scplots[[k]])[["plot"]][["labels"]][["y"]]
       df <- ggplot_build(scplots[[k]])$data[[4]]
       df$colour <- as.factor(df$colour)
 
@@ -99,7 +98,7 @@ ellipseSimilarity<- function(ps, type = "jaccard"){
       #make ellipses into polygon objects (z), do so for each ellipse of different colors
       z<- list()
       for(i in 1:length(unique_factors)){
-        temp <- df[which(df$colour == unique_factors[[i]]), c(2,3)]
+        temp <- df[which(df$colour == unique_factors[[i]]), c("x","y")]
 
         # Add the first point to the end to close the polygon
         if (!identical(temp[1, ], temp[nrow(temp), ])) {

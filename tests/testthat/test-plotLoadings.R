@@ -1,9 +1,9 @@
 #plotLoadings
-test_that("plotLoadingGrid is a gg object",{
+test_that("plotLoadingGrid is a ggmatrix object",{
   data("iris")
   a <- PCA(data = iris[,1:4])
   p <- plotLoadings(model = a, optns = list())
-  expect_s3_class(object= p[["plots"]][["plotLoadingGrid"]], class = "gg")
+  expect_s3_class(object= p[["plots"]][["plotLoadingGrid"]], class = "ggmatrix")
 })
 
 

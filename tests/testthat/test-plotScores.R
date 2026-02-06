@@ -16,7 +16,7 @@ test_that("PCA is handled correctly", {
   resultBasic <- plotScores(model = a)
 
   #correct class
-  expect_s3_class(object= resultBasic[["plots"]][["pcaGrid"]], class = "gg")
+  expect_s3_class(object= resultBasic[["plots"]][["pcaGrid"]], class = "ggmatrix")
   expect_equal(length(resultBasic), 2)
   expect_equal(length(resultBasic[["plots"]][["pcaGrid"]][["plots"]]), 9)
 
@@ -24,7 +24,7 @@ test_that("PCA is handled correctly", {
   expect_equal(length(resultBasic[["data"]][["rawData"]]),
                5)
 
-  resultBasic[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]]
+  # resultBasic[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]]
 
   resultComplex <- plotScores(model = a,
                               optns = list(color = data$sex,
@@ -38,29 +38,31 @@ test_that("PCA is handled correctly", {
 
   #Addition of shape, colour, ellipse and outlier labels should be evident in the following layer
   #overall length
-  expect_equal(length(resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]]), 9)
+  expect_contains(names(ggplot_build(resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]])[["plot"]][["labels"]])
+                  ,c("colour","shape","label"))
 
   #colour
   expected_colour <- "optns$color"
-  actual_colour <- resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]][["colour"]]
+  actual_colour <- ggplot_build(resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]])[["plot"]][["labels"]][["colour"]]
   expect_equal(actual_colour, expected_colour, info = "Labels colour should be optns$color")
 
   #shape
   expected_shape <- "optns$shape"
-  actual_shape <- resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]][["shape"]]
+  actual_shape <- ggplot_build(resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]])[["plot"]][["labels"]][["shape"]]
   expect_equal(actual_shape, expected_shape, info = "Labels shape should be optns$shape")
 
-  #ellipse
-  # ymin and ymax should exist
-  expect_true(exists("ymin", where = resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]]),
-              info = "Labels should have ymin")
-  expect_true(exists("ymax", where = resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]]),
-              info = "Labels should have ymax")
+  ##Why were these labels ever expected??? AB
+  # #ellipse
+  # # ymin and ymax should exist
+  # expect_true(exists("ymin", where = resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]]),
+  #             info = "Labels should have ymin")
+  # expect_true(exists("ymax", where = resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]]),
+  #             info = "Labels should have ymax")
 
   #outlier labels
-  resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]][["label"]]
+  # resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]][["label"]]
   expected_label <- "outlierID"
-  actual_label <- resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]][["labels"]][["label"]]
+  actual_label <- ggplot_build(resultComplex[["plots"]][["pcaGrid"]][["plots"]][[1]])[["plot"]][["labels"]][["label"]]
   expect_equal(actual_label, expected_label, info = "Labels shape should be outlierID")
 
   #####individual

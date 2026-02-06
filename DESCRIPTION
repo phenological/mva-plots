@@ -16,7 +16,7 @@ Imports:
     crayon,
     egg,
     GGally,
-    ggplot2,
+    ggplot2 (>= 4.0.0),
     ggpubr,
     ggrepel,
     methods,

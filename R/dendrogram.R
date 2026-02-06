@@ -45,7 +45,7 @@ dendrogram <- function(ps, p = 2, breaks = 1){
     colorAssignment <- unique(colorAssignment)
   }
 
-  if(is(ps)[1] == "gg"){
+  if("gg" %in% class(ps)){
     df <- ps[["data"]]
     scorePlot <- ps
     colorAssignment <- cbind(ggplot_build(scorePlot)$data[[1]]$colour,
