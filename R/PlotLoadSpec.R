@@ -3,16 +3,16 @@
 #' Allow to plot loadings of PCA, PLS, OPLS,PLS-DA and OPLS-DA
 #'
 #' @param model are the output from : PCA(), prcomp(), oplsda() or ropls::opls()
-#' @param PC is the number of components that you want to plot the loadings of
+#' @param PC numeric, the component that you want to plot the loadings of
 #' Default is 1 and only require to change when plotting PCA or PLS model
-#' @param  roi is the region of interest (default is from 0.5 to 9.5 ppm)
-#' @param type is the loading visualization types
+#' @param  roi numeric, the region of interest (default is from 0.5 to 9.5 ppm)
+#' @param type character specifying the loading visualization type
 #'         "Statistical reconstruction" calculate the covariance for the trace
 #'         (y) and Pearson's correlation of the predictive (O)PLS scores with
 #'         each ppm for the color.//
 #'         "Backscaling" calculate the trace with predicted loadings multiplied
-#'         by the standard deviation of X feature, color is weighted by the
-#'         OPLS model.//
+#'         by the standard deviation of X feature, color is the minmax-normalised
+#'         absolute value of the loading.//
 #'         for PCA it is always "Statistical reconstruction".
 #'         but for PLS and OPLS "Backscaling" method is recommended.
 #' @param X spectral data matrix used for the model.
@@ -26,7 +26,7 @@
 #'        When Median = True
 #'        Median spectra of each groups will be added on the top of loading plot showing the same direction as score plot
 #'
-#' @param optns An empty list for additional options.
+#' @param optns list, additional options (not implemented yet)
 #' @return plot of the loadings
 #' @examples
 #' \dontrun{
@@ -48,7 +48,9 @@
 #' @export
 
 
-PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X = NULL, Median = FALSE, optns = list()){
+PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5)
+                       , type = "Backscaled", X = NULL, ppm = NULL
+                       ,Median = FALSE, optns = list()){
 
   continuousPalette<- c(
     "#0000CC",
@@ -91,17 +93,19 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
     if(ncol(model$x)< PC){
       stop("PC selected is larger than the dimension of the model")
     }
-    x <- x[idx]
+    # x <- x[idx]
     method = "PCA"
     if(is.null(X)){
       stop("please define X which is a spectra data matrix used for the PCA model using prcomp")
     }
-    cc <- abs(cor(X[,idx],model$x[,PC]))
-    cv <- cov(X[,idx],model$x[,PC])
+    # cc <- abs(cor(X[,idx],model$x[,PC]))
+    # cv <- cov(X[,idx],model$x[,PC])
+    cc <- abs(cor(X,model$x[,PC]))
+    cv <- cov(X,model$x[,PC])
     raCol <- c(0, max(cc))
-    df <- data.frame(x = x,y = cv,col = cc)
+    df <- data.frame(x = x[idx],y = cv[idx],col = cc[idx])
   }
-  if(is(model)[1] == "list" & length(model) == 2){  # need to change this, for now, PCA() using library(prcomp) return list of 2
+  if(is(model)[1] == "list" & length(model) == 2){
     if (is.null(ppm)){
       if (is.null(row.names(model$data$loadings))){
         warning("Chemical shift values were not provided, neither explicitely (ppm) nor as stored variable names. Row indices will be used instead")
@@ -122,12 +126,14 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
     if(ncol(model$data$scores)< PC){
       stop("PC selected is larger than the dimension of the model")
     }
-    x <- x[idx]
+    # x <- x[idx]
     method = "PCA"
-    cc <- abs(cor(model$data$rawData[,idx],model$data$scores[,PC]))
-    cv <- cov(model$data$rawData[,idx],model$data$scores[,PC])
+    # cc <- abs(cor(model$data$rawData[,idx],model$data$scores[,PC]))
+    # cv <- cov(model$data$rawData[,idx],model$data$scores[,PC])
+    cc <- abs(cor(model$data$rawData,model$data$scores[,PC]))
+    cv <- cov(model$data$rawData,model$data$scores[,PC])
     raCol <- c(0, max(cc))
-    df <- data.frame(x = x, y = cv, col = cc)
+    df <- data.frame(x = x[idx], y = cv[idx], col = cc[idx])
   }
   if(is(model)[1] == "opls"){
     method <- model@typeC
@@ -154,22 +160,23 @@ PlotLoadSpec<-function(model, PC = 1, roi = c(0.5,9.5), type = "Backscaled", X =
     if(type == "Backscaled"){
       ldng <- model@loadingMN[,PC]
       m <- abs(ldng)
-      #The color min-max needs to be computed before filtering, else the scale
-      #re-adjust to the roi
-      col <- (m - min(m))/(max(m) - min(m))
-      cen <- model@xSdVn[idx]
-      y <- ldng[idx]*cen
-      x <- x[idx]
-      m <- m[idx]
-      col <- col[idx]
+      # cen <- model@xSdVn[idx]
+      # y <- ldng[idx]*cen
+      # x <- x[idx]
+      # m <- m[idx]
+      # col <- col[idx]
       # names(y)[1] <- "y"
-      df <- data.frame(x = x, y = y, col = col)
-      raCol = NULL
+      cen <- model@xSdVn
+      y <- ldng * cen
+      col <- (m - min(m))/(max(m) - min(m))
+      df <- data.frame(x = x[idx], y = y[idx], col = col[idx])
+      raCol = 0:1
     }
     if(type == "Statistical reconstruction"){
       if(is.null(X)){
-        stop("please defined X which is a spectra data matrix used for the PCA model using prcomp")
+        stop("please define X which is a spectra data matrix used for the PCA model using prcomp")
       }
+      #??????? I never use stat. recons. with (O)PLS but this looks wrong (AB)
       if(grepl("O",method)){ # for opls use scores
         df <- data.frame(model@orthoScoreMN, check.names = F)
       }else{ # for pls use orthogonal

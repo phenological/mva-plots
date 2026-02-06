@@ -23,7 +23,7 @@
 # Y<-factor(c(rep("A",28),rep("B",28)))
 # specOverlay(X,ppm,roi = c(3.0,4.5),alp = 0.3,optns = list(Y, factor(an$sampleType)))
 
-specOverlay <- function(X, ppm = NULL, roi = c(-0.01, 0.01), alp = 0.7, size = 0.5, title = "", optns=list(),...) {
+specOverlay <- function(X, ppm = NULL, roi = c(-0.01, 0.01), alpha = 0.7, size = 0.5, title = "", optns=list()) {
   
   if (is.null(ppm)) {
     ppm <- as.numeric(colnames(X))

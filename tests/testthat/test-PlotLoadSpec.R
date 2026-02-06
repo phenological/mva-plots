@@ -71,6 +71,9 @@ test_that("OPLS-DA loadings using mva.plots oplsda no median trace",{
 
   # check the loading plot data dimension
   expect_true(object = ncol(model_loadings_plot$data) == 3, "Without Median trace, the data should have three columns")
+  
+  #check it can use external ppm argument
+  expect_no_error(PlotLoadSpec(model,ppm=seq(0,10,length.out=ncol(X)),roi=c(0,10)))
 
 })
 

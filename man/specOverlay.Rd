@@ -8,11 +8,10 @@ specOverlay(
   X,
   ppm = NULL,
   roi = c(-0.01, 0.01),
-  alp = 0.7,
+  alpha = 0.7,
   size = 0.5,
   title = "",
-  optns = list(),
-  ...
+  optns = list()
 )
 }
 \arguments{
@@ -22,13 +21,13 @@ specOverlay(
 
 \item{roi}{region of interest if not defined default is set as c(-0.01 , 0.01)}
 
+\item{alpha}{A numeric of the alpha desired. Default size is 0.7.}
+
 \item{size}{A numeric of the size desired. Default size is 0.5.}
 
 \item{title}{A character for the title of the plot.}
 
 \item{optns}{An empty list the first list represent facet (require), the second list as color (optional) and the third as linshape (optional).}
-
-\item{alpha}{A numeric of the alpha desired. Default size is 0.7.}
 }
 \value{
 matspec non-interactive version separated by assigned column factor (i.e., Groups) and within the each plot that can have different color or linetype to differentiate further by sub-categories (i.e., timepoints, class)

@@ -10,6 +10,7 @@ PlotLoadSpec(
   roi = c(0.5, 9.5),
   type = "Backscaled",
   X = NULL,
+  ppm = NULL,
   Median = FALSE,
   optns = list()
 )
@@ -17,18 +18,18 @@ PlotLoadSpec(
 \arguments{
 \item{model}{are the output from : PCA(), prcomp(), oplsda() or ropls::opls()}
 
-\item{PC}{is the number of components that you want to plot the loadings of
+\item{PC}{numeric, the component that you want to plot the loadings of
 Default is 1 and only require to change when plotting PCA or PLS model}
 
-\item{roi}{is the region of interest (default is from 0.5 to 9.5 ppm)}
+\item{roi}{numeric, the region of interest (default is from 0.5 to 9.5 ppm)}
 
-\item{type}{is the loading visualization types
+\item{type}{character specifying the loading visualization type
 "Statistical reconstruction" calculate the covariance for the trace
 (y) and Pearson's correlation of the predictive (O)PLS scores with
 each ppm for the color.//
 "Backscaling" calculate the trace with predicted loadings multiplied
-by the standard deviation of X feature, color is weighted by the
-OPLS model.//
+by the standard deviation of X feature, color is the minmax-normalised
+absolute value of the loading.//
 for PCA it is always "Statistical reconstruction".
 but for PLS and OPLS "Backscaling" method is recommended.}
 
@@ -36,16 +37,16 @@ but for PLS and OPLS "Backscaling" method is recommended.}
 This is needed for PCA with prcomp package, or
 (O)PLS with type = "Statistical reconstruction".}
 
+\item{ppm}{chemical shift scale. If NULL (default), it is read from the row names
+of the loading matrix. If the rows are unnamed, row indices are
+used instead with a warning.}
+
 \item{Median}{only works for OPLS-DA model using mva.plot().
 Default is FALSE.
 When Median = True
 Median spectra of each groups will be added on the top of loading plot showing the same direction as score plot}
 
-\item{optns}{An empty list for additional options.}
-
-\item{ppm}{chemical shift scale. If NULL (default), it is read from the row names
-of the loading matrix. If the rows are unnamed, row indices are
-used instead with a warning.}
+\item{optns}{list, additional options (not implemented yet)}
 }
 \value{
 plot of the loadings
